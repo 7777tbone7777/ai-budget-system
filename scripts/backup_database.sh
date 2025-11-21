@@ -5,7 +5,10 @@
 set -e
 
 # Configuration
-DATABASE_URL="${DATABASE_URL:-postgresql://postgres:fokBnhssuYOYzrtLlUuGkuvHOCrhAejf@caboose.proxy.rlwy.net:14463/railway}"
+if [ -z "$DATABASE_URL" ]; then
+    echo "ERROR: DATABASE_URL environment variable is required"
+    exit 1
+fi
 OUTPUT_DIR="${1:-./backups}"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_FILE="${OUTPUT_DIR}/ai_budget_backup_${TIMESTAMP}.sql"

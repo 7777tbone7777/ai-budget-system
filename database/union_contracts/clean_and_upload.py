@@ -11,8 +11,9 @@ from pathlib import Path
 from datetime import datetime
 import uuid
 
-DATABASE_URL = os.environ.get('DATABASE_URL',
-    "postgresql://postgres:fokBnhssuYOYzrtLlUuGkuvHOCrhAejf@caboose.proxy.rlwy.net:14463/railway")
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable is required")
 
 BASE_DIR = Path(__file__).parent
 RATES_FILE = BASE_DIR / "extracted_rates" / "all_rates_v2.json"

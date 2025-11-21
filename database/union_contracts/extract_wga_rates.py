@@ -12,8 +12,9 @@ import os
 from pathlib import Path
 from datetime import datetime
 
-DATABASE_URL = os.environ.get('DATABASE_URL',
-    "postgresql://postgres:fokBnhssuYOYzrtLlUuGkuvHOCrhAejf@caboose.proxy.rlwy.net:14463/railway")
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable is required")
 
 BASE_DIR = Path(__file__).parent
 WGA_TEXT_FILE = BASE_DIR / "extracted_text" / "WGA" / "WGA_2023_Schedule_of_Minimums_Full.txt"

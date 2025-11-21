@@ -18,7 +18,9 @@ except ImportError:
     import psycopg2
     from psycopg2.extras import Json
 
-DATABASE_URL = "postgresql://postgres:fokBnhssuYOYzrtLlUuGkuvHOCrhAejf@caboose.proxy.rlwy.net:14463/railway"
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable is required")
 
 def apply_migration(conn):
     """Apply migration 006 to create template tables."""

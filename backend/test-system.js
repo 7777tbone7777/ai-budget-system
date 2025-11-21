@@ -8,8 +8,12 @@ const { parseNaturalLanguage, findBestTemplate, generateBudget } = require('./ai
 const { validateBudget } = require('./budget-validator');
 
 // Database connection
+if (!process.env.DATABASE_URL) {
+  console.error('ERROR: DATABASE_URL environment variable is required');
+  process.exit(1);
+}
 const db = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:fokBnhssuYOYzrtLlUuGkuvHOCrhAejf@caboose.proxy.rlwy.net:14463/railway'
+  connectionString: process.env.DATABASE_URL
 });
 
 // ANSI colors for terminal output

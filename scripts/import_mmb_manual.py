@@ -11,10 +11,9 @@ from pypdf import PdfReader
 
 # Configuration
 CHUNKS_DIR = "/Users/anthonyvazquez/Documents/budgets/MMB Manual/chunks"
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://postgres:fokBnhssuYOYzrtLlUuGkuvHOCrhAejf@caboose.proxy.rlwy.net:14463/railway?sslmode=require"
-)
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable is required")
 
 # Topic keywords for categorizing content
 TOPIC_KEYWORDS = {
