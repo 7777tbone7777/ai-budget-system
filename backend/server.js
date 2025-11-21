@@ -1213,7 +1213,7 @@ app.post('/api/productions', async (req, res) => {
 app.get('/api/productions', async (req, res) => {
   try {
     const result = await db.query(
-      'SELECT * FROM production_budget_summary ORDER BY production_name'
+      'SELECT * FROM productions ORDER BY created_at DESC'
     );
 
     res.json({
@@ -1253,6 +1253,43 @@ app.get('/api/productions/:id', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching production:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Delete production by ID
+app.delete('/api/productions/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if production exists
+    const checkResult = await db.query(
+      'SELECT id FROM productions WHERE id = $1',
+      [id]
+    );
+
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Production not found',
+      });
+    }
+
+    // Delete related line items first (CASCADE should handle this, but being explicit)
+    await db.query('DELETE FROM budget_line_items WHERE production_id = $1', [id]);
+
+    // Delete the production
+    await db.query('DELETE FROM productions WHERE id = $1', [id]);
+
+    res.json({
+      success: true,
+      message: 'Production deleted successfully',
+    });
+  } catch (error) {
+    console.error('Error deleting production:', error);
     res.status(500).json({
       success: false,
       error: error.message,
@@ -1614,7 +1651,13 @@ app.post('/api/productions/:production_id/line-items', async (req, res) => {
       job_classification,
       location,
       production_type,
-      notes
+      notes,
+      // Multi-period support
+      use_periods,
+      periods,
+      // Box rental support
+      use_box_rental,
+      box_rental
     } = req.body;
 
     // Get production details
@@ -1658,8 +1701,40 @@ app.post('/api/productions/:production_id/line-items', async (req, res) => {
       }
     }
 
-    // Calculate subtotal
-    const subtotal = (finalRate || 0) * (quantity || 0);
+    // Calculate subtotal (different logic for period-based vs simple)
+    let subtotal = 0;
+
+    if (use_periods && periods) {
+      // Multi-period calculation: sum all periods
+      // Formula per period: days × hours_per_day × rate
+      for (const periodName of ['prep', 'shoot', 'hiatus', 'wrap', 'holiday']) {
+        const period = periods[periodName] || {};
+        const periodDays = period.days || 0;
+        const periodHours = period.hours_per_day || 0;
+        const periodRate = period.rate || finalRate || 0;
+
+        subtotal += periodDays * periodHours * periodRate;
+      }
+    } else {
+      // Simple calculation: rate × quantity
+      subtotal = (finalRate || 0) * (quantity || 0);
+    }
+
+    // Calculate box rental if applicable
+    let box_rental_amount = 0;
+    if (use_box_rental && box_rental) {
+      const weekly_rate = box_rental.weekly_rate || 0;
+      const weeks = box_rental.weeks || 0;
+      const cap_amount = box_rental.cap_amount || 1000;
+
+      box_rental_amount = weekly_rate * weeks;
+      if (box_rental_amount > cap_amount) {
+        box_rental_amount = cap_amount;
+      }
+    }
+
+    // Add box rental to subtotal
+    subtotal += box_rental_amount;
 
     // Calculate fringes (get applicable fringe benefits)
     let totalFringes = 0;
@@ -1696,8 +1771,12 @@ app.post('/api/productions/:production_id/line-items', async (req, res) => {
         subtotal,
         fringes,
         total,
-        notes
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        notes,
+        use_periods,
+        periods,
+        use_box_rental,
+        box_rental
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
       RETURNING *
     `, [
       production_id,
@@ -1709,7 +1788,11 @@ app.post('/api/productions/:production_id/line-items', async (req, res) => {
       subtotal,
       totalFringes,
       total,
-      notes
+      notes,
+      use_periods || false,
+      periods ? JSON.stringify(periods) : null,
+      use_box_rental || false,
+      box_rental ? JSON.stringify(box_rental) : null
     ]);
 
     res.json({
@@ -1719,7 +1802,9 @@ app.post('/api/productions/:production_id/line-items', async (req, res) => {
         rate_used: finalRate,
         subtotal,
         fringes: totalFringes,
-        total
+        total,
+        box_rental_amount,
+        period_breakdown: use_periods ? periods : null
       }
     });
   } catch (error) {
