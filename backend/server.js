@@ -305,6 +305,167 @@ app.get('/api/rate-cards/compare', async (req, res) => {
 });
 
 // ============================================================================
+// API ROUTES - SAVED BUDGETS
+// ============================================================================
+
+// Get all saved budgets
+app.get('/api/saved-budgets', async (req, res) => {
+  try {
+    const result = await db.query(
+      `SELECT id, name, description, production_weeks, fringe_rate,
+              total_labor, total_fringes, grand_total, created_at, updated_at,
+              jsonb_array_length(crew_data) as crew_count
+       FROM saved_budgets
+       ORDER BY updated_at DESC`
+    );
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows,
+    });
+  } catch (error) {
+    console.error('Error fetching saved budgets:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Get a single saved budget by ID
+app.get('/api/saved-budgets/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query(
+      'SELECT * FROM saved_budgets WHERE id = $1',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Budget not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error fetching budget:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Save a new budget
+app.post('/api/saved-budgets', async (req, res) => {
+  try {
+    const { name, description, production_weeks, fringe_rate, crew_data, total_labor, total_fringes, grand_total } = req.body;
+
+    if (!name || !crew_data) {
+      return res.status(400).json({
+        success: false,
+        error: 'Name and crew_data are required',
+      });
+    }
+
+    const result = await db.query(
+      `INSERT INTO saved_budgets (name, description, production_weeks, fringe_rate, crew_data, total_labor, total_fringes, grand_total)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING *`,
+      [name, description, production_weeks || 12, fringe_rate || 30, JSON.stringify(crew_data), total_labor, total_fringes, grand_total]
+    );
+
+    res.status(201).json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error saving budget:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Update an existing budget
+app.put('/api/saved-budgets/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, production_weeks, fringe_rate, crew_data, total_labor, total_fringes, grand_total } = req.body;
+
+    const result = await db.query(
+      `UPDATE saved_budgets
+       SET name = COALESCE($1, name),
+           description = COALESCE($2, description),
+           production_weeks = COALESCE($3, production_weeks),
+           fringe_rate = COALESCE($4, fringe_rate),
+           crew_data = COALESCE($5, crew_data),
+           total_labor = COALESCE($6, total_labor),
+           total_fringes = COALESCE($7, total_fringes),
+           grand_total = COALESCE($8, grand_total),
+           updated_at = NOW()
+       WHERE id = $9
+       RETURNING *`,
+      [name, description, production_weeks, fringe_rate, crew_data ? JSON.stringify(crew_data) : null, total_labor, total_fringes, grand_total, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Budget not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error updating budget:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Delete a saved budget
+app.delete('/api/saved-budgets/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query(
+      'DELETE FROM saved_budgets WHERE id = $1 RETURNING id',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Budget not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Budget deleted successfully',
+    });
+  } catch (error) {
+    console.error('Error deleting budget:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// ============================================================================
 // API ROUTES - SIDELETTER RULES
 // ============================================================================
 
