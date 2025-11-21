@@ -570,6 +570,69 @@ app.get('/api/crew-positions', async (req, res) => {
 // API ROUTES - FRINGE BENEFITS
 // ============================================================================
 
+// Get suggested fringe rate for a union
+app.get('/api/fringes/suggest', async (req, res) => {
+  try {
+    const { union_local, state } = req.query;
+
+    // Get percentage-based fringes for the union
+    const result = await db.query(
+      `SELECT DISTINCT ON (benefit_type) benefit_type, rate_value
+       FROM fringe_benefits
+       WHERE (union_local ILIKE $1 OR union_local IS NULL)
+       AND rate_type = 'percentage'
+       AND effective_date <= CURRENT_DATE
+       ORDER BY benefit_type, union_local NULLS LAST, effective_date DESC`,
+      [`%${union_local || ''}%`]
+    );
+
+    // Sum all percentage-based fringes
+    let suggestedRate = 0;
+    const breakdown = [];
+
+    // Standard fringe components (typical industry rates if no union-specific)
+    const defaultFringes = {
+      'Health & Welfare': 7.5,
+      'Pension': 6.0,
+      'Vacation/Holiday': 4.0,
+      'Employer Taxes': 10.0, // FICA, FUTA, SUI
+    };
+
+    if (result.rows.length > 0) {
+      result.rows.forEach(row => {
+        // Cap individual components at reasonable values
+        const value = Math.min(parseFloat(row.rate_value), 25);
+        suggestedRate += value;
+        breakdown.push({ type: row.benefit_type, rate: value });
+      });
+    } else {
+      // Use defaults if no union-specific data
+      Object.entries(defaultFringes).forEach(([type, rate]) => {
+        suggestedRate += rate;
+        breakdown.push({ type, rate });
+      });
+    }
+
+    // Cap total at reasonable range (20-45%)
+    suggestedRate = Math.max(20, Math.min(45, suggestedRate));
+
+    res.json({
+      success: true,
+      union_local: union_local || 'Default',
+      suggested_rate: Math.round(suggestedRate * 100) / 100,
+      breakdown,
+      note: result.rows.length === 0 ? 'Using industry standard rates' : 'Based on union agreement data'
+    });
+  } catch (error) {
+    console.error('Error suggesting fringes:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      suggested_rate: 30 // Default fallback
+    });
+  }
+});
+
 // Calculate total fringe benefits for a position
 app.post('/api/fringes/calculate', async (req, res) => {
   try {
@@ -618,6 +681,81 @@ app.post('/api/fringes/calculate', async (req, res) => {
     res.status(500).json({
       success: false,
       error: error.message,
+    });
+  }
+});
+
+// ============================================================================
+// API ROUTES - CREW TEMPLATES
+// ============================================================================
+
+// Get all crew templates
+app.get('/api/crew-templates', async (req, res) => {
+  try {
+    const { category, production_type } = req.query;
+
+    let query = `SELECT * FROM crew_templates WHERE 1=1`;
+    const params = [];
+    let paramCount = 1;
+
+    if (category) {
+      query += ` AND category = $${paramCount++}`;
+      params.push(category);
+    }
+
+    if (production_type) {
+      query += ` AND production_type = $${paramCount++}`;
+      params.push(production_type);
+    }
+
+    query += ` ORDER BY category, name`;
+
+    const result = await db.query(query, params);
+
+    // Get unique categories for filtering
+    const categories = await db.query(`SELECT DISTINCT category FROM crew_templates ORDER BY category`);
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      categories: categories.rows.map(r => r.category),
+      data: result.rows
+    });
+  } catch (error) {
+    console.error('Error fetching crew templates:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Get a single crew template by ID
+app.get('/api/crew-templates/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db.query(
+      `SELECT * FROM crew_templates WHERE id = $1`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Template not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error fetching crew template:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
     });
   }
 });

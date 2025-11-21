@@ -39,8 +39,11 @@ export default function RootLayout({
                 <a href="/formula-tester" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
                   Formula Tester
                 </a>
-                <a href="/calculator" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
-                  Calculator
+                <a href="/budget-calculator" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                  Budget Calculator
+                </a>
+                <a href="/rate-comparison" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                  Compare Rates
                 </a>
               </div>
             </div>
