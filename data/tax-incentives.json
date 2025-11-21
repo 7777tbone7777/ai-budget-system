@@ -1,0 +1,686 @@
+{
+  "source": "U.S. State Production Incentive Guide - Entertainment Partners",
+  "extracted_at": "2025-11-20",
+  "states": [
+    {
+      "state": "Alabama",
+      "incentive": {
+        "min_percent": 25,
+        "max_percent": 35,
+        "type": "Refundable",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {
+        "resident_atl": 35,
+        "resident_btl": 35,
+        "non_resident_atl": 25,
+        "non_resident_btl": 25
+      },
+      "qualified_spend": {
+        "percent": 25
+      },
+      "minimums_caps": {
+        "minimum_spend": 500000,
+        "project_cap": 20000000,
+        "annual_cap": 20000000,
+        "compensation_cap": 1000000
+      },
+      "uplifts": {},
+      "requirements": {}
+    },
+    {
+      "state": "Arkansas",
+      "incentive": {
+        "min_percent": 20,
+        "max_percent": 30,
+        "type": "Transferable",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {
+        "resident_atl": 20,
+        "resident_btl": 30,
+        "non_resident_atl": 20,
+        "non_resident_btl": 20
+      },
+      "qualified_spend": {
+        "percent": 20
+      },
+      "minimums_caps": {
+        "minimum_spend": 200000,
+        "annual_cap": 4000000,
+        "compensation_cap": 500000
+      },
+      "uplifts": {
+        "labor": "10% on payroll of BTL employees who are full-time residents of AR or veterans (max of 30%)",
+        "spend": "10% on qualified expenditures paid to a veteran-owned small business"
+      },
+      "requirements": {}
+    },
+    {
+      "state": "California",
+      "incentive": {
+        "min_percent": 20,
+        "max_percent": 30,
+        "type": "Unknown",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {
+        "resident_atl": null,
+        "resident_btl": 20,
+        "non_resident_atl": null,
+        "non_resident_btl": 20
+      },
+      "qualified_spend": {
+        "percent": 20
+      },
+      "minimums_caps": {
+        "minimum_spend": 1000000,
+        "project_cap": 100000000,
+        "annual_cap": 330000000
+      },
+      "uplifts": {
+        "labor": "All productions are eligible to receive an additional 5% or 10%, if spending occurs in any of these three categories:\n\u2022 5% VFX - VFX expenditures in-state must equal $10M or 75% of total VFX costs\n\u2022 5% Out of Zone - wages for residents residing in the LA zone, working outside of the LA zone\n\u2022 10% Local Hire Labor - wages for residents residing outside of the LA zone, working outside of the LA zone",
+        "spend": "All productions are eligible to receive an additional 5% or 10%, if spending occurs in any of these three categories:\n\u2022 5% VFX - VFX expenditures in-state must equal $10M or 75% of total VFX costs\n\u2022 5% Out of Zone - items purchased and/or rented outside of the LA zone and totally consumed outside of the LA zone"
+      },
+      "requirements": {}
+    },
+    {
+      "state": "Colorado",
+      "incentive": {
+        "min_percent": 20,
+        "max_percent": 20,
+        "type": "Unknown",
+        "mechanism": "Rebate"
+      },
+      "labor": {
+        "resident_atl": 20,
+        "resident_btl": 20,
+        "non_resident_atl": 20,
+        "non_resident_btl": 20
+      },
+      "qualified_spend": {
+        "percent": 20
+      },
+      "minimums_caps": {
+        "minimum_spend": 100000
+      },
+      "uplifts": {},
+      "requirements": {}
+    },
+    {
+      "state": "Connecticut",
+      "incentive": {
+        "min_percent": 10,
+        "max_percent": 30,
+        "type": "Transferable",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {},
+      "qualified_spend": {},
+      "minimums_caps": {
+        "minimum_spend": 100000,
+        "compensation_cap": 20000000
+      },
+      "uplifts": {},
+      "requirements": {}
+    },
+    {
+      "state": "Georgia",
+      "incentive": {
+        "min_percent": 20,
+        "max_percent": 30,
+        "type": "Transferable",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {
+        "resident_atl": 20,
+        "resident_btl": 20,
+        "non_resident_atl": 20,
+        "non_resident_btl": 20
+      },
+      "qualified_spend": {
+        "percent": 20
+      },
+      "minimums_caps": {
+        "minimum_spend": 500000,
+        "compensation_cap": 500000
+      },
+      "uplifts": {
+        "labor": "10% for including Georgia promotional logo/end title credit or pre-approved alternative marketing promotion",
+        "spend": "10% for including Georgia promotional logo/end title credit or pre-approved alternative marketing promotion"
+      },
+      "requirements": {}
+    },
+    {
+      "state": "Hawaii",
+      "incentive": {
+        "min_percent": 20,
+        "max_percent": 25,
+        "type": "Refundable",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {
+        "resident_atl": 20,
+        "resident_btl": 20,
+        "non_resident_atl": 20,
+        "non_resident_btl": 20
+      },
+      "qualified_spend": {
+        "percent": 20
+      },
+      "minimums_caps": {
+        "minimum_spend": 200000,
+        "project_cap": 15000000,
+        "annual_cap": 50000000
+      },
+      "uplifts": {
+        "labor": "5% on qualified labor costs incurred while filming outside of Oahu",
+        "spend": "5% on qualified production costs incurred while filming outside of Oahu"
+      },
+      "requirements": {}
+    },
+    {
+      "state": "Illinois",
+      "incentive": {
+        "min_percent": 30,
+        "max_percent": 45,
+        "type": "Transferable",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {
+        "resident_atl": 30,
+        "resident_btl": 30,
+        "non_resident_atl": null,
+        "non_resident_btl": null
+      },
+      "qualified_spend": {
+        "percent": 30
+      },
+      "minimums_caps": {
+        "minimum_spend": 100000,
+        "compensation_cap": 100000
+      },
+      "uplifts": {
+        "labor": "15% on salaries of individuals who live in economically disadvantaged areas whose unemployment rate is at least 150% \nof the State\u2019s annual average."
+      },
+      "requirements": {}
+    },
+    {
+      "state": "Kentucky",
+      "incentive": {},
+      "labor": {},
+      "qualified_spend": {},
+      "minimums_caps": {},
+      "uplifts": {},
+      "requirements": {}
+    },
+    {
+      "state": "Louisiana",
+      "incentive": {
+        "min_percent": 25,
+        "max_percent": 40,
+        "type": "Refundable",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {
+        "resident_atl": 25,
+        "resident_btl": 25,
+        "non_resident_atl": 25,
+        "non_resident_btl": 25
+      },
+      "qualified_spend": {
+        "percent": 25
+      },
+      "minimums_caps": {
+        "minimum_spend": 300000,
+        "project_cap": 20000000,
+        "annual_cap": 150000000,
+        "compensation_cap": 3000000
+      },
+      "uplifts": {
+        "labor": "15% (max 40%) on individuals (loan-outs qualify at the base 25%)",
+        "spend": "Up to 15% (max 40%) for productions that qualify for one or both of the following:\n\u2022 10% on productions that spend between $50K and $5M, based upon a screenplay created by a Louisiana resident\n\u2022 5% on productions that have their production office and at least 60% of principal photography based outside of the"
+      },
+      "requirements": {}
+    },
+    {
+      "state": "Maine",
+      "incentive": {},
+      "labor": {},
+      "qualified_spend": {
+        "percent": 5
+      },
+      "minimums_caps": {
+        "minimum_spend": 75000,
+        "compensation_cap": 50000
+      },
+      "uplifts": {},
+      "requirements": {}
+    },
+    {
+      "state": "Maryland",
+      "incentive": {
+        "min_percent": 25,
+        "max_percent": 27,
+        "type": "Refundable",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {
+        "resident_atl": 25,
+        "resident_btl": 25,
+        "non_resident_atl": 25,
+        "non_resident_btl": 25
+      },
+      "qualified_spend": {
+        "percent": 25
+      },
+      "minimums_caps": {
+        "minimum_spend": 250000,
+        "project_cap": 10000000,
+        "annual_cap": 12000000,
+        "compensation_cap": 500000
+      },
+      "uplifts": {
+        "labor": "2% (max 27%) on total direct costs for a TV series",
+        "spend": "2% (max 27%) on total direct costs for a TV series"
+      },
+      "requirements": {}
+    },
+    {
+      "state": "Massachusetts",
+      "incentive": {},
+      "labor": {
+        "resident_atl": 25,
+        "resident_btl": 25,
+        "non_resident_atl": 25,
+        "non_resident_btl": 25
+      },
+      "qualified_spend": {
+        "percent": 25
+      },
+      "minimums_caps": {
+        "minimum_spend": 50000
+      },
+      "uplifts": {},
+      "requirements": {}
+    },
+    {
+      "state": "Mississippi",
+      "incentive": {
+        "min_percent": 25,
+        "max_percent": 30,
+        "type": "Unknown",
+        "mechanism": "Rebate"
+      },
+      "labor": {
+        "resident_atl": 30,
+        "resident_btl": 30,
+        "non_resident_atl": 25,
+        "non_resident_btl": 25
+      },
+      "qualified_spend": {
+        "percent": 25
+      },
+      "minimums_caps": {
+        "minimum_spend": 50000,
+        "project_cap": 10000000,
+        "annual_cap": 20000000,
+        "compensation_cap": 5000000
+      },
+      "uplifts": {
+        "labor": "5% on payroll paid to any member of the cast and crew who is an honorably discharged veteran of the US",
+        "spend": "0.5% if one of the following are met:\n\u2022 Project is set entirely in Kansas City, MO\n\u2022 Project is filmed entirely in Kansas City, MO\n\u2022 Project features or utilizes services or products from KC arts professionals including but not limited to poets, choreog-\nraphers, composers, visual artists or dancers\n0.5% for one or more testimonial videos on subjects having to do with Kansas city"
+      },
+      "requirements": {}
+    },
+    {
+      "state": "Montana",
+      "incentive": {
+        "min_percent": 20,
+        "max_percent": 35,
+        "type": "Transferable",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {
+        "resident_atl": 20,
+        "resident_btl": 25,
+        "non_resident_atl": 20,
+        "non_resident_btl": 15
+      },
+      "qualified_spend": {
+        "percent": 20
+      },
+      "minimums_caps": {
+        "minimum_spend": 350000,
+        "annual_cap": 12000000
+      },
+      "uplifts": {
+        "spend": "\u2022 10% on payments made to a Montana college or university for stage rentals, equipment rentals, or location fees for \nfilming on campus\n\u2022 10% on all in-studio facility and equipment rental expenditures incurred in Montana for a production that rents a studio \nfor 20 days or more\n\u2022 5% for production expenditures made in an underserved area\n\u2022 5% for using \u201cFilm Montana\u201d screen credit"
+      },
+      "requirements": {}
+    },
+    {
+      "state": "Nevada",
+      "incentive": {},
+      "labor": {},
+      "qualified_spend": {},
+      "minimums_caps": {},
+      "uplifts": {},
+      "requirements": {}
+    },
+    {
+      "state": "New Jersey",
+      "incentive": {
+        "min_percent": 30,
+        "max_percent": 37,
+        "type": "Transferable",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {
+        "resident_atl": 35,
+        "resident_btl": 35,
+        "non_resident_atl": 35,
+        "non_resident_btl": null
+      },
+      "qualified_spend": {},
+      "minimums_caps": {
+        "minimum_spend": 1000000,
+        "annual_cap": 100000000,
+        "compensation_cap": 500000
+      },
+      "uplifts": {
+        "labor": "2% on qualified labor provided that the application is accompanied by a diversity plan; the plan is approved; and the",
+        "spend": "2% on qualified production expenses provided that the application is accompanied by a diversity plan; the plan is \napproved; and the New Jersey Economic Development Authority has verified that the applicant has met or made good \nfaith efforts in achieving the goals stated within the diversity plan"
+      },
+      "requirements": {}
+    },
+    {
+      "state": "New Mexico",
+      "incentive": {
+        "min_percent": 25,
+        "max_percent": 35,
+        "type": "Refundable",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {
+        "resident_atl": 25,
+        "resident_btl": 25,
+        "non_resident_atl": null,
+        "non_resident_btl": 15
+      },
+      "qualified_spend": {
+        "percent": 25
+      },
+      "minimums_caps": {
+        "minimum_spend": 1000000,
+        "annual_cap": 100000000,
+        "compensation_cap": 5000000
+      },
+      "uplifts": {
+        "labor": "10% on qualified labor expenses incurred in certain counties, for productions with a budget over $500K.",
+        "spend": "\u2022 5% on standalone pilots intended for series TV in New Mexico\n\u2022 5% on series TV productions intended for commercial distribution with an order for at least six episodes in a \n  single season\n\u2022 5% if certain criteria are met regarding the use of qualified production facilities\n\u2022 5% on work, services, or items provided on location in NM that is at least 60 miles outside the exterior boundaries \n  of Bernalillo and Santa Fe counties"
+      },
+      "requirements": {}
+    },
+    {
+      "state": "North Carolina",
+      "incentive": {},
+      "labor": {},
+      "qualified_spend": {
+        "percent": 25
+      },
+      "minimums_caps": {
+        "project_cap": 7000000,
+        "annual_cap": 31000000,
+        "compensation_cap": 1000000
+      },
+      "uplifts": {},
+      "requirements": {}
+    },
+    {
+      "state": "Ohio",
+      "incentive": {
+        "min_percent": 30,
+        "max_percent": 30,
+        "type": "Refundable",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {
+        "resident_atl": 30,
+        "resident_btl": 30,
+        "non_resident_atl": 30,
+        "non_resident_btl": 30
+      },
+      "qualified_spend": {
+        "percent": 30
+      },
+      "minimums_caps": {
+        "minimum_spend": 300000,
+        "annual_cap": 40000000
+      },
+      "uplifts": {},
+      "requirements": {}
+    },
+    {
+      "state": "Oklahoma",
+      "incentive": {
+        "min_percent": 20,
+        "max_percent": 38,
+        "type": "Unknown",
+        "mechanism": "Rebate"
+      },
+      "labor": {
+        "resident_atl": 20,
+        "resident_btl": 20,
+        "non_resident_atl": null,
+        "non_resident_btl": null
+      },
+      "qualified_spend": {
+        "percent": 20
+      },
+      "minimums_caps": {
+        "minimum_spend": 50000,
+        "annual_cap": 30000000
+      },
+      "uplifts": {
+        "spend": "\u2022 Up to 3% for at least 25% of main crew principal photography on location in a county of less than 250K\n\u2022 Up to 2% for at least 25% of main crew principal photography on location in a municipality of less than 13K\n\u2022 Up to 5% for at least 25% of main crew principal photography on a qualified soundstage and at least 1% of direct ex  \npenditures spent at the soundstage\n\u2022 Up to 2% for a TV series pilot\n\u2022 Up to 5% for a TV series that is filmed for one or more seasons\n\u2022 Up to 5% for a multi-film deal (at least three films in three years)\n\u2022 Up to 3% for post-production expenses that are at least 3% of Qualified Production Expenditures (includes music)"
+      },
+      "requirements": {}
+    },
+    {
+      "state": "Cherokee Nation",
+      "incentive": {
+        "min_percent": 10,
+        "max_percent": 25,
+        "type": "Unknown",
+        "mechanism": "Rebate"
+      },
+      "labor": {},
+      "qualified_spend": {
+        "percent": 20
+      },
+      "minimums_caps": {
+        "minimum_spend": 50000,
+        "annual_cap": 1000000
+      },
+      "uplifts": {
+        "spend": "5% on qualified spend paid to Native American owned businesses within the CN and the vendor is able to prove at \nleast 51% Native ownership."
+      },
+      "requirements": {}
+    },
+    {
+      "state": "Oregon",
+      "incentive": {},
+      "labor": {},
+      "qualified_spend": {},
+      "minimums_caps": {},
+      "uplifts": {},
+      "requirements": {}
+    },
+    {
+      "state": "Pennsylvania",
+      "incentive": {
+        "min_percent": 25,
+        "max_percent": 30,
+        "type": "Transferable",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {
+        "resident_atl": 25,
+        "resident_btl": 25,
+        "non_resident_atl": 25,
+        "non_resident_btl": 25
+      },
+      "qualified_spend": {
+        "percent": 25
+      },
+      "minimums_caps": {
+        "annual_cap": 70000000,
+        "compensation_cap": 15000000
+      },
+      "uplifts": {
+        "spend": "5% for productions that meet the minimum state filming requirements at a Qualified Production Facility."
+      },
+      "requirements": {}
+    },
+    {
+      "state": "Puerto Rico",
+      "incentive": {
+        "min_percent": 20,
+        "max_percent": 40,
+        "type": "Transferable",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {
+        "resident_atl": 40,
+        "resident_btl": 40,
+        "non_resident_atl": 20,
+        "non_resident_btl": 20
+      },
+      "qualified_spend": {
+        "percent": 40
+      },
+      "minimums_caps": {
+        "minimum_spend": 100000,
+        "annual_cap": 38000000
+      },
+      "uplifts": {},
+      "requirements": {}
+    },
+    {
+      "state": "Rhode Island",
+      "incentive": {},
+      "labor": {},
+      "qualified_spend": {},
+      "minimums_caps": {},
+      "uplifts": {},
+      "requirements": {}
+    },
+    {
+      "state": "South Carolina",
+      "incentive": {},
+      "labor": {},
+      "qualified_spend": {},
+      "minimums_caps": {},
+      "uplifts": {},
+      "requirements": {}
+    },
+    {
+      "state": "Tennessee",
+      "incentive": {},
+      "labor": {
+        "resident_atl": 25,
+        "resident_btl": 25,
+        "non_resident_atl": 25,
+        "non_resident_btl": 25
+      },
+      "qualified_spend": {
+        "percent": 25
+      },
+      "minimums_caps": {
+        "minimum_spend": 200000,
+        "compensation_cap": 250000
+      },
+      "uplifts": {
+        "labor": "5% on resident labor for script TV projects that include a Filmed in TN logo."
+      },
+      "requirements": {}
+    },
+    {
+      "state": "Texas",
+      "incentive": {},
+      "labor": {},
+      "qualified_spend": {},
+      "minimums_caps": {
+        "minimum_spend": 250000,
+        "compensation_cap": 1000000
+      },
+      "uplifts": {
+        "spend": "2.5% if 25% of production occurs in underutilized or economically distressed areas."
+      },
+      "requirements": {}
+    },
+    {
+      "state": "Utah",
+      "incentive": {},
+      "labor": {},
+      "qualified_spend": {},
+      "minimums_caps": {},
+      "uplifts": {},
+      "requirements": {}
+    },
+    {
+      "state": "Virginia",
+      "incentive": {
+        "min_percent": 15,
+        "max_percent": 40,
+        "type": "Refundable",
+        "mechanism": "Tax Credit"
+      },
+      "labor": {
+        "resident_atl": 15,
+        "resident_btl": 15,
+        "non_resident_atl": 15,
+        "non_resident_btl": 15
+      },
+      "qualified_spend": {
+        "percent": 15
+      },
+      "minimums_caps": {
+        "minimum_spend": 250000,
+        "compensation_cap": 1000000
+      },
+      "uplifts": {
+        "labor": "\u2022 10% of total aggregate payroll for VA residents when a production spends at least $250K in VA.\n\u2022 20% of total aggregate payroll for VA residents when a production spends at least $1M in VA.\n\u2022 10% of total aggregate payroll for VA residents employed for the first time as actors or members of the \n   production crew.",
+        "spend": "5% on qualified expenditures if the production takes place in an economically distressed area (as designated by the"
+      },
+      "requirements": {}
+    },
+    {
+      "state": "Washington",
+      "incentive": {
+        "min_percent": 15,
+        "max_percent": 35,
+        "type": "Unknown",
+        "mechanism": "Rebate"
+      },
+      "labor": {
+        "resident_atl": 30,
+        "resident_btl": 30,
+        "non_resident_atl": null,
+        "non_resident_btl": 15
+      },
+      "qualified_spend": {
+        "percent": 30
+      },
+      "minimums_caps": {
+        "minimum_spend": 500000,
+        "compensation_cap": 50000
+      },
+      "uplifts": {
+        "spend": "5% of qualified in-state expenditures for an episodic series with at least 6 episodes"
+      },
+      "requirements": {}
+    }
+  ]
+}

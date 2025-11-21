@@ -2202,6 +2202,324 @@ app.post('/api/location-comparison/compare', async (req, res) => {
   }
 });
 
+// ============================================================================
+// API ROUTES - BUDGET TEMPLATES
+// ============================================================================
+
+// Get all templates (with optional filtering)
+app.get('/api/templates', async (req, res) => {
+  try {
+    const { location, production_type, budget_min, budget_max } = req.query;
+
+    let query = `
+      SELECT
+        id,
+        name,
+        location,
+        production_type,
+        total_budget,
+        department_count,
+        line_item_count,
+        completeness_score,
+        shoot_days
+      FROM budget_templates
+      WHERE is_active = true
+    `;
+
+    const params = [];
+    let paramIndex = 1;
+
+    if (location) {
+      query += ` AND location ILIKE $${paramIndex}`;
+      params.push(`%${location}%`);
+      paramIndex++;
+    }
+
+    if (production_type) {
+      query += ` AND production_type = $${paramIndex}`;
+      params.push(production_type);
+      paramIndex++;
+    }
+
+    if (budget_min) {
+      query += ` AND total_budget >= $${paramIndex}`;
+      params.push(parseFloat(budget_min));
+      paramIndex++;
+    }
+
+    if (budget_max) {
+      query += ` AND total_budget <= $${paramIndex}`;
+      params.push(parseFloat(budget_max));
+      paramIndex++;
+    }
+
+    query += ` ORDER BY completeness_score DESC, line_item_count DESC`;
+
+    const result = await pool.query(query, params);
+
+    res.json({
+      success: true,
+      templates: result.rows,
+      count: result.rows.length
+    });
+  } catch (error) {
+    console.error('Error fetching templates:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Get template by ID with full details
+app.get('/api/templates/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Get template metadata
+    const templateResult = await pool.query(`
+      SELECT * FROM budget_templates WHERE id = $1 AND is_active = true
+    `, [id]);
+
+    if (templateResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Template not found'
+      });
+    }
+
+    const template = templateResult.rows[0];
+
+    // Get departments with line items
+    const deptResult = await pool.query(`
+      SELECT
+        d.id,
+        d.name,
+        d.account,
+        d.total,
+        d.sort_order
+      FROM template_departments d
+      WHERE d.template_id = $1
+      ORDER BY d.sort_order
+    `, [id]);
+
+    // Get line items for each department
+    for (const dept of deptResult.rows) {
+      const itemsResult = await pool.query(`
+        SELECT
+          account,
+          description,
+          position,
+          quantity,
+          unit,
+          rate,
+          subtotal,
+          total,
+          detail_lines,
+          periods
+        FROM template_line_items
+        WHERE department_id = $1
+        ORDER BY sort_order
+      `, [dept.id]);
+
+      dept.line_items = itemsResult.rows;
+    }
+
+    template.departments = deptResult.rows;
+
+    res.json({
+      success: true,
+      template: template
+    });
+  } catch (error) {
+    console.error('Error fetching template:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Apply template to production (creates budget groups and line items)
+app.post('/api/productions/:production_id/apply-template', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const { template_id, scale_to_budget } = req.body;
+
+    // Get template with full details
+    const templateResult = await pool.query(`
+      SELECT template_data FROM budget_templates WHERE id = $1 AND is_active = true
+    `, [template_id]);
+
+    if (templateResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Template not found'
+      });
+    }
+
+    const templateData = templateResult.rows[0].template_data;
+    const departments = templateData.departments || [];
+
+    // Calculate scaling factor if requested
+    let scaleFactor = 1.0;
+    if (scale_to_budget && templateData.metadata && templateData.metadata.total_budget) {
+      scaleFactor = scale_to_budget / templateData.metadata.total_budget;
+    }
+
+    let groupsCreated = 0;
+    let itemsCreated = 0;
+
+    // Create groups and line items from template
+    for (const dept of departments) {
+      // Create budget group
+      const groupResult = await pool.query(`
+        INSERT INTO budget_groups (production_id, name, account_number, sort_order)
+        VALUES ($1, $2, $3, $4)
+        RETURNING id
+      `, [production_id, dept.name, dept.account, groupsCreated]);
+
+      const groupId = groupResult.rows[0].id;
+      groupsCreated++;
+
+      // Create line items
+      for (const item of dept.line_items || []) {
+        const scaledRate = item.rate ? item.rate * scaleFactor : 0;
+        const scaledSubtotal = item.subtotal ? item.subtotal * scaleFactor : 0;
+
+        await pool.query(`
+          INSERT INTO budget_line_items (
+            production_id,
+            group_id,
+            account_number,
+            description,
+            quantity,
+            unit,
+            rate,
+            rate_override,
+            subtotal,
+            fringe_total,
+            total
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        `, [
+          production_id,
+          groupId,
+          item.account,
+          item.description || item.position,
+          item.quantity || 0,
+          item.unit,
+          0, // base rate (will use override)
+          scaledRate, // rate_override
+          scaledSubtotal,
+          0, // fringe_total (will be calculated)
+          scaledSubtotal // total
+        ]);
+
+        itemsCreated++;
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Applied template successfully`,
+      groups_created: groupsCreated,
+      items_created: itemsCreated,
+      scale_factor: scaleFactor.toFixed(4)
+    });
+  } catch (error) {
+    console.error('Error applying template:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Get position rate suggestions by location
+app.get('/api/templates/rates/:position', async (req, res) => {
+  try {
+    const { position } = req.params;
+    const { location } = req.query;
+
+    let query = `
+      SELECT
+        position,
+        location,
+        unit,
+        avg_rate,
+        min_rate,
+        max_rate,
+        sample_count
+      FROM position_rates_by_location
+      WHERE position ILIKE $1
+    `;
+
+    const params = [`%${position}%`];
+
+    if (location) {
+      query += ` AND location ILIKE $2`;
+      params.push(`%${location}%`);
+    }
+
+    query += ` ORDER BY sample_count DESC, avg_rate DESC LIMIT 10`;
+
+    const result = await pool.query(query, params);
+
+    res.json({
+      success: true,
+      rates: result.rows,
+      count: result.rows.length
+    });
+  } catch (error) {
+    console.error('Error fetching rates:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Get template statistics
+app.get('/api/templates/stats', async (req, res) => {
+  try {
+    const statsResult = await pool.query(`
+      SELECT
+        location,
+        COUNT(*) as template_count,
+        AVG(total_budget)::DECIMAL(12,2) as avg_budget,
+        MIN(total_budget)::DECIMAL(12,2) as min_budget,
+        MAX(total_budget)::DECIMAL(12,2) as max_budget,
+        SUM(line_item_count) as total_items
+      FROM budget_templates
+      WHERE is_active = true AND total_budget > 0
+      GROUP BY location
+      ORDER BY avg_budget
+    `);
+
+    const overallResult = await pool.query(`
+      SELECT
+        COUNT(*) as total_templates,
+        SUM(department_count) as total_departments,
+        SUM(line_item_count) as total_items,
+        AVG(completeness_score)::DECIMAL(5,2) as avg_completeness
+      FROM budget_templates
+      WHERE is_active = true
+    `);
+
+    res.json({
+      success: true,
+      by_location: statsResult.rows,
+      overall: overallResult.rows[0]
+    });
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({

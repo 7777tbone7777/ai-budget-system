@@ -1,0 +1,3290 @@
+-- Guild Agreement: 2021 IATSE Local 873 Long Term Agreement - July 20, 2021 (FINAL) (00249683xBE9D7).pdf
+-- Union: IATSE Local 873
+-- Agreement: 2021 IATSE Local 873 Long Term Agreement
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'IATSE Local 873',
+  '2021 IATSE Local 873 Long Term Agreement',
+  '2021-04-01',
+  '2024-03-31',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/2021 IATSE Local 873 Long Term Agreement - July 20, 2021 (FINAL) (00249683xBE9D7).pdf'
+);
+
+-- Rate Cards (6 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 873',
+  'Head Carpenter/On-set Carp',
+  'daily',
+  51.39,
+  NULL,
+  'theatrical',
+  '2021-04-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 873',
+  'Assistant Head Carpenter',
+  'daily',
+  49.06,
+  NULL,
+  'theatrical',
+  '2021-04-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 873',
+  'Carpenter',
+  'daily',
+  48.12,
+  NULL,
+  'theatrical',
+  '2021-04-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 873',
+  'Boom Operator',
+  'daily',
+  51.39,
+  NULL,
+  'theatrical',
+  '2021-04-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 873',
+  'Production Labourer',
+  'daily',
+  35.59,
+  NULL,
+  'theatrical',
+  '2021-04-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (3 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Meals on an Overnight Location',
+  'television',
+  NULL
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Parking in the Toronto Central Core',
+  'television',
+  NULL
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Safety and Training',
+  'all',
+  NULL
+);
+
+-- Fringe Benefits (4 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'IATSE Local 873',
+  'CA',
+  'percentage',
+  7,
+  '2021-04-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'IATSE Local 873',
+  'CA',
+  'percentage',
+  4,
+  '2021-04-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'IATSE Local 873',
+  'CA',
+  'percentage',
+  8,
+  '2021-04-01'
+);
+-- Guild Agreement: 2021-Local-399-817-Casting-Directors-Agreement-Final-00315151xBE9D7.pdf
+-- Union: IATSE Local 399
+-- Agreement: 2021 Local 399 & 817 Casting Directors Agreement
+-- Extracted: 2025-11-21
+-- Confidence: HIGH
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'IATSE Local 399',
+  '2021 Local 399 & 817 Casting Directors Agreement',
+  '2021-10-01',
+  '2024-09-30',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/2021-Local-399-817-Casting-Directors-Agreement-Final-00315151xBE9D7.pdf'
+);
+
+-- Rate Cards (4 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 399',
+  'Casting Director',
+  'weekly',
+  3080,
+  'New York, Los Angeles',
+  'theatrical',
+  '2021-10-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 399',
+  'Casting Director',
+  'weekly',
+  2550,
+  'New York, Los Angeles',
+  'television',
+  '2021-10-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 399',
+  'Associate Casting Director',
+  'weekly',
+  1000,
+  'New York, Los Angeles',
+  'theatrical',
+  '2021-10-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 399',
+  'Associate Casting Director',
+  'hourly',
+  19,
+  'New York, Los Angeles',
+  'television',
+  '2021-10-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (2 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Casting Directors in Episodic Television',
+  'episodic television',
+  NULL
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Casting Directors on Multi-Camera Series',
+  'multi-camera series',
+  NULL
+);
+
+-- Fringe Benefits (4 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'IATSE Local 399',
+  'CA',
+  'percentage',
+  1.8065,
+  '2021-10-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'IATSE Local 399',
+  'CA',
+  'percentage',
+  4.513,
+  '2021-10-01'
+);
+-- Guild Agreement: 2022-2024-CSP-HWO-Contract-Summary-Final-1 (2).pdf
+-- Union: Unknown Union
+-- Agreement: Craftservice Providers & Honeywagon Operators Contract Summary
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'Unknown Union',
+  'Craftservice Providers & Honeywagon Operators Contract Summary',
+  '2022-02-02',
+  '2024-12-31',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/2022-2024-CSP-HWO-Contract-Summary-Final-1 (2).pdf'
+);
+
+-- Rate Cards (9 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Craftservice Provider - Key',
+  'weekly',
+  1874.27,
+  NULL,
+  'theatrical',
+  '2022-02-02'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Craftservice Provider - Assistant',
+  'weekly',
+  1788.15,
+  NULL,
+  'theatrical',
+  '2022-02-02'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Honeywagon Operator',
+  'weekly',
+  1681.86,
+  NULL,
+  'theatrical',
+  '2022-02-02'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Craftservice Provider - Key',
+  'weekly',
+  1930.5,
+  NULL,
+  'theatrical',
+  '2022-02-02'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Craftservice Provider - Assistant',
+  'weekly',
+  1841.8,
+  NULL,
+  'theatrical',
+  '2022-02-02'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Honeywagon Operator',
+  'weekly',
+  1732.32,
+  NULL,
+  'theatrical',
+  '2022-02-02'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Craftservice Provider - Key',
+  'weekly',
+  1988.42,
+  NULL,
+  'theatrical',
+  '2022-02-02'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Craftservice Provider - Assistant',
+  'weekly',
+  1897.05,
+  NULL,
+  'theatrical',
+  '2022-02-02'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Honeywagon Operator',
+  'weekly',
+  1784.29,
+  NULL,
+  'theatrical',
+  '2022-02-02'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (1 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'New Media Rates',
+  'webisodes/podcasts/interstitials',
+  NULL
+);
+
+-- Fringe Benefits (8 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  4,
+  '2022-02-02'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  6,
+  '2022-02-02'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  5.5,
+  '2022-02-02'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  5,
+  '2022-02-02'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  4.5,
+  '2022-02-02'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  6,
+  '2022-02-02'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'retirement',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  3.5,
+  '2022-02-02'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'retirement',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  2,
+  '2022-02-02'
+);
+-- Guild Agreement: 2023_WGA_mba_moa.pdf
+-- Union: WGA
+-- Agreement: 2023 Writers Guild of America – Alliance of Motion Picture and Television Producers Theatrical and Television Basic Agreement
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'WGA',
+  '2023 Writers Guild of America – Alliance of Motion Picture and Television Producers Theatrical and Television Basic Agreement',
+  '2023-09-25',
+  '2026-05-01',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/2023_WGA_mba_moa.pdf'
+);
+
+-- Rate Cards (3 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'WGA',
+  'Writer',
+  'weekly',
+  10000,
+  NULL,
+  'theatrical',
+  '2023-09-25'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'WGA',
+  'Writer',
+  'weekly',
+  8000,
+  NULL,
+  'network_tv',
+  '2023-09-25'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'WGA',
+  'Writer',
+  'weekly',
+  6000,
+  NULL,
+  'hb_svod',
+  '2023-09-25'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (2 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'High Budget SVOD Programs',
+  'SVOD',
+  'subscription consumer pay platform'
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Development Rooms',
+  'television',
+  NULL
+);
+
+-- Fringe Benefits (4 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'WGA',
+  'CA',
+  'percentage',
+  5,
+  '2023-09-25'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'WGA',
+  'CA',
+  'percentage',
+  12,
+  '2023-09-25'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'WGA',
+  'CA',
+  'percentage',
+  10,
+  '2023-09-25'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'WGA',
+  'CA',
+  'percentage',
+  7.65,
+  '2023-09-25'
+);
+-- Guild Agreement: 2024_EPC_ON_Ratebook_SDTV[60].pdf
+-- Union: EPC
+-- Agreement: 2024 EPC ON Ratebook
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'EPC',
+  '2024 EPC ON Ratebook',
+  '2024-01-01',
+  '2024-12-31',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/2024_EPC_ON_Ratebook_SDTV[60].pdf'
+);
+
+-- Rate Cards (4 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'EPC',
+  'Principal Actor',
+  'daily',
+  882.25,
+  NULL,
+  'theatrical',
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'EPC',
+  'Actor',
+  'daily',
+  595.5,
+  NULL,
+  'theatrical',
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'EPC',
+  'Boom Operator',
+  'hourly',
+  37.23,
+  NULL,
+  'network_tv',
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (2 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Meal Penalty',
+  'all',
+  NULL
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Turnaround Time',
+  'all',
+  NULL
+);
+
+-- Fringe Benefits (4 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'EPC',
+  'CA',
+  'percentage',
+  7,
+  '2024-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'EPC',
+  'CA',
+  'percentage',
+  4,
+  '2024-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'EPC',
+  'CA',
+  'percentage',
+  4,
+  '2024-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'EPC',
+  'CA',
+  'percentage',
+  2.64,
+  '2024-01-01'
+);
+-- Guild Agreement: 2024_IATSE_Area_Standards_Agreement_MOA_07_03_2024.pdf
+-- Union: IATSE
+-- Agreement: 2024 IATSE Area Standards Agreement MOA
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'IATSE',
+  '2024 IATSE Area Standards Agreement MOA',
+  '2024-08-04',
+  '2027-07-31',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/2024_IATSE_Area_Standards_Agreement_MOA_07_03_2024.pdf'
+);
+
+-- Rate Cards (7 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Assistant Production Office Coordinator',
+  'hourly',
+  28.5,
+  NULL,
+  'theatrical',
+  '2024-08-04'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Assistant Production Office Coordinator',
+  'hourly',
+  30,
+  NULL,
+  'theatrical',
+  '2024-08-04'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Nearby Hire Living Allowance',
+  'weekly',
+  637,
+  NULL,
+  NULL,
+  '2024-08-04'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Nearby Hire Living Allowance',
+  'weekly',
+  707,
+  NULL,
+  NULL,
+  '2024-08-04'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Nearby Hire Living Allowance',
+  'weekly',
+  777,
+  NULL,
+  NULL,
+  '2024-08-04'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Per Diem',
+  'daily',
+  70,
+  NULL,
+  NULL,
+  '2024-08-04'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Per Diem',
+  'daily',
+  75,
+  NULL,
+  NULL,
+  '2024-08-04'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (3 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'High Budget AVOD or FAST Channel Programs',
+  'AVOD or FAST Channel',
+  NULL
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Low Budget AVOD or FAST Channel Programs',
+  'AVOD or FAST Channel',
+  NULL
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Productions Made for Basic Cable or The CW',
+  'Basic Cable or The CW',
+  NULL
+);
+
+-- Fringe Benefits (3 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'IATSE',
+  'CA',
+  'percentage',
+  19,
+  '2024-08-04'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'IATSE',
+  'CA',
+  'percentage',
+  136,
+  '2024-08-04'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'annuity',
+  'IATSE',
+  'CA',
+  'percentage',
+  20,
+  '2024-08-04'
+);
+-- Guild Agreement: 2024_IATSE_Basic_Agreement_MOA_07_03_2024.pdf
+-- Union: IATSE
+-- Agreement: 2024 IATSE Basic Agreement MOA
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'IATSE',
+  '2024 IATSE Basic Agreement MOA',
+  '2024-08-01',
+  '2027-07-31',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/2024_IATSE_Basic_Agreement_MOA_07_03_2024.pdf'
+);
+
+-- Rate Cards (1 positions)
+
+-- Sideletter Rules (3 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Half-Hour and One-Hour Pilots',
+  'network_tv|pay_tv|hb_svod|hb_avod|hb_fast_channel',
+  'varies'
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Single Camera Half-Hour Series',
+  'network_tv|pay_tv|hb_svod|hb_avod|hb_fast_channel',
+  'varies'
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Multi-Camera Half-Hour Series',
+  'network_tv|pay_tv|hb_svod|hb_avod|hb_fast_channel',
+  'varies'
+);
+
+-- Fringe Benefits (4 benefits)
+-- Guild Agreement: 2024_SUMMARY_OF_BASIC_AGREEMENT_NEGOTIATIONS_6.28.24_FINAL.pdf
+-- Union: Unknown Union
+-- Agreement: Basic Agreement
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'Unknown Union',
+  'Basic Agreement',
+  '2024-08-01',
+  '2027-07-31',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/2024_SUMMARY_OF_BASIC_AGREEMENT_NEGOTIATIONS_6.28.24_FINAL.pdf'
+);
+
+-- Rate Cards (1 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'General Wage Improvements',
+  'percentage',
+  7,
+  NULL,
+  NULL,
+  '2024-08-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (3 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Streaming Improvements',
+  'Streaming',
+  'SVOD'
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Long-Form/Movie of the Week Rates',
+  'Long-Form',
+  NULL
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Mini-Series Wage Rates',
+  'Mini-Series',
+  NULL
+);
+
+-- Fringe Benefits (3 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  15,
+  '2024-08-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  1.09,
+  '2024-08-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  4.583,
+  '2024-08-01'
+);
+-- Guild Agreement: 2024-Casting-Directors-MOA-2024-09-30-00324386xBE9D7.pdf
+-- Union: Teamsters Local 399/IATSE Local 817
+-- Agreement: 2024 Casting Directors Memorandum of Agreement
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'Teamsters Local 399/IATSE Local 817',
+  '2024 Casting Directors Memorandum of Agreement',
+  '2024-10-01',
+  '2027-09-30',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/2024-Casting-Directors-MOA-2024-09-30-00324386xBE9D7.pdf'
+);
+
+-- Rate Cards (5 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Teamsters Local 399/IATSE Local 817',
+  'Casting Director',
+  'weekly',
+  7000,
+  'New York, NY or Los Angeles, CA',
+  'theatrical|svod',
+  '2024-10-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Teamsters Local 399/IATSE Local 817',
+  'Casting Director (Children''s Programming)',
+  'weekly',
+  5850,
+  'New York, NY or Los Angeles, CA',
+  'theatrical|svod',
+  '2024-10-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Teamsters Local 399/IATSE Local 817',
+  'Casting Director (Subsequent Episodes)',
+  'weekly',
+  4500,
+  'New York, NY or Los Angeles, CA',
+  'theatrical|svod',
+  '2024-10-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Teamsters Local 399/IATSE Local 817',
+  'Associate Casting Director',
+  'weekly',
+  2210,
+  'New York, NY or Los Angeles, CA',
+  'theatrical|svod',
+  '2024-10-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Teamsters Local 399/IATSE Local 817',
+  'Casting Assistant',
+  'hourly',
+  21,
+  'New York, NY or Los Angeles, CA',
+  NULL,
+  '2024-10-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (1 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Casting Directors on Multi-Camera Series',
+  'multi-camera',
+  NULL
+);
+
+-- Fringe Benefits (4 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'Teamsters Local 399/IATSE Local 817',
+  'CA',
+  'percentage',
+  1.8,
+  '2024-10-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'Teamsters Local 399/IATSE Local 817',
+  'CA',
+  'percentage',
+  4.51,
+  '2024-10-01'
+);
+-- Guild Agreement: 2024-IATSE-Basic-Agreement-MOA-FINAL.pdf
+-- Union: IATSE
+-- Agreement: 2024 IATSE Basic Agreement MOA
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'IATSE',
+  '2024 IATSE Basic Agreement MOA',
+  '2024-08-04',
+  '2027-07-31',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/2024-IATSE-Basic-Agreement-MOA-FINAL.pdf'
+);
+
+-- Rate Cards (1 positions)
+
+-- Sideletter Rules (3 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Half-Hour Pilot, One-Hour Pilot, One-Hour Episodic Series',
+  'network_tv|pay_tv|hb_svod|hb_avod|hb_fast_channel',
+  'null'
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Single Camera Half-Hour Prime Time Dramatic Series',
+  'network_tv|pay_tv|hb_svod|hb_avod|hb_fast_channel',
+  'null'
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Multi-Camera Half-Hour Pilots and Episodic Series',
+  'network_tv|pay_tv|hb_svod|hb_avod|hb_fast_channel',
+  'null'
+);
+
+-- Fringe Benefits (4 benefits)
+-- Guild Agreement: 600 Rate Card 2023 to 2024 (V4).pdf
+-- Union: Unknown Union
+-- Agreement: Basic Agreement Amendment Agreement Inside and Outside 'The Corridor' and Videotape Supplemental Agreement Wages, Schedules, and Conditions
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'Unknown Union',
+  'Basic Agreement Amendment Agreement Inside and Outside ''The Corridor'' and Videotape Supplemental Agreement Wages, Schedules, and Conditions',
+  '2023-07-31',
+  '2024-07-29',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/600 Rate Card 2023 to 2024 (V4).pdf'
+);
+
+-- Rate Cards (18 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Director of Photography',
+  'daily',
+  1088.7,
+  'Inside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Camera Operator',
+  'daily',
+  851.52,
+  'Inside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Still Photographer',
+  'daily',
+  677.5,
+  'Inside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  '1st Asst. Photographer',
+  'daily',
+  560.91,
+  'Inside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  '2nd Asst. Photographer',
+  'daily',
+  444.17,
+  'Inside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Digital Imaging Technician',
+  'daily',
+  646.24,
+  'Inside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Video Controller (Shader)',
+  'daily',
+  514.8,
+  'Inside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Camera Utility Person',
+  'daily',
+  490.56,
+  'Inside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Digital Utility Person',
+  'daily',
+  337.44,
+  'Inside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Director of Photography',
+  'daily',
+  1045.68,
+  'Outside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Camera Operator',
+  'daily',
+  646.32,
+  'Outside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Still Photographer',
+  'daily',
+  563.36,
+  'Outside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  '1st Asst. Photographer',
+  'hourly',
+  59.03,
+  'Outside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  '2nd Asst. Photographer',
+  'hourly',
+  54.45,
+  'Outside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Digital Imaging Technician',
+  'daily',
+  646.24,
+  'Outside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Video Controller (Shader)',
+  'daily',
+  514.8,
+  'Outside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Camera Utility Person',
+  'daily',
+  490.56,
+  'Outside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Digital Utility Person',
+  'daily',
+  337.44,
+  'Outside the Corridor',
+  'theatrical',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (1 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Long-Form Sideletter',
+  'Long-Form Television',
+  NULL
+);
+
+-- Fringe Benefits (4 benefits)
+-- Guild Agreement: DGA-BasicAgreement2020-2023.pdf
+-- Union: DGA
+-- Agreement: Directors Guild of America Basic Agreement of 2020
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'DGA',
+  'Directors Guild of America Basic Agreement of 2020',
+  '2020-07-01',
+  '2023-06-30',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/DGA-BasicAgreement2020-2023.pdf'
+);
+
+-- Rate Cards (6 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Freelance Director',
+  'weekly',
+  12954,
+  NULL,
+  'theatrical',
+  '2020-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Low Budget Director',
+  'weekly',
+  12954,
+  NULL,
+  'theatrical',
+  '2020-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Medium Budget Director',
+  'weekly',
+  14723,
+  NULL,
+  'theatrical',
+  '2020-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'High Budget Director',
+  'weekly',
+  20616,
+  NULL,
+  'theatrical',
+  '2020-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Network Prime Time Director (1 hour)',
+  'weekly',
+  48318,
+  NULL,
+  'network_tv',
+  '2020-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Network Prime Time Director (½ hour)',
+  'weekly',
+  28452,
+  NULL,
+  'network_tv',
+  '2020-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (3 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Virtual MVPDs',
+  NULL,
+  NULL
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Over-the-Top Delivery of Pay Television Services',
+  NULL,
+  NULL
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'New Residual Formula for One-Hour Network Prime Time Dramatic Series',
+  'network_tv',
+  NULL
+);
+
+-- Fringe Benefits (4 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'DGA',
+  'CA',
+  'percentage',
+  0.5,
+  '2020-07-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'DGA',
+  'CA',
+  'percentage',
+  0.5,
+  '2020-07-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'DGA',
+  'CA',
+  'percentage',
+  750,
+  '2020-07-01'
+);
+-- Guild Agreement: DGA2023_BAFLTTA_MemorandumOfAgreement.pdf
+-- Union: DGA
+-- Agreement: DGA 2023 Basic Agreement
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'DGA',
+  'DGA 2023 Basic Agreement',
+  '2023-07-01',
+  '2026-06-30',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/DGA2023_BAFLTTA_MemorandumOfAgreement.pdf'
+);
+
+-- Rate Cards (3 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Director',
+  'weekly',
+  5000,
+  NULL,
+  'theatrical',
+  '2023-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Assistant Director',
+  'weekly',
+  3000,
+  NULL,
+  'network_tv',
+  '2023-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Production Manager',
+  'weekly',
+  4000,
+  NULL,
+  'hb_svod',
+  '2023-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (2 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Multi-Camera Production Rate',
+  'multi-camera',
+  NULL
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Single-Camera Production Rate',
+  'single-camera',
+  NULL
+);
+
+-- Fringe Benefits (4 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'DGA',
+  'CA',
+  'percentage',
+  12,
+  '2023-07-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'DGA',
+  'CA',
+  'percentage',
+  5,
+  '2023-07-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'DGA',
+  'CA',
+  'percentage',
+  10,
+  '2023-07-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'DGA',
+  'CA',
+  'percentage',
+  7.65,
+  '2023-07-01'
+);
+-- Guild Agreement: DGA240529Rates2024thru2025.pdf
+-- Union: DGA
+-- Agreement: DGA Minimum Salary Schedule
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'DGA',
+  'DGA Minimum Salary Schedule',
+  '2024-07-01',
+  '2025-06-30',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/DGA240529Rates2024thru2025.pdf'
+);
+
+-- Rate Cards (6 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Director - Theatrical Motion Picture',
+  'weekly',
+  23767,
+  NULL,
+  'theatrical',
+  '2024-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Director - Network Prime-Time',
+  'program',
+  32642,
+  NULL,
+  'network_tv',
+  '2024-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Director - Non-Network, Non-Prime-Time',
+  'program',
+  14666,
+  NULL,
+  'network_tv',
+  '2024-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Director - Basic Cable Dramatic Programs',
+  'program',
+  14666,
+  NULL,
+  'basic_cable',
+  '2024-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Director - High Budget SVOD Programs',
+  'program',
+  18509,
+  NULL,
+  'hb_svod',
+  '2024-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Director - Low Budget Sideletter',
+  'daily',
+  1500,
+  NULL,
+  'theatrical',
+  '2024-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (2 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Low Budget Sideletter',
+  'theatrical',
+  NULL
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Paid Post Production',
+  'hb_svod',
+  'streamers'
+);
+
+-- Fringe Benefits (4 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'DGA',
+  'CA',
+  'percentage',
+  8.5,
+  '2024-07-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'DGA',
+  'CA',
+  'percentage',
+  11,
+  '2024-07-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'DGA',
+  'CA',
+  'percentage',
+  4,
+  '2024-07-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'DGA',
+  'CA',
+  'percentage',
+  2.5,
+  '2024-07-01'
+);
+-- Guild Agreement: DGA240626Rates2024thru2025.pdf
+-- Union: DGA
+-- Agreement: DGA Minimum Salary Schedule
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'DGA',
+  'DGA Minimum Salary Schedule',
+  '2024-07-01',
+  '2025-06-30',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/DGA240626Rates2024thru2025.pdf'
+);
+
+-- Rate Cards (5 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Director - Theatrical Motion Picture',
+  'weekly',
+  23767,
+  NULL,
+  'theatrical',
+  '2024-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Director - Television Network Prime-Time',
+  'weekly',
+  32642,
+  NULL,
+  'network_tv',
+  '2024-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Director - Television Non-Network, Non-Prime-Time',
+  'weekly',
+  14666,
+  NULL,
+  'network_tv',
+  '2024-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Director - High Budget SVOD Programs',
+  'weekly',
+  18509,
+  NULL,
+  'hb_svod',
+  '2024-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Director - Low Budget SVOD Programs',
+  'daily',
+  880,
+  NULL,
+  'hb_svod',
+  '2024-07-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (2 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Low Budget Side Letter',
+  'theatrical',
+  NULL
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Paid Post Production',
+  'hb_svod',
+  NULL
+);
+
+-- Fringe Benefits (4 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'DGA',
+  'CA',
+  'percentage',
+  8.5,
+  '2024-07-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'DGA',
+  'CA',
+  'percentage',
+  11,
+  '2024-07-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'DGA',
+  'CA',
+  'percentage',
+  4,
+  '2024-07-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'DGA',
+  'CA',
+  'percentage',
+  2.5,
+  '2024-07-01'
+);
+-- Guild Agreement: DGARates2023thru2024pg11ADUPMGeneralRates240213.pdf
+-- Union: DGA
+-- Agreement: DGA Rates 2023-2024
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'DGA',
+  'DGA Rates 2023-2024',
+  '2024-01-01',
+  '2024-06-30',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/DGARates2023thru2024pg11ADUPMGeneralRates240213.pdf'
+);
+
+-- Rate Cards (20 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Unit Production Manager',
+  'weekly',
+  6523,
+  'Studio',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Unit Production Manager',
+  'weekly',
+  9133,
+  'Location',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'First Assistant Director',
+  'weekly',
+  6202,
+  'Studio',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'First Assistant Director',
+  'weekly',
+  8675,
+  'Location',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Second Assistant Director',
+  'weekly',
+  4156,
+  'Studio',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Second Assistant Director',
+  'weekly',
+  5808,
+  'Location',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Additional Second Assistant Director',
+  'weekly',
+  3923,
+  'Studio',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Additional Second Assistant Director',
+  'weekly',
+  5486,
+  'Location',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Key Second Assistant Director',
+  'weekly',
+  2388,
+  'Studio',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Key Second Assistant Director',
+  'weekly',
+  3350,
+  'Location',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Unit Production Manager',
+  'daily',
+  1631,
+  'Studio',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Unit Production Manager',
+  'daily',
+  2283,
+  'Location',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'First Assistant Director',
+  'daily',
+  1551,
+  'Studio',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'First Assistant Director',
+  'daily',
+  2169,
+  'Location',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Second Assistant Director',
+  'daily',
+  1039,
+  'Studio',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Second Assistant Director',
+  'daily',
+  1452,
+  'Location',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Additional Second Assistant Director',
+  'daily',
+  981,
+  'Studio',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Additional Second Assistant Director',
+  'daily',
+  1372,
+  'Location',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGA',
+  'Key Second Assistant Director',
+  'daily',
+  597,
+  'Studio',
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (2 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Basic Cable Dramatic Programs',
+  'Dramatic Programs',
+  'Basic Cable'
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Basic Cable Dramatic Programs - Production Seasons',
+  'Dramatic Programs',
+  'Basic Cable'
+);
+
+-- Fringe Benefits (4 benefits)
+-- Guild Agreement: DGC-Core-Standard-Agreement-2023-2025-Apr.122023.pdf
+-- Union: DGC
+-- Agreement: DGC/CMPA Standard Agreement
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'DGC',
+  'DGC/CMPA Standard Agreement',
+  '2023-01-01',
+  '2025-12-31',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/DGC-Core-Standard-Agreement-2023-2025-Apr.122023.pdf'
+);
+
+-- Rate Cards (3 positions)
+
+-- Sideletter Rules (1 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Documentary Production',
+  'Documentary',
+  NULL
+);
+
+-- Fringe Benefits (4 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'DGC',
+  'CA',
+  'percentage',
+  2,
+  '2023-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'DGC',
+  'CA',
+  'percentage',
+  2,
+  '2023-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'DGC',
+  'CA',
+  'percentage',
+  4,
+  '2023-01-01'
+);
+-- Guild Agreement: DGC-Directors-2023-2025-FINAL-DGC-FINAL-approved-Mar.24.2023.pdf
+-- Union: DGC
+-- Agreement: DGC/CMPA Standard Agreement
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'DGC',
+  'DGC/CMPA Standard Agreement',
+  '2023-01-01',
+  '2025-12-31',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/DGC-Directors-2023-2025-FINAL-DGC-FINAL-approved-Mar.24.2023.pdf'
+);
+
+-- Rate Cards (9 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Director',
+  'weekly',
+  12561,
+  NULL,
+  'theatrical',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Director',
+  'weekly',
+  11325,
+  NULL,
+  'theatrical',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Director',
+  'weekly',
+  10530,
+  NULL,
+  'theatrical',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Director',
+  'weekly',
+  8949,
+  NULL,
+  'theatrical',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Director',
+  'weekly',
+  2,
+  NULL,
+  'theatrical',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Director',
+  'weekly',
+  2,
+  NULL,
+  'theatrical',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Director',
+  'weekly',
+  19101,
+  NULL,
+  'television',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Director',
+  'weekly',
+  38298,
+  NULL,
+  'television',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Second Unit Director',
+  'weekly',
+  12562,
+  NULL,
+  'theatrical',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (1 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Series Bonus',
+  'television',
+  NULL
+);
+
+-- Fringe Benefits (4 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'DGC',
+  'CA',
+  'percentage',
+  2,
+  '2023-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'DGC',
+  'CA',
+  'percentage',
+  2,
+  '2023-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'DGC',
+  'CA',
+  'percentage',
+  2,
+  '2023-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'DGC',
+  'CA',
+  'percentage',
+  2,
+  '2023-01-01'
+);
+-- Guild Agreement: DGC-Ontario-Standard-Agreement-2023-2025-June-5.pdf
+-- Union: DGC
+-- Agreement: DGC/CMPA Standard Agreement
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'DGC',
+  'DGC/CMPA Standard Agreement',
+  '2023-01-01',
+  '2025-12-31',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/DGC-Ontario-Standard-Agreement-2023-2025-June-5.pdf'
+);
+
+-- Rate Cards (8 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Production Manager',
+  'daily',
+  1108,
+  NULL,
+  'theatrical',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Assistant Production Manager',
+  'daily',
+  775,
+  NULL,
+  'theatrical',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'First Assistant Director',
+  'daily',
+  1054.25,
+  NULL,
+  'theatrical',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Second Assistant Director',
+  'daily',
+  775,
+  NULL,
+  'theatrical',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Third Assistant Director',
+  'daily',
+  504,
+  NULL,
+  'theatrical',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Production Designer',
+  'daily',
+  1336.25,
+  NULL,
+  'theatrical',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Picture Editor',
+  'daily',
+  1055.5,
+  NULL,
+  'theatrical',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'DGC',
+  'Sound Editor',
+  'daily',
+  936.75,
+  NULL,
+  'theatrical',
+  '2023-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (2 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Tier A Television Series Incentives',
+  'television',
+  NULL
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Fact Based/Lifestyle/Docu-Drama Production',
+  'fact_based',
+  NULL
+);
+
+-- Fringe Benefits (4 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'DGC',
+  'CA',
+  'percentage',
+  6,
+  '2023-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'DGC',
+  'CA',
+  'percentage',
+  5,
+  '2023-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'DGC',
+  'CA',
+  'percentage',
+  4,
+  '2023-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'DGC',
+  'CA',
+  'percentage',
+  2,
+  '2023-01-01'
+);
+-- Guild Agreement: IA 667 Rate & Fringe Summary 2024 2.pdf
+-- Union: Unknown Union
+-- Agreement: IATSE Local 667 Minimum Scale 2024
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'Unknown Union',
+  'IATSE Local 667 Minimum Scale 2024',
+  NULL,
+  NULL,
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/IA 667 Rate & Fringe Summary 2024 2.pdf'
+);
+
+-- Rate Cards (9 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Director of Photography',
+  'daily',
+  118.75,
+  NULL,
+  'feature',
+  CURRENT_DATE
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Director of Photography',
+  'weekly',
+  8311.9,
+  NULL,
+  'feature',
+  CURRENT_DATE
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Camera Operator',
+  'daily',
+  81.3,
+  NULL,
+  'feature',
+  CURRENT_DATE
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Camera Operator',
+  'weekly',
+  7740,
+  NULL,
+  'television',
+  CURRENT_DATE
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Publicist',
+  'weekly',
+  4605.5,
+  NULL,
+  'feature',
+  CURRENT_DATE
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Publicist',
+  'daily',
+  810.95,
+  NULL,
+  'television',
+  CURRENT_DATE
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Digital Engineer',
+  'daily',
+  99.5,
+  NULL,
+  NULL,
+  CURRENT_DATE
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'Unknown Union',
+  'Camera Trainee',
+  'daily',
+  18.45,
+  'Ontario',
+  NULL,
+  CURRENT_DATE
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Fringe Benefits (8 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  8,
+  CURRENT_DATE
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  4.5,
+  CURRENT_DATE
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  12,
+  CURRENT_DATE
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  6,
+  CURRENT_DATE
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  12,
+  CURRENT_DATE
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  1,
+  CURRENT_DATE
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  0.5,
+  CURRENT_DATE
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'Unknown Union',
+  'CA',
+  'percentage',
+  2,
+  CURRENT_DATE
+);
+-- Guild Agreement: IATSE 411 2024 PC Agreement - MASTER FILLABLE.pdf
+-- Union: IATSE
+-- Agreement: I.A.T.S.E. Local 411 Production Coordinators Collective Agreement
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'IATSE',
+  'I.A.T.S.E. Local 411 Production Coordinators Collective Agreement',
+  '2024-01-01',
+  '2024-12-31',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/IATSE 411 2024 PC Agreement - MASTER FILLABLE.pdf'
+);
+
+-- Rate Cards (6 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Production Coordinator',
+  'weekly',
+  3345.38,
+  NULL,
+  'theatrical',
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  '1st Assistant Production Coordinator',
+  'weekly',
+  2515.27,
+  NULL,
+  'theatrical',
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  '2nd Assistant Production Coordinator',
+  'weekly',
+  1779.12,
+  NULL,
+  'theatrical',
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Travel Coordinator',
+  'weekly',
+  2515.27,
+  NULL,
+  'theatrical',
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Script/Story Coordinator',
+  'weekly',
+  2176.41,
+  NULL,
+  'theatrical',
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Production Assistant',
+  'weekly',
+  1350.6,
+  NULL,
+  'theatrical',
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Fringe Benefits (4 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'IATSE',
+  'CA',
+  'percentage',
+  6,
+  '2024-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'IATSE',
+  'CA',
+  'percentage',
+  4,
+  '2024-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'IATSE',
+  'CA',
+  'percentage',
+  7,
+  '2024-01-01'
+);
+-- Guild Agreement: IATSE 411 2024 PC Rate Sheet.pdf
+-- Union: IATSE
+-- Agreement: IATSE 411 2024 Contract Summary
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'IATSE',
+  'IATSE 411 2024 Contract Summary',
+  '2024-01-01',
+  '2024-12-31',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/IATSE 411 2024 PC Rate Sheet.pdf'
+);
+
+-- Rate Cards (12 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Production Coordinator',
+  'weekly',
+  3345.38,
+  NULL,
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  '1st Assistant Production Coordinator',
+  'weekly',
+  2515.27,
+  NULL,
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  '2nd Assistant Production Coordinator',
+  'weekly',
+  1779.12,
+  NULL,
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Travel Coordinator',
+  'weekly',
+  2515.27,
+  NULL,
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Script/Story Coordinator',
+  'weekly',
+  2176.41,
+  NULL,
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Production Assistant',
+  'weekly',
+  1350.6,
+  NULL,
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Production Coordinator',
+  'daily',
+  669.08,
+  NULL,
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  '1st Assistant Production Coordinator',
+  'daily',
+  503.05,
+  NULL,
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  '2nd Assistant Production Coordinator',
+  'daily',
+  355.82,
+  NULL,
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Travel Coordinator',
+  'daily',
+  503.05,
+  NULL,
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Script/Story Coordinator',
+  'daily',
+  435.28,
+  NULL,
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE',
+  'Production Assistant',
+  'daily',
+  270.12,
+  NULL,
+  NULL,
+  '2024-01-01'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Fringe Benefits (11 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'IATSE',
+  'CA',
+  'percentage',
+  7,
+  '2024-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'IATSE',
+  'CA',
+  'percentage',
+  6,
+  '2024-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'IATSE',
+  'CA',
+  'percentage',
+  4,
+  '2024-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'IATSE',
+  'CA',
+  'percentage',
+  4,
+  '2024-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'IATSE',
+  'CA',
+  'percentage',
+  9,
+  '2024-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'IATSE',
+  'CA',
+  'percentage',
+  4,
+  '2024-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'IATSE',
+  'CA',
+  'percentage',
+  2,
+  '2024-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'IATSE',
+  'CA',
+  'percentage',
+  6,
+  '2024-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'IATSE',
+  'CA',
+  'percentage',
+  5,
+  '2024-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'IATSE',
+  'CA',
+  'percentage',
+  2,
+  '2024-01-01'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'IATSE',
+  'CA',
+  'percentage',
+  1.75,
+  '2024-01-01'
+);
+-- Guild Agreement: IATSE-2024-Basic-Consent-Skydance-Pictures-LLC.pdf
+-- Union: IATSE
+-- Agreement: Agreement of Consent
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'IATSE',
+  'Agreement of Consent',
+  '2024-09-24',
+  '2027-07-31',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/IATSE-2024-Basic-Consent-Skydance-Pictures-LLC.pdf'
+);
+
+-- Fringe Benefits (2 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'IATSE',
+  'CA',
+  'percentage',
+  4,
+  '2024-09-24'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'IATSE',
+  'CA',
+  'percentage',
+  4.583,
+  '2024-09-24'
+);
+-- Guild Agreement: IATSE-2024-Basic-Trust-Skydance-Pictures-LLC.pdf
+-- Union: IATSE
+-- Agreement: IATSE Basic Agreement 2024
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'IATSE',
+  'IATSE Basic Agreement 2024',
+  NULL,
+  NULL,
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/IATSE-2024-Basic-Trust-Skydance-Pictures-LLC.pdf'
+);
+
+-- Fringe Benefits (4 benefits)
+-- Guild Agreement: IATSE-2024-MPI-Skydance-Pictures-LLC.pdf
+-- Union: IATSE
+-- Agreement: IATSE 2024 MPI Skydance Pictures LLC
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'IATSE',
+  'IATSE 2024 MPI Skydance Pictures LLC',
+  '2024-09-24',
+  NULL,
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/IATSE-2024-MPI-Skydance-Pictures-LLC.pdf'
+);
+
+-- Fringe Benefits (4 benefits)
+-- Guild Agreement: IATSE-2024-Term-Letter-Agreement-Skydance-Pictures-LLC.pdf
+-- Union: IATSE
+-- Agreement: IATSE 2024 Term Letter Agreement
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'IATSE',
+  'IATSE 2024 Term Letter Agreement',
+  '2024-09-24',
+  NULL,
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/IATSE-2024-Term-Letter-Agreement-Skydance-Pictures-LLC.pdf'
+);
+
+-- Fringe Benefits (4 benefits)
+-- Guild Agreement: IATSE-Local-411-2022-2024-CSP-HWO-Agreement-w-LOU-MASTER-FILLABLE-17-7-1 (1).pdf
+-- Union: IATSE Local 411
+-- Agreement: Craftservice Providers and Honeywagon Operators Collective Agreement
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'IATSE Local 411',
+  'Craftservice Providers and Honeywagon Operators Collective Agreement',
+  '2022-02-02',
+  '2024-12-31',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/IATSE-Local-411-2022-2024-CSP-HWO-Agreement-w-LOU-MASTER-FILLABLE-17-7-1 (1).pdf'
+);
+
+-- Rate Cards (4 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 411',
+  'Craftservice Provider - Key',
+  'weekly',
+  1874.27,
+  NULL,
+  'theatrical',
+  '2022-02-02'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 411',
+  'Craftservice Provider - Assistant',
+  'weekly',
+  1788.15,
+  NULL,
+  'theatrical',
+  '2022-02-02'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 411',
+  'Honeywagon Operator - Tier A',
+  'weekly',
+  1681.86,
+  NULL,
+  'theatrical',
+  '2022-02-02'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 411',
+  'Honeywagon Operator - Tier B',
+  'weekly',
+  1615.89,
+  NULL,
+  'theatrical',
+  '2022-02-02'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (1 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Productions Made for New Media',
+  'new_media',
+  NULL
+);
+
+-- Fringe Benefits (4 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'vacation_holiday',
+  'IATSE Local 411',
+  'CA',
+  'percentage',
+  4,
+  '2022-02-02'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'IATSE Local 411',
+  'CA',
+  'percentage',
+  6,
+  '2022-02-02'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'retirement',
+  'IATSE Local 411',
+  'CA',
+  'percentage',
+  3.5,
+  '2022-02-02'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'IATSE Local 411',
+  'CA',
+  'percentage',
+  0.5,
+  '2022-02-02'
+);
+-- Guild Agreement: Local 600 Rate Sheet.pdf
+-- Union: IATSE Local 600
+-- Agreement: IATSE Local 600 Rate Sheet
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'IATSE Local 600',
+  'IATSE Local 600 Rate Sheet',
+  '2023-07-31',
+  '2024-07-29',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/Local 600 Rate Sheet.pdf'
+);
+
+-- Rate Cards (12 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 600',
+  'Director of Photography',
+  'daily',
+  1045.68,
+  'Eastern Region',
+  'hb_svod',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 600',
+  'Camera Operator',
+  'daily',
+  646.32,
+  'Eastern Region',
+  'hb_svod',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 600',
+  'Portrait Photographer',
+  'daily',
+  646.32,
+  'Eastern Region',
+  'hb_svod',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 600',
+  'Still Photographer',
+  'daily',
+  563.36,
+  'Eastern Region',
+  'hb_svod',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 600',
+  '1st Asst. Photographer',
+  'daily',
+  56.93,
+  'Eastern Region',
+  'hb_svod',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 600',
+  '2nd Asst. Photographer',
+  'daily',
+  52.64,
+  'Eastern Region',
+  'hb_svod',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 600',
+  'Technician',
+  'daily',
+  66.77,
+  'Eastern Region',
+  'hb_svod',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 600',
+  'Digital Imaging Technician',
+  'daily',
+  646.24,
+  'Eastern Region',
+  'hb_svod',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 600',
+  'Video Controller (Shader)',
+  'daily',
+  514.8,
+  'Eastern Region',
+  'hb_svod',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 600',
+  'Camera Utility Person',
+  'daily',
+  490.56,
+  'Eastern Region',
+  'hb_svod',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'IATSE Local 600',
+  'Digital Utility Person',
+  'daily',
+  337.44,
+  'Eastern Region',
+  'hb_svod',
+  '2023-07-31'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (1 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Special Conditions Sideletter',
+  'Pilots & Season 1',
+  'hb_svod'
+);
+
+-- Fringe Benefits (4 benefits)
+-- Guild Agreement: PRIVILEGED - MSK 2023 WGA MOA Summary(15888461.3).pdf
+-- Union: WGA
+-- Agreement: 2023 Writers Guild of America Memorandum of Agreement
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'WGA',
+  '2023 Writers Guild of America Memorandum of Agreement',
+  '2023-09-25',
+  '2026-05-01',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/PRIVILEGED - MSK 2023 WGA MOA Summary(15888461.3).pdf'
+);
+
+-- Rate Cards (3 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'WGA',
+  'Writer',
+  'weekly',
+  200000,
+  NULL,
+  NULL,
+  '2023-09-25'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'WGA',
+  'Writer-Producer (Lower Tier)',
+  'weekly',
+  5,
+  NULL,
+  'series, serials, mini-series',
+  '2023-09-25'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'WGA',
+  'Writer-Producer (Higher Tier)',
+  'weekly',
+  9.5,
+  NULL,
+  'series, serials, mini-series',
+  '2023-09-25'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (2 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Minimum Staffing Requirements for Writers Before a Series is Green-Lit',
+  'series, serial, mini-series',
+  'SVOD'
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'Minimum Staffing Requirements for Writers After a Season Order',
+  'series, serial, mini-series',
+  NULL
+);
+
+-- Fringe Benefits (2 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'WGA',
+  'CA',
+  'percentage',
+  12,
+  '2023-09-25'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'WGA',
+  'CA',
+  'percentage',
+  0.5,
+  '2023-09-25'
+);
+-- Guild Agreement: WGA 2023_Schedule_of_Minimums_Year_3NEW.pdf
+-- Union: WGA
+-- Agreement: WGA 2023 Theatrical and Television Basic Agreement
+-- Extracted: 2025-11-21
+-- Confidence: MEDIUM
+
+-- Insert union agreement
+INSERT INTO union_agreements (id, union_name, agreement_type, effective_date_start, effective_date_end, document_url)
+VALUES (
+  gen_random_uuid(),
+  'WGA',
+  'WGA 2023 Theatrical and Television Basic Agreement',
+  '2023-09-25',
+  '2026-05-01',
+  '/Users/anthonyvazquez/Documents/budgets/Guild Agreements/WGA 2023_Schedule_of_Minimums_Year_3NEW.pdf'
+);
+
+-- Rate Cards (4 positions)
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'WGA',
+  'Original Screenplay, Including Treatment (High Budget)',
+  'weekly',
+  160084,
+  NULL,
+  'theatrical',
+  '2023-09-25'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'WGA',
+  'Original Screenplay, Including Treatment (Low Budget)',
+  'weekly',
+  85281,
+  NULL,
+  'theatrical',
+  '2023-09-25'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'WGA',
+  'Teleplay (30 minutes or less)',
+  'weekly',
+  21389,
+  NULL,
+  'network_tv',
+  '2023-09-25'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date)
+VALUES (
+  'WGA',
+  'Teleplay (60 minutes or less)',
+  'weekly',
+  28858,
+  NULL,
+  'network_tv',
+  '2023-09-25'
+) ON CONFLICT (union_local, job_classification, location, production_type, effective_date) DO NOTHING;
+
+-- Sideletter Rules (2 rules)
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'High Budget SVOD Programs',
+  'SVOD',
+  'Various'
+);
+INSERT INTO sideletter_rules (sideletter_name, production_type, distribution_platform)
+VALUES (
+  'High Budget AVOD Programs',
+  'AVOD',
+  'Various'
+);
+
+-- Fringe Benefits (3 benefits)
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'pension',
+  'WGA',
+  'CA',
+  'percentage',
+  11.25,
+  '2023-09-25'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'health',
+  'WGA',
+  'CA',
+  'percentage',
+  11.5,
+  '2023-09-25'
+);
+INSERT INTO fringe_benefits (benefit_type, union_local, state, rate_type, rate_value, effective_date)
+VALUES (
+  'payroll_tax',
+  'WGA',
+  'CA',
+  'percentage',
+  0.5,
+  '2023-09-25'
+);

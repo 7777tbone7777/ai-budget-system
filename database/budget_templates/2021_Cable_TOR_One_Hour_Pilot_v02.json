@@ -1,0 +1,1264 @@
+{
+  "metadata": {
+    "filename": "2021 Cable TOR One-Hour Pilot v02.pdf",
+    "location": "Toronto, ON 15 Day Shoot - 15 Local Location Days",
+    "production_type": null,
+    "shoot_days": 15,
+    "shoot_dates": null,
+    "total_budget": null,
+    "atl_total": null,
+    "btl_total": null,
+    "other_total": null,
+    "post_total": null,
+    "production_total": null,
+    "pdf_path": "/Users/anthonyvazquez/Documents/budgets/2021 Pilot - 1Hr/Toronto/Ver 02/2021 Cable TOR One-Hour Pilot v02.pdf"
+  },
+  "departments": [
+    {
+      "name": "DIRECTOR",
+      "account": "1300",
+      "total": 213520.0,
+      "line_items": [
+        {
+          "account": "1385",
+          "description": "MISC EXPENSES",
+          "position": "Director'smiscellaneous",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 25000.0,
+          "subtotal": 25000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Director'smiscellaneous",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 25000.0,
+              "subtotal": 25000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ATLTRAVEL&LIVING",
+      "account": "1500",
+      "total": 169913.0,
+      "line_items": [
+        {
+          "account": "1501",
+          "description": "AIRFARES",
+          "position": "Writers",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Writers",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "1502",
+          "description": "HOTELS",
+          "position": "Writers",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Writers",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "1504",
+          "description": "PER DIEM /LIVINGALLOWANCES",
+          "position": "Writers",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Writers",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "1505",
+          "description": "GROUND TRANSPORTATION",
+          "position": "Writers",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Writers",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PRODUCTIONSTAFF",
+      "account": "2000",
+      "total": 604592.0,
+      "line_items": [
+        {
+          "account": "2002",
+          "description": "1ST ASSISTANT DIRECTOR",
+          "position": "Overscale",
+          "quantity": 3975.0,
+          "unit": "weeks",
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Overscale",
+              "quantity": 3975.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2015",
+          "description": "BOARD PREP",
+          "position": "Board/ScriptBreakdown",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 8500.0,
+          "subtotal": 8500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Board/ScriptBreakdown",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 8500.0,
+              "subtotal": 8500.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EXTRATALENT",
+      "account": "2100",
+      "total": 139927.0,
+      "line_items": [
+        {
+          "account": "2107",
+          "description": "WARDROBE FITTINGS",
+          "position": "Adjustments & Fittings",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 500.0,
+          "subtotal": 400.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Adjustments & Fittings",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 400.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2155",
+          "description": "ATMOSPHERE CARS/MILEAGE",
+          "position": "Location Specific",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Location Specific",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EXTRATALENT",
+      "account": "2100",
+      "total": 139927.0,
+      "line_items": [
+        {
+          "account": "2107",
+          "description": "WARDROBE FITTINGS",
+          "position": "Adjustments & Fittings",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 500.0,
+          "subtotal": 400.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Adjustments & Fittings",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 400.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2155",
+          "description": "ATMOSPHERE CARS/MILEAGE",
+          "position": "Location Specific",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Location Specific",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SET STRIKE",
+      "account": "2400",
+      "total": 7611.0,
+      "line_items": [
+        {
+          "account": "2497",
+          "description": "TRASH & HAZARDOUS WASTE REMOVAL",
+          "position": "Hazardous Waste Removal",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": 2000.0,
+          "subtotal": 1600.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Hazardous Waste Removal",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 2000.0,
+              "subtotal": 1600.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SPECIAL EFFECTS",
+      "account": "2600",
+      "total": 18137.0,
+      "line_items": [
+        {
+          "account": "2602",
+          "description": "F/XFOREMAN",
+          "position": "F/XFOREMAN",
+          "quantity": null,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {
+            "shoot": {
+              "quantity": null,
+              "unit": "days\ndays",
+              "rate": null,
+              "subtotal": null
+            }
+          },
+          "detail_lines": []
+        },
+        {
+          "account": "2603",
+          "description": "COMPANY F/XTECHNICIANS",
+          "position": "COMPANY F/XTECHNICIANS",
+          "quantity": null,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {
+            "shoot": {
+              "quantity": null,
+              "unit": "days\ndays",
+              "rate": null,
+              "subtotal": null
+            }
+          },
+          "detail_lines": []
+        },
+        {
+          "account": "2618",
+          "description": "EQUIPMENT RENTALS",
+          "position": "SFX Truck & Kit",
+          "quantity": 7.0,
+          "unit": "days",
+          "rate": 500.0,
+          "subtotal": 2800.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "SFX Truck & Kit",
+              "quantity": 7.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 2800.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SET DRESSING",
+      "account": "2700",
+      "total": 61113.0,
+      "line_items": [
+        {
+          "account": "2803",
+          "description": "ADD'LPROP LABOR",
+          "position": "ADD'LPROP LABOR",
+          "quantity": null,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {
+            "shoot": {
+              "quantity": null,
+              "unit": "days\ndays",
+              "rate": null,
+              "subtotal": null
+            }
+          },
+          "detail_lines": []
+        },
+        {
+          "account": "2817",
+          "description": "BOX/COMPUTER RENTALS",
+          "position": "Propmaster Box (Shoot/Test)",
+          "quantity": 3.2,
+          "unit": "weeks",
+          "rate": 500.0,
+          "subtotal": 1280.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Propmaster Box (Shoot/Test)",
+              "quantity": 3.2,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 1280.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2855",
+          "description": "CAR ALLOWANCES",
+          "position": "Propmaster",
+          "quantity": 6.8,
+          "unit": "weeks",
+          "rate": 150.0,
+          "subtotal": 816.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Propmaster",
+              "quantity": 6.8,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 150.0,
+              "subtotal": 816.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ANIMALS&PICTURECARS",
+      "account": "3000",
+      "total": 20000.0,
+      "line_items": [
+        {
+          "account": "3007",
+          "description": "PICTURE VEHICLE RENTALS",
+          "position": "Picture Cars & Animals",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 25000.0,
+          "subtotal": 20000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Picture Cars & Animals",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 25000.0,
+              "subtotal": 20000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LIGHTING",
+      "account": "3200",
+      "total": 147729.0,
+      "line_items": [
+        {
+          "account": "3216",
+          "description": "PURCHASES",
+          "position": "Purchases",
+          "quantity": 3.0,
+          "unit": "weeks",
+          "rate": 2500.0,
+          "subtotal": 6000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Purchases",
+              "quantity": 3.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 2500.0,
+              "subtotal": 6000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3217",
+          "description": "BOX RENTALS",
+          "position": "BOX RENTALS",
+          "quantity": null,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {
+            "shoot": {
+              "quantity": null,
+              "unit": "weeks\nweeks\nweeks",
+              "rate": null,
+              "subtotal": null
+            }
+          },
+          "detail_lines": []
+        },
+        {
+          "account": "3221",
+          "description": "CONDORS & LIFTS",
+          "position": "Booms/Scissor Lifts",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 750.0,
+          "subtotal": 2400.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Booms/Scissor Lifts",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 750.0,
+              "subtotal": 2400.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CAMERA",
+      "account": "3300",
+      "total": 296856.0,
+      "line_items": [
+        {
+          "account": "3316",
+          "description": "PURCHASES",
+          "position": "Camera Expendables",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 1500.0,
+          "subtotal": 1200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Camera Expendables",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 1500.0,
+              "subtotal": 1200.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3319",
+          "description": "STEADICAM RENTALS",
+          "position": "Steadicam rig",
+          "quantity": 3.0,
+          "unit": "weeks",
+          "rate": 3000.0,
+          "subtotal": 7200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Steadicam rig",
+              "quantity": 3.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 3000.0,
+              "subtotal": 7200.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TRANSPORTATION",
+      "account": "3500",
+      "total": 385338.0,
+      "line_items": [
+        {
+          "account": "3502",
+          "description": "CAPTAIN",
+          "position": "Captain (Corp) Local 873",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Captain (Corp) Local 873",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3516",
+          "description": "PURCHASES",
+          "position": "Purchases",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 500.0,
+          "subtotal": 400.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Purchases",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 400.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3517",
+          "description": "BOX/COMPUTER RENTALS",
+          "position": "Coordinator Kit",
+          "quantity": 7.0,
+          "unit": "weeks",
+          "rate": 50.0,
+          "subtotal": 280.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Coordinator Kit",
+              "quantity": 7.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 50.0,
+              "subtotal": 280.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3545",
+          "description": "MILEAGE",
+          "position": "PA Mileage",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 2000.0,
+          "subtotal": 1600.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "PA Mileage",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 2000.0,
+              "subtotal": 1600.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3547",
+          "description": "PARKING, PERMITS, TOLLS",
+          "position": "Tolls & Misc Parking",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 1500.0,
+          "subtotal": 1200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Tolls & Misc Parking",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 1500.0,
+              "subtotal": 1200.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION EXPENSE",
+      "account": "3600",
+      "total": 732271.0,
+      "line_items": [
+        {
+          "account": "3606",
+          "description": "SCOUTING/SURVEYCOSTS",
+          "position": "Scouting/SurveyCosts",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 4000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Scouting/SurveyCosts",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3613",
+          "description": "SHIPPING/POSTAGE",
+          "position": "Customs Duties-Canada",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 5600.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Customs Duties-Canada",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            },
+            {
+              "position": "Ship Camera masters to LA",
+              "quantity": 4.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 1600.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3620",
+          "description": "CATERED MEALS",
+          "position": "Office/Off-Set Meals (Add'l for Canada ...",
+          "quantity": 25.0,
+          "unit": "days",
+          "rate": 15.0,
+          "subtotal": 6000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Office/Off-Set Meals (Add'l for Canada ...",
+              "quantity": 25.0,
+              "unit": "days",
+              "multiplier": 20.0,
+              "rate": 15.0,
+              "subtotal": 6000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3630",
+          "description": "LOCATION SECURITY",
+          "position": "Company fee on LSPs [based on POE]",
+          "quantity": 684.0,
+          "unit": "days",
+          "rate": 4.0,
+          "subtotal": 2189.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Company fee on LSPs [based on POE]",
+              "quantity": 684.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 4.0,
+              "subtotal": 2189.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3632",
+          "description": "MISC LOCAL EMPLOYEES",
+          "position": "SiteReps",
+          "quantity": 15.0,
+          "unit": "days",
+          "rate": 300.0,
+          "subtotal": 3600.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "SiteReps",
+              "quantity": 15.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 300.0,
+              "subtotal": 3600.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION EXPENSE",
+      "account": "3600",
+      "total": 732271.0,
+      "line_items": [
+        {
+          "account": "3606",
+          "description": "SCOUTING/SURVEYCOSTS",
+          "position": "Scouting/SurveyCosts",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 4000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Scouting/SurveyCosts",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3613",
+          "description": "SHIPPING/POSTAGE",
+          "position": "Customs Duties-Canada",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 5600.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Customs Duties-Canada",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            },
+            {
+              "position": "Ship Camera masters to LA",
+              "quantity": 4.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 1600.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3620",
+          "description": "CATERED MEALS",
+          "position": "Office/Off-Set Meals (Add'l for Canada ...",
+          "quantity": 25.0,
+          "unit": "days",
+          "rate": 15.0,
+          "subtotal": 6000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Office/Off-Set Meals (Add'l for Canada ...",
+              "quantity": 25.0,
+              "unit": "days",
+              "multiplier": 20.0,
+              "rate": 15.0,
+              "subtotal": 6000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3630",
+          "description": "LOCATION SECURITY",
+          "position": "Company fee on LSPs [based on POE]",
+          "quantity": 684.0,
+          "unit": "days",
+          "rate": 4.0,
+          "subtotal": 2189.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Company fee on LSPs [based on POE]",
+              "quantity": 684.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 4.0,
+              "subtotal": 2189.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3632",
+          "description": "MISC LOCAL EMPLOYEES",
+          "position": "SiteReps",
+          "quantity": 15.0,
+          "unit": "days",
+          "rate": 300.0,
+          "subtotal": 3600.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "SiteReps",
+              "quantity": 15.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 300.0,
+              "subtotal": 3600.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION EXPENSE",
+      "account": "3600",
+      "total": 732271.0,
+      "line_items": [
+        {
+          "account": "3606",
+          "description": "SCOUTING/SURVEYCOSTS",
+          "position": "Scouting/SurveyCosts",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 4000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Scouting/SurveyCosts",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3613",
+          "description": "SHIPPING/POSTAGE",
+          "position": "Customs Duties-Canada",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 5600.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Customs Duties-Canada",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            },
+            {
+              "position": "Ship Camera masters to LA",
+              "quantity": 4.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 1600.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3620",
+          "description": "CATERED MEALS",
+          "position": "Office/Off-Set Meals (Add'l for Canada ...",
+          "quantity": 25.0,
+          "unit": "days",
+          "rate": 15.0,
+          "subtotal": 6000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Office/Off-Set Meals (Add'l for Canada ...",
+              "quantity": 25.0,
+              "unit": "days",
+              "multiplier": 20.0,
+              "rate": 15.0,
+              "subtotal": 6000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3630",
+          "description": "LOCATION SECURITY",
+          "position": "Company fee on LSPs [based on POE]",
+          "quantity": 684.0,
+          "unit": "days",
+          "rate": 4.0,
+          "subtotal": 2189.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Company fee on LSPs [based on POE]",
+              "quantity": 684.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 4.0,
+              "subtotal": 2189.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3632",
+          "description": "MISC LOCAL EMPLOYEES",
+          "position": "SiteReps",
+          "quantity": 15.0,
+          "unit": "days",
+          "rate": 300.0,
+          "subtotal": 3600.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "SiteReps",
+              "quantity": 15.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 300.0,
+              "subtotal": 3600.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PRODUCTION FILM&LAB",
+      "account": "3700",
+      "total": 48044.0,
+      "line_items": [
+        {
+          "account": "3764",
+          "description": "STREAMING TRANSMISSION",
+          "position": "DailiesEncode & Upload - DAX",
+          "quantity": 15.0,
+          "unit": "days",
+          "rate": 50.0,
+          "subtotal": 2250.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "DailiesEncode & Upload - DAX",
+              "quantity": 15.0,
+              "unit": "days",
+              "multiplier": 3.0,
+              "rate": 50.0,
+              "subtotal": 2250.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "VISUAL EFFECTS",
+      "account": "4400",
+      "total": 13000.0,
+      "line_items": [
+        {
+          "account": "4432",
+          "description": "VFX",
+          "position": "Beauty Fixes",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 5000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Beauty Fixes",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 5000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "INSURANCE",
+      "account": "6700",
+      "total": 10557.0,
+      "line_items": [
+        {
+          "account": "6701",
+          "description": "PRODUCTIONINSURANCE",
+          "position": "Based on budget less 6701",
+          "quantity": 0.16,
+          "unit": "%",
+          "rate": 5658247.0,
+          "subtotal": 9053.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Based on budget less 6701",
+              "quantity": 0.16,
+              "unit": "%",
+              "multiplier": 1.0,
+              "rate": 5658247.0,
+              "subtotal": 9053.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "6702",
+          "description": "NEGATIVEINSURANCE",
+          "position": "Per half hour",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 356.0,
+          "subtotal": 712.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Per half hour",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 2.0,
+              "rate": 356.0,
+              "subtotal": 712.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "6703",
+          "description": "ERRORS & OMISSIONS",
+          "position": "Per half hour",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 356.0,
+          "subtotal": 712.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Per half hour",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 2.0,
+              "rate": 356.0,
+              "subtotal": 712.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "6705",
+          "description": "OTHERINSURANCE",
+          "position": "OntarioWCI (Workers Comp) registration",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 100.0,
+          "subtotal": 80.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "OntarioWCI (Workers Comp) registration",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 100.0,
+              "subtotal": 80.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "extraction_stats": {
+    "total_pages": 60,
+    "departments_found": 18,
+    "line_items_found": 50
+  }
+}

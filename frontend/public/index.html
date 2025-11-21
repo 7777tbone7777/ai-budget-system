@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U.S. Film Tax Incentive Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body class="bg-gray-50">
+    <div x-data="taxIncentiveApp()" class="min-h-screen p-8">
+        <!-- Header -->
+        <div class="max-w-7xl mx-auto mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">U.S. Film Tax Incentive Calculator</h1>
+            <p class="text-gray-600">Compare production tax incentives across 28 U.S. states</p>
+        </div>
+
+        <!-- Production Budget Input -->
+        <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Production Budget Details</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Total Budget ($)</label>
+                    <input type="number" x-model="budget.totalBudget"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="10000000">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Resident ATL Spend ($)</label>
+                    <input type="number" x-model="budget.residentAtlSpend"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="1000000">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Resident BTL Spend ($)</label>
+                    <input type="number" x-model="budget.residentBtlSpend"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="2000000">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Non-Resident ATL Spend ($)</label>
+                    <input type="number" x-model="budget.nonResidentAtlSpend"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="500000">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Non-Resident BTL Spend ($)</label>
+                    <input type="number" x-model="budget.nonResidentBtlSpend"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="1500000">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Qualified Spend ($)</label>
+                    <input type="number" x-model="budget.qualifiedSpend"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="6000000">
+                </div>
+            </div>
+        </div>
+
+        <!-- State Selection -->
+        <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Select States to Compare</h2>
+
+            <div class="mb-4">
+                <button @click="selectAllStates()"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 mr-2">
+                    Select All
+                </button>
+                <button @click="clearStates()"
+                        class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 mr-2">
+                    Clear All
+                </button>
+                <button @click="compareStates()"
+                        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                    Compare Selected States
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3" x-show="states.length > 0">
+                <template x-for="state in states" :key="state.state">
+                    <label class="flex items-center space-x-2 cursor-pointer p-2 rounded hover:bg-gray-50">
+                        <input type="checkbox"
+                               :value="state.state"
+                               x-model="selectedStates"
+                               class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                        <span class="text-sm" x-text="state.state"></span>
+                    </label>
+                </template>
+            </div>
+
+            <div x-show="states.length === 0" class="text-center py-8">
+                <p class="text-gray-500">Loading states...</p>
+            </div>
+        </div>
+
+        <!-- Comparison Results -->
+        <div x-show="comparison.length > 0" class="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Tax Incentive Comparison Results</h2>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Rank
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                State
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tax Credit
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Effective Rate
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Type
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <template x-for="(result, index) in comparison" :key="index">
+                            <tr :class="index === 0 ? 'bg-green-50' : ''">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span x-text="index + 1"
+                                          :class="index === 0 ? 'text-green-600 font-bold text-lg' : 'text-gray-900'">
+                                    </span>
+                                    <span x-show="index === 0" class="ml-2 text-xl">🏆</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900" x-text="result.state"></div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <template x-if="result.eligible">
+                                        <div class="text-sm font-semibold text-gray-900"
+                                             x-text="'$' + (result.totalCredit || 0).toLocaleString()"></div>
+                                    </template>
+                                    <template x-if="!result.eligible">
+                                        <div class="text-sm text-gray-500">Not Eligible</div>
+                                    </template>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <template x-if="result.eligible">
+                                        <div class="text-sm text-gray-900" x-text="result.effectiveRate + '%'"></div>
+                                    </template>
+                                    <template x-if="!result.eligible">
+                                        <div class="text-sm text-gray-500">-</div>
+                                    </template>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+                                          x-text="result.incentiveType + ' ' + result.mechanism"></span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <template x-if="result.eligible">
+                                        <span class="text-green-600">✓ Eligible</span>
+                                    </template>
+                                    <template x-if="!result.eligible">
+                                        <span class="text-red-600" x-text="result.reason"></span>
+                                    </template>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Summary Stats -->
+            <div x-show="summary" class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <div class="text-sm text-blue-600 font-medium">States Compared</div>
+                    <div class="text-2xl font-bold text-blue-900" x-text="summary.totalStatesCompared"></div>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <div class="text-sm text-green-600 font-medium">Eligible States</div>
+                    <div class="text-2xl font-bold text-green-900" x-text="summary.eligibleStates"></div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <div class="text-sm text-purple-600 font-medium">Best State</div>
+                    <div class="text-2xl font-bold text-purple-900" x-text="summary.bestState || 'None'"></div>
+                </div>
+                <div class="bg-orange-50 p-4 rounded-lg">
+                    <div class="text-sm text-orange-600 font-medium">Best Credit</div>
+                    <div class="text-2xl font-bold text-orange-900"
+                         x-text="'$' + (summary.bestCredit || 0).toLocaleString()"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function taxIncentiveApp() {
+            return {
+                // API Base URL
+                apiUrl: 'https://backend-production-8e04.up.railway.app/api',
+
+                // Available states
+                states: [],
+
+                // Selected states for comparison
+                selectedStates: [],
+
+                // Budget inputs
+                budget: {
+                    totalBudget: 10000000,
+                    residentAtlSpend: 1000000,
+                    residentBtlSpend: 2000000,
+                    nonResidentAtlSpend: 500000,
+                    nonResidentBtlSpend: 1500000,
+                    qualifiedSpend: 6000000
+                },
+
+                // Comparison results
+                comparison: [],
+                summary: null,
+
+                // Initialize
+                async init() {
+                    await this.loadStates();
+                },
+
+                // Load all available states
+                async loadStates() {
+                    try {
+                        const response = await fetch(`${this.apiUrl}/tax-incentives`);
+                        const data = await response.json();
+                        if (data.success) {
+                            this.states = data.data.sort((a, b) => a.state.localeCompare(b.state));
+                        }
+                    } catch (error) {
+                        console.error('Error loading states:', error);
+                        alert('Failed to load states. Please try again.');
+                    }
+                },
+
+                // Select all states
+                selectAllStates() {
+                    this.selectedStates = this.states.map(s => s.state);
+                },
+
+                // Clear all selections
+                clearStates() {
+                    this.selectedStates = [];
+                },
+
+                // Compare selected states
+                async compareStates() {
+                    if (this.selectedStates.length === 0) {
+                        alert('Please select at least one state to compare');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`${this.apiUrl}/tax-incentives/compare`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                states: this.selectedStates,
+                                ...this.budget
+                            })
+                        });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            this.comparison = data.data;
+                            this.summary = data.summary;
+                        }
+                    } catch (error) {
+                        console.error('Error comparing states:', error);
+                        alert('Failed to compare states. Please try again.');
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

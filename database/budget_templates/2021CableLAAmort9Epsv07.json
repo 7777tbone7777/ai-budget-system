@@ -1,0 +1,1049 @@
+{
+  "metadata": {
+    "filename": "2021+Cable+LA+Amort+9Eps+v07.pdf",
+    "location": "Los Angeles, CA 8 Day Shoot - 4 Stage / 4 Location",
+    "production_type": null,
+    "shoot_days": null,
+    "shoot_dates": "3/15/21-6/24/21",
+    "total_budget": null,
+    "atl_total": null,
+    "btl_total": null,
+    "other_total": null,
+    "post_total": null,
+    "production_total": null,
+    "pdf_path": "/Users/anthonyvazquez/Documents/budgets/2021+Cable+LA+Amort+9Eps+v07.pdf"
+  },
+  "departments": [
+    {
+      "name": "PRODUCERS UNIT",
+      "account": "1200",
+      "total": 63755.0,
+      "line_items": [
+        {
+          "account": "1285",
+          "description": "MISC EXPENSES",
+          "position": "Line Prod. Phone Allow",
+          "quantity": 23.8,
+          "unit": "weeks",
+          "rate": 25.0,
+          "subtotal": 595.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Line Prod. Phone Allow",
+              "quantity": 23.8,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 25.0,
+              "subtotal": 595.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "1288",
+          "description": "PRODUCERBONUS",
+          "position": "SeriesSales Bonus",
+          "quantity": 0.75,
+          "unit": "epis",
+          "rate": 25000.0,
+          "subtotal": 18750.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "SeriesSales Bonus",
+              "quantity": 0.75,
+              "unit": "epis",
+              "multiplier": 1.0,
+              "rate": 25000.0,
+              "subtotal": 18750.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PRODUCTIONSTAFF",
+      "account": "2000",
+      "total": 541587.0,
+      "line_items": [
+        {
+          "account": "2005",
+          "description": "SCRIPTSUPERVISOR",
+          "position": "Local Hire - Longform Daily\nPrep (episodic prep in pattern)",
+          "quantity": 2.0,
+          "unit": "days",
+          "rate": 39.33,
+          "subtotal": 944.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Local Hire - Longform Daily\nPrep (episodic prep in pattern)",
+              "quantity": 2.0,
+              "unit": "days",
+              "multiplier": 12.0,
+              "rate": 39.33,
+              "subtotal": 944.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2017",
+          "description": "BOX/COMPUTER RENTALS",
+          "position": "Asst. Location Mgr. #2 Computer\nPrep",
+          "quantity": 3.0,
+          "unit": "weeks",
+          "rate": 50.0,
+          "subtotal": 150.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Asst. Location Mgr. #2 Computer\nPrep",
+              "quantity": 3.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 50.0,
+              "subtotal": 150.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EXTRATALENT",
+      "account": "2100",
+      "total": 4547.0,
+      "line_items": [
+        {
+          "account": "2101",
+          "description": "STAND-INS",
+          "position": "Holidays (must work day before and day after)",
+          "quantity": 2.0,
+          "unit": "days",
+          "rate": 209.1,
+          "subtotal": 1673.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Holidays (must work day before and day after)",
+              "quantity": 2.0,
+              "unit": "days",
+              "multiplier": 4.0,
+              "rate": 209.1,
+              "subtotal": 1673.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2110",
+          "description": "EXTRAS CASTING COORDINATOR",
+          "position": "Central Casting Prep Fee",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 2000.0,
+          "subtotal": 2000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Central Casting Prep Fee",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 2000.0,
+              "subtotal": 2000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EXTRATALENT",
+      "account": "2100",
+      "total": 4547.0,
+      "line_items": [
+        {
+          "account": "2101",
+          "description": "STAND-INS",
+          "position": "Holidays (must work day before and day after)",
+          "quantity": 2.0,
+          "unit": "days",
+          "rate": 209.1,
+          "subtotal": 1673.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Holidays (must work day before and day after)",
+              "quantity": 2.0,
+              "unit": "days",
+              "multiplier": 4.0,
+              "rate": 209.1,
+              "subtotal": 1673.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2110",
+          "description": "EXTRAS CASTING COORDINATOR",
+          "position": "Central Casting Prep Fee",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 2000.0,
+          "subtotal": 2000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Central Casting Prep Fee",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 2000.0,
+              "subtotal": 2000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SETCONSTRUCTION",
+      "account": "2300",
+      "total": 1244186.0,
+      "line_items": [
+        {
+          "account": "2316",
+          "description": "PURCHASES",
+          "position": "Permanent Sets",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 325000.0,
+          "subtotal": 325000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Permanent Sets",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 325000.0,
+              "subtotal": 325000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SETOPERATIONS",
+      "account": "2500",
+      "total": 154556.0,
+      "line_items": [
+        {
+          "account": "2505",
+          "description": "COMPANY GRIPS",
+          "position": "Grip #3\nPrep",
+          "quantity": 5.0,
+          "unit": "days",
+          "rate": 38.33,
+          "subtotal": 2108.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Grip #3\nPrep",
+              "quantity": 5.0,
+              "unit": "days",
+              "multiplier": 11.0,
+              "rate": 38.33,
+              "subtotal": 2108.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2512",
+          "description": "CRAFTS SERVICEPURCHASES",
+          "position": "Startup",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 2500.0,
+          "subtotal": 2500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Startup",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 2500.0,
+              "subtotal": 2500.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2516",
+          "description": "PURCHASES",
+          "position": "Grid Pipe & Chain - Purchase",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 17500.0,
+          "subtotal": 44500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Grid Pipe & Chain - Purchase",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 17500.0,
+              "subtotal": 17500.0,
+              "total": null
+            },
+            {
+              "position": "Episodic purchases",
+              "quantity": 9.0,
+              "unit": "epis",
+              "multiplier": 1.0,
+              "rate": 3000.0,
+              "subtotal": 27000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SET DRESSING",
+      "account": "2700",
+      "total": 322079.0,
+      "line_items": [
+        {
+          "account": "2717",
+          "description": "BOX/COMPUTER RENTALS",
+          "position": "On-Set Decorator\nPrep",
+          "quantity": 0.2,
+          "unit": "weeks",
+          "rate": 100.0,
+          "subtotal": 20.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "On-Set Decorator\nPrep",
+              "quantity": 0.2,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 100.0,
+              "subtotal": 20.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2718",
+          "description": "RENTALS",
+          "position": "Misc ROS Rentals",
+          "quantity": 3.42,
+          "unit": "mon...",
+          "rate": 10000.0,
+          "subtotal": 34180.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Misc ROS Rentals",
+              "quantity": 3.42,
+              "unit": "mon...",
+              "multiplier": 1.0,
+              "rate": 10000.0,
+              "subtotal": 34180.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "WARDROBE",
+      "account": "2900",
+      "total": 191387.0,
+      "line_items": [
+        {
+          "account": "2908",
+          "description": "ALTERATIONS & REPAIRS",
+          "position": "ALTERATIONS & REPAIRS",
+          "quantity": null,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {
+            "prep": {
+              "quantity": 13.0,
+              "unit": "days",
+              "rate": 38.58,
+              "subtotal": 7022.0
+            }
+          },
+          "detail_lines": []
+        },
+        {
+          "account": "2909",
+          "description": "CLEANING & DYEING",
+          "position": "Cleaning",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 1350.0,
+          "subtotal": 1350.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Cleaning",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 1350.0,
+              "subtotal": 1350.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LIGHTING",
+      "account": "3200",
+      "total": 158110.0,
+      "line_items": [
+        {
+          "account": "3220",
+          "description": "LIGHTINGPACKAGE",
+          "position": "Holiday\nStage Pkg",
+          "quantity": 0.4,
+          "unit": "weeks",
+          "rate": 25000.0,
+          "subtotal": 10000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Holiday\nStage Pkg",
+              "quantity": 0.4,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 25000.0,
+              "subtotal": 10000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CAMERA",
+      "account": "3300",
+      "total": 63684.0,
+      "line_items": [
+        {
+          "account": "3305",
+          "description": "1ST ASSISTANT CAMERA",
+          "position": "B Camera 1stAC\nLocal Hire - Local 600 Longform\nPrep",
+          "quantity": 1.0,
+          "unit": "day",
+          "rate": 52.96,
+          "subtotal": 583.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "B Camera 1stAC\nLocal Hire - Local 600 Longform\nPrep",
+              "quantity": 1.0,
+              "unit": "day",
+              "multiplier": 11.0,
+              "rate": 52.96,
+              "subtotal": 583.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3306",
+          "description": "2ND ASSISTANT CAMERA",
+          "position": "Local 600 Longform Daily\nA Camera\nLocal Hire\nWrap",
+          "quantity": 1.0,
+          "unit": "day",
+          "rate": 48.01,
+          "subtotal": 528.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Local 600 Longform Daily\nA Camera\nLocal Hire\nWrap",
+              "quantity": 1.0,
+              "unit": "day",
+              "multiplier": 11.0,
+              "rate": 48.01,
+              "subtotal": 528.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3316",
+          "description": "PURCHASES",
+          "position": "Startup",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 2750.0,
+          "subtotal": 2750.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Startup",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 2750.0,
+              "subtotal": 2750.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3317",
+          "description": "BOX RENTALS",
+          "position": "DP Box Prep",
+          "quantity": 3.0,
+          "unit": "weeks",
+          "rate": 500.0,
+          "subtotal": 1500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "DP Box Prep",
+              "quantity": 3.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 1500.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3318",
+          "description": "EQUIPMENT RENTALS",
+          "position": "Add'l Equipment",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 2250.0,
+          "subtotal": 2250.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Add'l Equipment",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 2250.0,
+              "subtotal": 2250.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3319",
+          "description": "STEADICAM RENTALS",
+          "position": "Steadicam Holiday Carry",
+          "quantity": 0.4,
+          "unit": "weeks",
+          "rate": 3000.0,
+          "subtotal": 1200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Steadicam Holiday Carry",
+              "quantity": 0.4,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 3000.0,
+              "subtotal": 1200.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TRANSPORTATION",
+      "account": "3500",
+      "total": 357252.0,
+      "line_items": [
+        {
+          "account": "3502",
+          "description": "CO-CAPTAIN",
+          "position": "Local Hire - WB Lot rate\nDrives #20 Maxi Van #1\nPrep",
+          "quantity": 4.0,
+          "unit": "weeks",
+          "rate": 42.08,
+          "subtotal": 11782.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Local Hire - WB Lot rate\nDrives #20 Maxi Van #1\nPrep",
+              "quantity": 4.0,
+              "unit": "weeks",
+              "multiplier": 70.0,
+              "rate": 42.08,
+              "subtotal": 11782.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3516",
+          "description": "PURCHASES",
+          "position": "Startup",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 500.0,
+          "subtotal": 500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Startup",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 500.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3544",
+          "description": "FUEL",
+          "position": "Prep/Wrap Mileage",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 1000.0,
+          "subtotal": 1000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Prep/Wrap Mileage",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 1000.0,
+              "subtotal": 1000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3547",
+          "description": "PARKING, PERMITS, TOLLS",
+          "position": "Vehicle Permits",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 2500.0,
+          "subtotal": 2500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Vehicle Permits",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 2500.0,
+              "subtotal": 2500.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3585",
+          "description": "MISC EXPENSES",
+          "position": "WB DOT AdministrationFee",
+          "quantity": 9.0,
+          "unit": "epis",
+          "rate": 1600.0,
+          "subtotal": 14400.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "WB DOT AdministrationFee",
+              "quantity": 9.0,
+              "unit": "epis",
+              "multiplier": 1.0,
+              "rate": 1600.0,
+              "subtotal": 14400.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3598",
+          "description": "LOSS & DAMAGE",
+          "position": "Loss & Damage",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 2500.0,
+          "subtotal": 2500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Loss & Damage",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 2500.0,
+              "subtotal": 2500.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION EXPENSE",
+      "account": "3600",
+      "total": 963976.0,
+      "line_items": [
+        {
+          "account": "4206",
+          "description": "OTHER STAGES & FACILITIES",
+          "position": "PowerDrops\nStage Security",
+          "quantity": 3.42,
+          "unit": "mon...",
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {
+            "post": {
+              "quantity": 8.0,
+              "unit": "weeks",
+              "rate": 1200.0,
+              "subtotal": 9600.0
+            }
+          },
+          "detail_lines": [
+            {
+              "position": "PowerDrops\nStage Security",
+              "quantity": 3.42,
+              "unit": "mon...",
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "4210",
+          "description": "STORAGE CHARGES",
+          "position": "Hold Sets",
+          "quantity": 5.0,
+          "unit": "mon...",
+          "rate": 5000.0,
+          "subtotal": 25000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Hold Sets",
+              "quantity": 5.0,
+              "unit": "mon...",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 25000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION EXPENSE",
+      "account": "3600",
+      "total": 963976.0,
+      "line_items": [
+        {
+          "account": "4206",
+          "description": "OTHER STAGES & FACILITIES",
+          "position": "PowerDrops\nStage Security",
+          "quantity": 3.42,
+          "unit": "mon...",
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {
+            "post": {
+              "quantity": 8.0,
+              "unit": "weeks",
+              "rate": 1200.0,
+              "subtotal": 9600.0
+            }
+          },
+          "detail_lines": [
+            {
+              "position": "PowerDrops\nStage Security",
+              "quantity": 3.42,
+              "unit": "mon...",
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "4210",
+          "description": "STORAGE CHARGES",
+          "position": "Hold Sets",
+          "quantity": 5.0,
+          "unit": "mon...",
+          "rate": 5000.0,
+          "subtotal": 25000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Hold Sets",
+              "quantity": 5.0,
+              "unit": "mon...",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 25000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION EXPENSE",
+      "account": "3600",
+      "total": 963976.0,
+      "line_items": [
+        {
+          "account": "4206",
+          "description": "OTHER STAGES & FACILITIES",
+          "position": "PowerDrops\nStage Security",
+          "quantity": 3.42,
+          "unit": "mon...",
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {
+            "post": {
+              "quantity": 8.0,
+              "unit": "weeks",
+              "rate": 1200.0,
+              "subtotal": 9600.0
+            }
+          },
+          "detail_lines": [
+            {
+              "position": "PowerDrops\nStage Security",
+              "quantity": 3.42,
+              "unit": "mon...",
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "4210",
+          "description": "STORAGE CHARGES",
+          "position": "Hold Sets",
+          "quantity": 5.0,
+          "unit": "mon...",
+          "rate": 5000.0,
+          "subtotal": 25000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Hold Sets",
+              "quantity": 5.0,
+              "unit": "mon...",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 25000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MUSIC",
+      "account": "4600",
+      "total": 220728.0,
+      "line_items": [
+        {
+          "account": "4602",
+          "description": "COMPOSERS",
+          "position": "Composer (PilotCompletion)",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 15000.0,
+          "subtotal": 15000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Composer (PilotCompletion)",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 15000.0,
+              "subtotal": 15000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "4605",
+          "description": "MUSIC SUPERVISION",
+          "position": "Music Supervisor (PilotCompletion)",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 4000.0,
+          "subtotal": 4000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Music Supervisor (PilotCompletion)",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 4000.0,
+              "subtotal": 4000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "4646",
+          "description": "MUSIC LICENSE AMXT BUYOUT",
+          "position": "Pilot Completion",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 200000.0,
+          "subtotal": 200000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Pilot Completion",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 200000.0,
+              "subtotal": 200000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "INSURANCE",
+      "account": "6700",
+      "total": 15000.0,
+      "line_items": [
+        {
+          "account": "6705",
+          "description": "OTHERINSURANCE",
+          "position": "Non-Union CIGNA Medical Insurance",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 15000.0,
+          "subtotal": 15000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Non-Union CIGNA Medical Insurance",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 15000.0,
+              "subtotal": 15000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "INSURANCE",
+      "account": "6700",
+      "total": 15000.0,
+      "line_items": [
+        {
+          "account": "6705",
+          "description": "OTHERINSURANCE",
+          "position": "Non-Union CIGNA Medical Insurance",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 15000.0,
+          "subtotal": 15000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Non-Union CIGNA Medical Insurance",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 15000.0,
+              "subtotal": 15000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "extraction_stats": {
+    "total_pages": 56,
+    "departments_found": 17,
+    "line_items_found": 40
+  }
+}

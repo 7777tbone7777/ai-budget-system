@@ -1,0 +1,536 @@
+{
+  "metadata": {
+    "filename": "2021 Multicam S1 Pattern 12Eps v06.pdf",
+    "location": null,
+    "production_type": "multicam_pilot",
+    "shoot_days": null,
+    "shoot_dates": "8/16/21-12/3/21",
+    "total_budget": null,
+    "atl_total": null,
+    "btl_total": null,
+    "other_total": null,
+    "post_total": null,
+    "production_total": null,
+    "pdf_path": "/Users/anthonyvazquez/Documents/budgets/2021 Multicam S1 Pattern 12Eps v06.pdf"
+  },
+  "departments": [
+    {
+      "name": "PRODUCER",
+      "account": "1200",
+      "total": 45581.0,
+      "line_items": [
+        {
+          "account": "1201",
+          "description": "EXECUTIVEPRODUCER",
+          "position": "TBD-NonWritingProducer",
+          "quantity": 1.0,
+          "unit": "episode",
+          "rate": null,
+          "subtotal": 15000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "TBD-NonWritingProducer",
+              "quantity": 1.0,
+              "unit": "episode",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 15000.0,
+              "total": 15000.0
+            }
+          ]
+        },
+        {
+          "account": "1202",
+          "description": "PRODUCER",
+          "position": "ProducerPortion",
+          "quantity": 1.0,
+          "unit": "episode",
+          "rate": null,
+          "subtotal": 8046.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "ProducerPortion",
+              "quantity": 1.0,
+              "unit": "episode",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 8046.0,
+              "total": 8046.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PRODUCTIONSTAFF",
+      "account": "2000",
+      "total": null,
+      "line_items": [
+        {
+          "account": "2003",
+          "description": "2NDASSISTANTDIRECTOR",
+          "position": "2nd2ndAD\nBlock/Shoot",
+          "quantity": 2.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 836.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "2nd2ndAD\nBlock/Shoot",
+              "quantity": 2.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 836.0,
+              "total": 1673.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EXTRATALENT",
+      "account": "2100",
+      "total": 30060.0,
+      "line_items": [
+        {
+          "account": "2101",
+          "description": "STAND-INS",
+          "position": "BLOCKDAY\nDAY#4\nStand-Ins",
+          "quantity": 6.0,
+          "unit": "mandays",
+          "rate": null,
+          "subtotal": 6636.25,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "BLOCKDAY\nDAY#4\nStand-Ins",
+              "quantity": 6.0,
+              "unit": "mandays",
+              "multiplier": 15.0,
+              "rate": null,
+              "subtotal": 26.125,
+              "total": 2351.0
+            },
+            {
+              "position": "SHOOTDAY\nDAY#5\nStand-Ins",
+              "quantity": 6.0,
+              "unit": "mandays",
+              "multiplier": 11.0,
+              "rate": null,
+              "subtotal": 26.125,
+              "total": 1724.0
+            },
+            {
+              "position": "AdjustmentAllowance",
+              "quantity": 10.0,
+              "unit": "%",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 6584.0,
+              "total": 658.0
+            }
+          ]
+        },
+        {
+          "account": "2102",
+          "description": "UNIONEXTRAS",
+          "position": "NETWORKRUN-THROUGHDAY\nREHEARSALDAY\nDay#3\nUnionExtras",
+          "quantity": 1.0,
+          "unit": "mandays",
+          "rate": null,
+          "subtotal": 8076.75,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "NETWORKRUN-THROUGHDAY\nREHEARSALDAY\nDay#3\nUnionExtras",
+              "quantity": 1.0,
+              "unit": "mandays",
+              "multiplier": 8.0,
+              "rate": null,
+              "subtotal": 22.25,
+              "total": 178.0
+            },
+            {
+              "position": "BLOCKDAY\nDay#4\nUnionExtras",
+              "quantity": 16.0,
+              "unit": "mandays",
+              "multiplier": 11.0,
+              "rate": null,
+              "subtotal": 22.25,
+              "total": 3916.0
+            },
+            {
+              "position": "SHOOTDAY\nDay#5\nUnionExtras",
+              "quantity": 16.0,
+              "unit": "mandays",
+              "multiplier": 11.0,
+              "rate": null,
+              "subtotal": 22.25,
+              "total": 3916.0
+            },
+            {
+              "position": "AdjustmentAllowance",
+              "quantity": 10.0,
+              "unit": "%",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 8010.0,
+              "total": 801.0
+            }
+          ]
+        },
+        {
+          "account": "2103",
+          "description": "NON-UNIONEXTRAS",
+          "position": "BLOCKDAY\nDay#4\nLaughers",
+          "quantity": 20.0,
+          "unit": "mandays",
+          "rate": null,
+          "subtotal": 30.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "BLOCKDAY\nDay#4\nLaughers",
+              "quantity": 20.0,
+              "unit": "mandays",
+              "multiplier": 8.0,
+              "rate": null,
+              "subtotal": 15.0,
+              "total": 2400.0
+            },
+            {
+              "position": "SHOOTDAY\nDay#5\nLaughers",
+              "quantity": 10.0,
+              "unit": "mandays",
+              "multiplier": 8.0,
+              "rate": null,
+              "subtotal": 15.0,
+              "total": 1200.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SETOPERATIONS",
+      "account": "2500",
+      "total": 3967.0,
+      "line_items": [
+        {
+          "account": "2616",
+          "description": "SPECIALEFFECTS",
+          "position": "Purchases",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Purchases",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 500.0,
+              "total": 500.0
+            }
+          ]
+        },
+        {
+          "account": "2618",
+          "description": "SPECIALEFFECTSEQUIPRENT",
+          "position": "Rentals",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 1000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Rentals",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 1000.0,
+              "total": 1000.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "COSTUMES",
+      "account": "2900",
+      "total": 6253.0,
+      "line_items": [
+        {
+          "account": "3043",
+          "description": "WRANGLERS",
+          "position": "DogTrainers",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 46.93,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "DogTrainers",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 11.0,
+              "rate": null,
+              "subtotal": 46.93,
+              "total": 2065.0
+            }
+          ]
+        },
+        {
+          "account": "3049",
+          "description": "ANIMALTRANSPORT",
+          "position": "Transport",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 350.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Transport",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 2.0,
+              "rate": null,
+              "subtotal": 350.0,
+              "total": 700.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MAKEUP&HAIRSTYLISTS",
+      "account": "3100",
+      "total": 60830.0,
+      "line_items": [
+        {
+          "account": "3217",
+          "description": "BOXRENTALS",
+          "position": "Gaffer",
+          "quantity": 1.0,
+          "unit": "week",
+          "rate": null,
+          "subtotal": 150.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Gaffer",
+              "quantity": 1.0,
+              "unit": "week",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 150.0,
+              "total": 150.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CAMERA",
+      "account": "3300",
+      "total": 26456.0,
+      "line_items": [
+        {
+          "account": "3516",
+          "description": "PURCHASES",
+          "position": "Purchases",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 250.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Purchases",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 250.0,
+              "total": 250.0
+            }
+          ]
+        },
+        {
+          "account": "3546",
+          "description": "REPAIRS&MAINTENANCE",
+          "position": "TrailersPumpingService",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 250.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "TrailersPumpingService",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 250.0,
+              "total": 250.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TRANSPORTATION",
+      "account": "3500",
+      "total": 26456.0,
+      "line_items": [
+        {
+          "account": "3516",
+          "description": "PURCHASES",
+          "position": "Purchases",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 250.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Purchases",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 250.0,
+              "total": 250.0
+            }
+          ]
+        },
+        {
+          "account": "3546",
+          "description": "REPAIRS&MAINTENANCE",
+          "position": "TrailersPumpingService",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 250.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "TrailersPumpingService",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 250.0,
+              "total": 250.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "INSURANCE",
+      "account": "6700",
+      "total": 4145.0,
+      "line_items": [
+        {
+          "account": "6702",
+          "description": "NEGINSURANCE",
+          "position": "NegInsurance",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 356.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "NegInsurance",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 356.0,
+              "total": 356.0
+            }
+          ]
+        },
+        {
+          "account": "6703",
+          "description": "ERRORS&OMISSIONS",
+          "position": "Errors&Omissions",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 356.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Errors&Omissions",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 356.0,
+              "total": 356.0
+            }
+          ]
+        },
+        {
+          "account": "6705",
+          "description": "OTHERINSURANCE",
+          "position": "ProductionInsurance",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 600.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "ProductionInsurance",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 600.0,
+              "total": 600.0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "extraction_stats": {
+    "total_pages": 32,
+    "departments_found": 9,
+    "line_items_found": 18
+  }
+}

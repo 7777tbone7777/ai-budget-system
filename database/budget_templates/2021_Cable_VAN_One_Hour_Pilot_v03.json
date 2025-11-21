@@ -1,0 +1,1552 @@
+{
+  "metadata": {
+    "filename": "2021 Cable VAN One-Hour Pilot v03.pdf",
+    "location": "Vancouver, BC 15 Local Location Days",
+    "production_type": null,
+    "shoot_days": 15,
+    "shoot_dates": null,
+    "total_budget": null,
+    "atl_total": null,
+    "btl_total": null,
+    "other_total": null,
+    "post_total": null,
+    "production_total": null,
+    "pdf_path": "/Users/anthonyvazquez/Documents/budgets/2021 Pilot - 1Hr/Vancouver/Ver 03/2021 Cable VAN One-Hour Pilot v03.pdf"
+  },
+  "departments": [
+    {
+      "name": "DIRECTOR",
+      "account": "1300",
+      "total": 206669.0,
+      "line_items": [
+        {
+          "account": "1301",
+          "description": "DIRECTOR",
+          "position": "Director(Non-Network)",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Director(Non-Network)",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "1385",
+          "description": "MISCELLANEOUS",
+          "position": "Miscellaneous",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 25000.0,
+          "subtotal": 25000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Miscellaneous",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 25000.0,
+              "subtotal": 25000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ATLTRAVEL&LIVING",
+      "account": "1500",
+      "total": 125321.0,
+      "line_items": [
+        {
+          "account": "1503",
+          "description": "MEALS",
+          "position": "Writers",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Writers",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            },
+            {
+              "position": "Producers",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            },
+            {
+              "position": "Director",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            },
+            {
+              "position": "Cast",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "1504",
+          "description": "PER DIEM /LIVINGALLOWANCES",
+          "position": "Writers",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Writers",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "1505",
+          "description": "GROUND TRANSPORTATION",
+          "position": "Writers",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Writers",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PRODUCTIONSTAFF",
+      "account": "2000",
+      "total": 645238.0,
+      "line_items": [
+        {
+          "account": "2002",
+          "description": "1ST ASSISTANT DIRECTOR",
+          "position": "Overscale - scale =",
+          "quantity": 3667.0,
+          "unit": "weeks",
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Overscale - scale =",
+              "quantity": 3667.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2015",
+          "description": "BOARD PREP",
+          "position": "Board/ScriptBreakdown",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 8500.0,
+          "subtotal": 8500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Board/ScriptBreakdown",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 8500.0,
+              "subtotal": 8500.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EXTRATALENT",
+      "account": "2100",
+      "total": 129852.0,
+      "line_items": [
+        {
+          "account": "2107",
+          "description": "WARDROBE FITTINGS",
+          "position": "Adjustments & Fittings",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 500.0,
+          "subtotal": 400.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Adjustments & Fittings",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 400.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2185",
+          "description": "MISCELLANEOUS",
+          "position": "Extras Casting Expenses (Location Specific)",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 250.0,
+          "subtotal": 200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Extras Casting Expenses (Location Specific)",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 250.0,
+              "subtotal": 200.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EXTRATALENT",
+      "account": "2100",
+      "total": 129852.0,
+      "line_items": [
+        {
+          "account": "2107",
+          "description": "WARDROBE FITTINGS",
+          "position": "Adjustments & Fittings",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 500.0,
+          "subtotal": 400.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Adjustments & Fittings",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 400.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2185",
+          "description": "MISCELLANEOUS",
+          "position": "Extras Casting Expenses (Location Specific)",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 250.0,
+          "subtotal": 200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Extras Casting Expenses (Location Specific)",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 250.0,
+              "subtotal": 200.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SETCONSTRUCTION",
+      "account": "2300",
+      "total": 179050.0,
+      "line_items": [
+        {
+          "account": "2301",
+          "description": "CONSTRUCTIONLABOR",
+          "position": "891 Local Hires",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "891 Local Hires",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2307",
+          "description": "BACKINGS",
+          "position": "Graphics",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 8000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Graphics",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            },
+            {
+              "position": "Backings / Translites",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2316",
+          "description": "PURCHASES",
+          "position": "Materials & Supplies",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 20000.0,
+          "subtotal": 16000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Materials & Supplies",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 20000.0,
+              "subtotal": 16000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2385",
+          "description": "MISCELLANEOUS",
+          "position": "LiftsScaffolds for Constuction",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 4000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "LiftsScaffolds for Constuction",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SET STRIKE",
+      "account": "2400",
+      "total": 7625.0,
+      "line_items": [
+        {
+          "account": "2497",
+          "description": "TRASH & HAZARDOUS WASTE REMOVAL",
+          "position": "Hazardous Waste Removal",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": 2000.0,
+          "subtotal": 1600.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Hazardous Waste Removal",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 2000.0,
+              "subtotal": 1600.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SPECIAL EFFECTS",
+      "account": "2600",
+      "total": 181716.0,
+      "line_items": [
+        {
+          "account": "2716",
+          "description": "PURCHASES",
+          "position": "Purchases",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 40000.0,
+          "subtotal": 32000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Purchases",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 40000.0,
+              "subtotal": 32000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2718",
+          "description": "RENTALS",
+          "position": "Rentals",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 20000.0,
+          "subtotal": 16000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Rentals",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 20000.0,
+              "subtotal": 16000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PROPERTY",
+      "account": "2800",
+      "total": 73623.0,
+      "line_items": [
+        {
+          "account": "2801",
+          "description": "PROPERTY MASTER",
+          "position": "891 Local Hire - Corp",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "891 Local Hire - Corp",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2818",
+          "description": "RENTALS",
+          "position": "Prop Rentals",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5010.0,
+          "subtotal": 4008.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Prop Rentals",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5010.0,
+              "subtotal": 4008.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ANIMALS&PICTURECARS",
+      "account": "3000",
+      "total": 20000.0,
+      "line_items": [
+        {
+          "account": "3007",
+          "description": "PICTURE VEHICLE RENTALS",
+          "position": "PictureCars",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 25000.0,
+          "subtotal": 20000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "PictureCars",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 25000.0,
+              "subtotal": 20000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LIGHTING",
+      "account": "3200",
+      "total": 144098.0,
+      "line_items": [
+        {
+          "account": "3216",
+          "description": "PURCHASES",
+          "position": "Purchases",
+          "quantity": 2.8,
+          "unit": "weeks",
+          "rate": 2500.0,
+          "subtotal": 5600.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Purchases",
+              "quantity": 2.8,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 2500.0,
+              "subtotal": 5600.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3217",
+          "description": "BOX RENTALS",
+          "position": "BOX RENTALS",
+          "quantity": null,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {
+            "shoot": {
+              "quantity": null,
+              "unit": "weeks\nweeks\nweeks\nweeks",
+              "rate": null,
+              "subtotal": null
+            }
+          },
+          "detail_lines": []
+        }
+      ]
+    },
+    {
+      "name": "CAMERA",
+      "account": "3300",
+      "total": 264501.0,
+      "line_items": [
+        {
+          "account": "3316",
+          "description": "PURCHASES",
+          "position": "Camera Expendables",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 1500.0,
+          "subtotal": 1200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Camera Expendables",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 1500.0,
+              "subtotal": 1200.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TRANSPORTATION",
+      "account": "3500",
+      "total": 41347.0,
+      "line_items": [
+        {
+          "account": "3503",
+          "description": "STUDIO DRIVERS",
+          "position": "03. Camera (See Co-Captain)",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "03. Camera (See Co-Captain)",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3516",
+          "description": "PURCHASES",
+          "position": "Purchases",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 500.0,
+          "subtotal": 400.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Purchases",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 400.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3518",
+          "description": "VEHICLE RENTALS",
+          "position": "02. Grip Tractor",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "02. Grip Tractor",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.0,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION EXPENSE",
+      "account": "3600",
+      "total": 449631.0,
+      "line_items": [
+        {
+          "account": "3606",
+          "description": "SCOUTING/SURVEYCOSTS",
+          "position": "Scouting/SurveyCosts",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 4000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Scouting/SurveyCosts",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3607",
+          "description": "SITE RENTALS / PERMITS",
+          "position": "Location Site Rentals",
+          "quantity": 14.0,
+          "unit": "days",
+          "rate": 35000.0,
+          "subtotal": 392000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Location Site Rentals",
+              "quantity": 14.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 35000.0,
+              "subtotal": 392000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3609",
+          "description": "COURTESY PAYMENTS",
+          "position": "CourtesyPayments",
+          "quantity": 14.0,
+          "unit": "days",
+          "rate": 1100.0,
+          "subtotal": 12320.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "CourtesyPayments",
+              "quantity": 14.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 1100.0,
+              "subtotal": 12320.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3613",
+          "description": "SHIPPING/POSTAGE",
+          "position": "Brokerage Fees - Canadian Allowance",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 5520.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Brokerage Fees - Canadian Allowance",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            },
+            {
+              "position": "Ship Camera Masters to LA",
+              "quantity": 3.8,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 1520.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3620",
+          "description": "CATERED MEALS",
+          "position": "UnrecoverablePST",
+          "quantity": 7.0,
+          "unit": "%",
+          "rate": 75664.0,
+          "subtotal": 5296.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "UnrecoverablePST",
+              "quantity": 7.0,
+              "unit": "%",
+              "multiplier": 1.0,
+              "rate": 75664.0,
+              "subtotal": 5296.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION EXPENSE",
+      "account": "3600",
+      "total": 764010.0,
+      "line_items": [
+        {
+          "account": "3606",
+          "description": "SCOUTING/SURVEYCOSTS",
+          "position": "Scouting/SurveyCosts",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 4000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Scouting/SurveyCosts",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3607",
+          "description": "SITE RENTALS / PERMITS",
+          "position": "Location Site Rentals",
+          "quantity": 14.0,
+          "unit": "days",
+          "rate": 35000.0,
+          "subtotal": 392000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Location Site Rentals",
+              "quantity": 14.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 35000.0,
+              "subtotal": 392000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3609",
+          "description": "COURTESY PAYMENTS",
+          "position": "CourtesyPayments",
+          "quantity": 14.0,
+          "unit": "days",
+          "rate": 1100.0,
+          "subtotal": 12320.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "CourtesyPayments",
+              "quantity": 14.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 1100.0,
+              "subtotal": 12320.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3613",
+          "description": "SHIPPING/POSTAGE",
+          "position": "Brokerage Fees - Canadian Allowance",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 5520.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Brokerage Fees - Canadian Allowance",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            },
+            {
+              "position": "Ship Camera Masters to LA",
+              "quantity": 3.8,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 1520.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3620",
+          "description": "CATERED MEALS",
+          "position": "UnrecoverablePST",
+          "quantity": 7.0,
+          "unit": "%",
+          "rate": 75664.0,
+          "subtotal": 5296.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "UnrecoverablePST",
+              "quantity": 7.0,
+              "unit": "%",
+              "multiplier": 1.0,
+              "rate": 75664.0,
+              "subtotal": 5296.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3625",
+          "description": "FIRST AID TECHNICIANS",
+          "position": "1st Aid (See 2511)",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": 0.25,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "1st Aid (See 2511)",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.25,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3632",
+          "description": "MISC LOCAL EMPLOYEES",
+          "position": "Site Reps/Liaisons (location upcharge)",
+          "quantity": 14.0,
+          "unit": "days",
+          "rate": 1250.0,
+          "subtotal": 14000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Site Reps/Liaisons (location upcharge)",
+              "quantity": 14.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 1250.0,
+              "subtotal": 14000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION EXPENSE",
+      "account": "3600",
+      "total": 764010.0,
+      "line_items": [
+        {
+          "account": "3606",
+          "description": "SCOUTING/SURVEYCOSTS",
+          "position": "Scouting/SurveyCosts",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 4000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Scouting/SurveyCosts",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3607",
+          "description": "SITE RENTALS / PERMITS",
+          "position": "Location Site Rentals",
+          "quantity": 14.0,
+          "unit": "days",
+          "rate": 35000.0,
+          "subtotal": 392000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Location Site Rentals",
+              "quantity": 14.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 35000.0,
+              "subtotal": 392000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3609",
+          "description": "COURTESY PAYMENTS",
+          "position": "CourtesyPayments",
+          "quantity": 14.0,
+          "unit": "days",
+          "rate": 1100.0,
+          "subtotal": 12320.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "CourtesyPayments",
+              "quantity": 14.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 1100.0,
+              "subtotal": 12320.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3613",
+          "description": "SHIPPING/POSTAGE",
+          "position": "Brokerage Fees - Canadian Allowance",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 5520.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Brokerage Fees - Canadian Allowance",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            },
+            {
+              "position": "Ship Camera Masters to LA",
+              "quantity": 3.8,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 1520.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3620",
+          "description": "CATERED MEALS",
+          "position": "UnrecoverablePST",
+          "quantity": 7.0,
+          "unit": "%",
+          "rate": 75664.0,
+          "subtotal": 5296.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "UnrecoverablePST",
+              "quantity": 7.0,
+              "unit": "%",
+              "multiplier": 1.0,
+              "rate": 75664.0,
+              "subtotal": 5296.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3625",
+          "description": "FIRST AID TECHNICIANS",
+          "position": "1st Aid (See 2511)",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": 0.25,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "1st Aid (See 2511)",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.25,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3632",
+          "description": "MISC LOCAL EMPLOYEES",
+          "position": "Site Reps/Liaisons (location upcharge)",
+          "quantity": 14.0,
+          "unit": "days",
+          "rate": 1250.0,
+          "subtotal": 14000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Site Reps/Liaisons (location upcharge)",
+              "quantity": 14.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 1250.0,
+              "subtotal": 14000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION EXPENSE",
+      "account": "3600",
+      "total": 764010.0,
+      "line_items": [
+        {
+          "account": "3606",
+          "description": "SCOUTING/SURVEYCOSTS",
+          "position": "Scouting/SurveyCosts",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 4000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Scouting/SurveyCosts",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3607",
+          "description": "SITE RENTALS / PERMITS",
+          "position": "Location Site Rentals",
+          "quantity": 14.0,
+          "unit": "days",
+          "rate": 35000.0,
+          "subtotal": 392000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Location Site Rentals",
+              "quantity": 14.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 35000.0,
+              "subtotal": 392000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3609",
+          "description": "COURTESY PAYMENTS",
+          "position": "CourtesyPayments",
+          "quantity": 14.0,
+          "unit": "days",
+          "rate": 1100.0,
+          "subtotal": 12320.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "CourtesyPayments",
+              "quantity": 14.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 1100.0,
+              "subtotal": 12320.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3613",
+          "description": "SHIPPING/POSTAGE",
+          "position": "Brokerage Fees - Canadian Allowance",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5000.0,
+          "subtotal": 5520.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Brokerage Fees - Canadian Allowance",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 4000.0,
+              "total": null
+            },
+            {
+              "position": "Ship Camera Masters to LA",
+              "quantity": 3.8,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 1520.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3620",
+          "description": "CATERED MEALS",
+          "position": "UnrecoverablePST",
+          "quantity": 7.0,
+          "unit": "%",
+          "rate": 75664.0,
+          "subtotal": 5296.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "UnrecoverablePST",
+              "quantity": 7.0,
+              "unit": "%",
+              "multiplier": 1.0,
+              "rate": 75664.0,
+              "subtotal": 5296.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3625",
+          "description": "FIRST AID TECHNICIANS",
+          "position": "1st Aid (See 2511)",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": 0.25,
+          "subtotal": null,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "1st Aid (See 2511)",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": 0.25,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3632",
+          "description": "MISC LOCAL EMPLOYEES",
+          "position": "Site Reps/Liaisons (location upcharge)",
+          "quantity": 14.0,
+          "unit": "days",
+          "rate": 1250.0,
+          "subtotal": 14000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Site Reps/Liaisons (location upcharge)",
+              "quantity": 14.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 1250.0,
+              "subtotal": 14000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PRODUCTION FILM&LAB",
+      "account": "3700",
+      "total": 47119.0,
+      "line_items": [
+        {
+          "account": "3764",
+          "description": "STREAMING TRANSMISSION / TELCO",
+          "position": "DailiesEncode & Upload - DAX",
+          "quantity": 14.0,
+          "unit": "days",
+          "rate": 50.0,
+          "subtotal": 2100.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "DailiesEncode & Upload - DAX",
+              "quantity": 14.0,
+              "unit": "days",
+              "multiplier": 3.0,
+              "rate": 50.0,
+              "subtotal": 2100.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "INSURANCE",
+      "account": "6700",
+      "total": 10935.0,
+      "line_items": [
+        {
+          "account": "6701",
+          "description": "PRODUCTIONINSURANCE",
+          "position": "Based on budget less 6701",
+          "quantity": 0.16,
+          "unit": "%",
+          "rate": 5944221.0,
+          "subtotal": 9511.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Based on budget less 6701",
+              "quantity": 0.16,
+              "unit": "%",
+              "multiplier": 1.0,
+              "rate": 5944221.0,
+              "subtotal": 9511.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "6702",
+          "description": "NEGINSURANCE",
+          "position": "Per half hour",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 356.0,
+          "subtotal": 712.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Per half hour",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 2.0,
+              "rate": 356.0,
+              "subtotal": 712.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "6703",
+          "description": "ERRORS & OMISSIONS",
+          "position": "Per half hour",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 356.0,
+          "subtotal": 712.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Per half hour",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 2.0,
+              "rate": 356.0,
+              "subtotal": 712.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "INSURANCE",
+      "account": "6700",
+      "total": 10935.0,
+      "line_items": [
+        {
+          "account": "6701",
+          "description": "PRODUCTIONINSURANCE",
+          "position": "Based on budget less 6701",
+          "quantity": 0.16,
+          "unit": "%",
+          "rate": 5944221.0,
+          "subtotal": 9511.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Based on budget less 6701",
+              "quantity": 0.16,
+              "unit": "%",
+              "multiplier": 1.0,
+              "rate": 5944221.0,
+              "subtotal": 9511.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "6702",
+          "description": "NEGINSURANCE",
+          "position": "Per half hour",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 356.0,
+          "subtotal": 712.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Per half hour",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 2.0,
+              "rate": 356.0,
+              "subtotal": 712.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "6703",
+          "description": "ERRORS & OMISSIONS",
+          "position": "Per half hour",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 356.0,
+          "subtotal": 712.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Per half hour",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 2.0,
+              "rate": 356.0,
+              "subtotal": 712.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "extraction_stats": {
+    "total_pages": 65,
+    "departments_found": 20,
+    "line_items_found": 60
+  }
+}

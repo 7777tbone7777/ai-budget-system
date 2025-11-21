@@ -1,0 +1,1427 @@
+{
+  "metadata": {
+    "filename": "2021+Cable+LA+Pattern+9Eps+v07.pdf",
+    "location": "Los Angeles, CA 8 Day Shoot - 4 Stage / 4 Location",
+    "production_type": null,
+    "shoot_days": null,
+    "shoot_dates": "3/15/21-6/24/21",
+    "total_budget": null,
+    "atl_total": null,
+    "btl_total": null,
+    "other_total": null,
+    "post_total": null,
+    "production_total": null,
+    "pdf_path": "/Users/anthonyvazquez/Documents/budgets/2021+Cable+LA+Pattern+9Eps+v07.pdf"
+  },
+  "departments": [
+    {
+      "name": "PRODUCERS UNIT",
+      "account": "1200",
+      "total": 117563.0,
+      "line_items": [
+        {
+          "account": "1201",
+          "description": "EXECUTIVEPRODUCER",
+          "position": "Exec Prod #2 - TBD",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 30000.0,
+          "subtotal": 30000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Exec Prod #2 - TBD",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 30000.0,
+              "subtotal": 30000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "1207",
+          "description": "PRODUCER'S ASSISTANT",
+          "position": "Exec Producer'sAsst\nLocal Hire - Non-Union\nShoot",
+          "quantity": 8.0,
+          "unit": "days",
+          "rate": 21.75,
+          "subtotal": 4090.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Exec Producer'sAsst\nLocal Hire - Non-Union\nShoot",
+              "quantity": 8.0,
+              "unit": "days",
+              "multiplier": 11.0,
+              "rate": 21.75,
+              "subtotal": 1914.0,
+              "total": null
+            },
+            {
+              "position": "Line Producer's Asst:\nLocal Hire - Non-Union\nShoot",
+              "quantity": 8.0,
+              "unit": "days",
+              "multiplier": 14.0,
+              "rate": 19.43,
+              "subtotal": 2176.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DIRECTOR",
+      "account": "1300",
+      "total": 43783.0,
+      "line_items": [
+        {
+          "account": "1309",
+          "description": "PILOT ROYALTY",
+          "position": "NOT CONFIRMED",
+          "quantity": 1.0,
+          "unit": "epis...",
+          "rate": 4000.0,
+          "subtotal": 4000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "NOT CONFIRMED",
+              "quantity": 1.0,
+              "unit": "epis...",
+              "multiplier": 1.0,
+              "rate": 4000.0,
+              "subtotal": 4000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PRODUCTIONSTAFF",
+      "account": "2000",
+      "total": 148609.0,
+      "line_items": [
+        {
+          "account": "2002",
+          "description": "1ST ASSISTANT DIRECTOR",
+          "position": "1st AD #2\nNo Prep During Final Episode\nPrep Episode",
+          "quantity": 1.6,
+          "unit": "weeks",
+          "rate": 5459.0,
+          "subtotal": 8734.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "1st AD #2\nNo Prep During Final Episode\nPrep Episode",
+              "quantity": 1.6,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 5459.0,
+              "subtotal": 8734.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2007",
+          "description": "LOCATIONMANAGER",
+          "position": "Local Hire - 399\nShoot",
+          "quantity": 1.6,
+          "unit": "weeks",
+          "rate": 3018.0,
+          "subtotal": 4829.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Local Hire - 399\nShoot",
+              "quantity": 1.6,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 3018.0,
+              "subtotal": 4829.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2008",
+          "description": "ASSISTANT LOCATION MANAGER",
+          "position": "Asst. Location Manager #1\nLocal Hire - Non-Union\nShoot",
+          "quantity": 1.6,
+          "unit": "weeks",
+          "rate": 1238.0,
+          "subtotal": 5642.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Asst. Location Manager #1\nLocal Hire - Non-Union\nShoot",
+              "quantity": 1.6,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 1238.0,
+              "subtotal": 1981.0,
+              "total": null
+            },
+            {
+              "position": "Asst. Location Manager #2\nLocal Hire - Non-Union\nShoot",
+              "quantity": 1.6,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 1238.0,
+              "subtotal": 1981.0,
+              "total": null
+            },
+            {
+              "position": "Production Assistant #1\nLocal Hire - Non-Union\nShoot",
+              "quantity": 1.6,
+              "unit": "weeks",
+              "multiplier": 70.0,
+              "rate": 15.0,
+              "subtotal": 1680.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2009",
+          "description": "PRODUCTIONCOORDINATOR",
+          "position": "Local Hire - Longform\nNegotiable\nShoot",
+          "quantity": 1.6,
+          "unit": "weeks",
+          "rate": 29.35,
+          "subtotal": 3287.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Local Hire - Longform\nNegotiable\nShoot",
+              "quantity": 1.6,
+              "unit": "weeks",
+              "multiplier": 70.0,
+              "rate": 29.35,
+              "subtotal": 3287.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2014",
+          "description": "ASST ACCOUNTANTS",
+          "position": "Local Hires - NonAffil\n1st Asst Accountant\nShoot",
+          "quantity": 1.6,
+          "unit": "weeks",
+          "rate": 33.0,
+          "subtotal": 15144.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Local Hires - NonAffil\n1st Asst Accountant\nShoot",
+              "quantity": 1.6,
+              "unit": "weeks",
+              "multiplier": 70.0,
+              "rate": 33.0,
+              "subtotal": 3696.0,
+              "total": null
+            },
+            {
+              "position": "Payroll Accountant\nShoot",
+              "quantity": 1.6,
+              "unit": "weeks",
+              "multiplier": 70.0,
+              "rate": 31.5,
+              "subtotal": 3528.0,
+              "total": null
+            },
+            {
+              "position": "2nd Asst Accountant\nShoot",
+              "quantity": 1.6,
+              "unit": "weeks",
+              "multiplier": 55.0,
+              "rate": 30.0,
+              "subtotal": 2640.0,
+              "total": null
+            },
+            {
+              "position": "2nd 2nd Asst Accountant\nShoot",
+              "quantity": 1.6,
+              "unit": "weeks",
+              "multiplier": 55.0,
+              "rate": 25.0,
+              "subtotal": 2200.0,
+              "total": null
+            },
+            {
+              "position": "AP Clerk\nShoot",
+              "quantity": 8.0,
+              "unit": "days",
+              "multiplier": 11.0,
+              "rate": 17.5,
+              "subtotal": 1540.0,
+              "total": null
+            },
+            {
+              "position": "PR Clerk\nShoot",
+              "quantity": 8.0,
+              "unit": "days",
+              "multiplier": 11.0,
+              "rate": 17.5,
+              "subtotal": 1540.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2017",
+          "description": "BOX/COMPUTER RENTALS",
+          "position": "Computers cap @ $1000\nSee Amort\nLocation Manager",
+          "quantity": 1.6,
+          "unit": "weeks",
+          "rate": 125.0,
+          "subtotal": 200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Computers cap @ $1000\nSee Amort\nLocation Manager",
+              "quantity": 1.6,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 125.0,
+              "subtotal": 200.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EXTRATALENT",
+      "account": "2100",
+      "total": 90885.0,
+      "line_items": [
+        {
+          "account": "2103",
+          "description": "NON-UNIONEXTRAS",
+          "position": "2x after10 hours\nHeavy (10perHeavy Extrasdays)",
+          "quantity": 20.0,
+          "unit": "days",
+          "rate": 15.0,
+          "subtotal": 4500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "2x after10 hours\nHeavy (10perHeavy Extrasdays)",
+              "quantity": 20.0,
+              "unit": "days",
+              "multiplier": 15.0,
+              "rate": 15.0,
+              "subtotal": 4500.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2107",
+          "description": "WARDROBE FITTINGS",
+          "position": "Adjustments & Fittings",
+          "quantity": 1.0,
+          "unit": "epis...",
+          "rate": 500.0,
+          "subtotal": 500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Adjustments & Fittings",
+              "quantity": 1.0,
+              "unit": "epis...",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 500.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2155",
+          "description": "ATMOSPHERE CARS/MILEAGE",
+          "position": "Mileage/Auto Adjustments",
+          "quantity": 8.0,
+          "unit": "days",
+          "rate": 50.0,
+          "subtotal": 400.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Mileage/Auto Adjustments",
+              "quantity": 8.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 50.0,
+              "subtotal": 400.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SET DESIGN",
+      "account": "2200",
+      "total": 27784.0,
+      "line_items": [
+        {
+          "account": "2202",
+          "description": "ART DIRECTOR",
+          "position": "Local Hire - Longform\nShoot",
+          "quantity": 1.6,
+          "unit": "weeks",
+          "rate": 3130.16,
+          "subtotal": 5008.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Local Hire - Longform\nShoot",
+              "quantity": 1.6,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 3130.16,
+              "subtotal": 5008.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2213",
+          "description": "ART DEPT COORDINATOR",
+          "position": "Production Assistant\nLocal Hire - Non-Union\nShoot",
+          "quantity": 8.0,
+          "unit": "days",
+          "rate": 15.0,
+          "subtotal": 1680.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Production Assistant\nLocal Hire - Non-Union\nShoot",
+              "quantity": 8.0,
+              "unit": "days",
+              "multiplier": 14.0,
+              "rate": 15.0,
+              "subtotal": 1680.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2280",
+          "description": "PRINTING/XEROX/PHOTODEV.",
+          "position": "Blueprints/Graphics",
+          "quantity": 1.0,
+          "unit": "epis...",
+          "rate": 250.0,
+          "subtotal": 250.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Blueprints/Graphics",
+              "quantity": 1.0,
+              "unit": "epis...",
+              "multiplier": 1.0,
+              "rate": 250.0,
+              "subtotal": 250.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SET STRIKE",
+      "account": "2400",
+      "total": 144349.0,
+      "line_items": [
+        {
+          "account": "2504",
+          "description": "CRANE GRIP",
+          "position": "Technocrane Op (assume $650/10 hrs)",
+          "quantity": 1.0,
+          "unit": "day",
+          "rate": 59.09,
+          "subtotal": 650.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Technocrane Op (assume $650/10 hrs)",
+              "quantity": 1.0,
+              "unit": "day",
+              "multiplier": 11.0,
+              "rate": 59.09,
+              "subtotal": 650.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2509",
+          "description": "RIGGINGCREW",
+          "position": "Rigging Key\nLocal Hire - Longform\nShoot",
+          "quantity": 8.0,
+          "unit": "days",
+          "rate": 38.93,
+          "subtotal": 4360.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Rigging Key\nLocal Hire - Longform\nShoot",
+              "quantity": 8.0,
+              "unit": "days",
+              "multiplier": 14.0,
+              "rate": 38.93,
+              "subtotal": 4360.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2518",
+          "description": "EQUIPMENT RENTALS",
+          "position": "Add'l Rentals",
+          "quantity": 1.0,
+          "unit": "epis...",
+          "rate": 3500.0,
+          "subtotal": 3500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Add'l Rentals",
+              "quantity": 1.0,
+              "unit": "epis...",
+              "multiplier": 1.0,
+              "rate": 3500.0,
+              "subtotal": 3500.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2519",
+          "description": "CRANES",
+          "position": "Titan Crane or (15ft)Technocrane",
+          "quantity": 1.0,
+          "unit": "day",
+          "rate": 2000.0,
+          "subtotal": 2000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Titan Crane or (15ft)Technocrane",
+              "quantity": 1.0,
+              "unit": "day",
+              "multiplier": 1.0,
+              "rate": 2000.0,
+              "subtotal": 2000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SPECIAL EFFECTS",
+      "account": "2600",
+      "total": 6011.0,
+      "line_items": [
+        {
+          "account": "2618",
+          "description": "EQUIPMENT RENTALS",
+          "position": "SFX Truck & Kit",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 500.0,
+          "subtotal": 2000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "SFX Truck & Kit",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 2000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "WARDROBE",
+      "account": "2900",
+      "total": 74572.0,
+      "line_items": [
+        {
+          "account": "2908",
+          "description": "ALTERATIONS & REPAIRS",
+          "position": "Local Hire - Longform\nShoot",
+          "quantity": 8.0,
+          "unit": "days",
+          "rate": 38.58,
+          "subtotal": 3395.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Local Hire - Longform\nShoot",
+              "quantity": 8.0,
+              "unit": "days",
+              "multiplier": 11.0,
+              "rate": 38.58,
+              "subtotal": 3395.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2909",
+          "description": "CLEANING & DYEING",
+          "position": "Cleaning",
+          "quantity": 8.0,
+          "unit": "days",
+          "rate": 285.0,
+          "subtotal": 2280.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Cleaning",
+              "quantity": 8.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 285.0,
+              "subtotal": 2280.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2916",
+          "description": "PURCHASES",
+          "position": "Purchases",
+          "quantity": 1.0,
+          "unit": "epis...",
+          "rate": 20000.0,
+          "subtotal": 20000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Purchases",
+              "quantity": 1.0,
+              "unit": "epis...",
+              "multiplier": 1.0,
+              "rate": 20000.0,
+              "subtotal": 20000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "2918",
+          "description": "EQUIPMENT RENTALS",
+          "position": "Background",
+          "quantity": 1.0,
+          "unit": "epis...",
+          "rate": 2500.0,
+          "subtotal": 2500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Background",
+              "quantity": 1.0,
+              "unit": "epis...",
+              "multiplier": 1.0,
+              "rate": 2500.0,
+              "subtotal": 2500.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ANIMALS&PICTURECARS",
+      "account": "3000",
+      "total": 250.0,
+      "line_items": [
+        {
+          "account": "3011",
+          "description": "REPAIRS/MODIFICATIONS",
+          "position": "Picture Car Maintenance",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 250.0,
+          "subtotal": 250.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Picture Car Maintenance",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 250.0,
+              "subtotal": 250.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CAMERA",
+      "account": "3300",
+      "total": 168935.0,
+      "line_items": [
+        {
+          "account": "3306",
+          "description": "2ND ASSISTANT CAMERA",
+          "position": "A Camera\nLocal Hire - Local 600 Longform\nShoot Studio",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 48.01,
+          "subtotal": 2689.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "A Camera\nLocal Hire - Local 600 Longform\nShoot Studio",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 14.0,
+              "rate": 48.01,
+              "subtotal": 2689.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3316",
+          "description": "PURCHASES",
+          "position": "Episodic",
+          "quantity": 1.0,
+          "unit": "epis...",
+          "rate": 500.0,
+          "subtotal": 500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Episodic",
+              "quantity": 1.0,
+              "unit": "epis...",
+              "multiplier": 1.0,
+              "rate": 500.0,
+              "subtotal": 500.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3318",
+          "description": "EQUIPMENT RENTALS",
+          "position": "Add'l Outside Rentals",
+          "quantity": 8.0,
+          "unit": "days",
+          "rate": 750.0,
+          "subtotal": 6000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Add'l Outside Rentals",
+              "quantity": 8.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 750.0,
+              "subtotal": 6000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PRODUCTIONSOUND",
+      "account": "3400",
+      "total": 34483.0,
+      "line_items": [
+        {
+          "account": "3416",
+          "description": "PURCHASES",
+          "position": "Episodic",
+          "quantity": 1.0,
+          "unit": "epis...",
+          "rate": 450.0,
+          "subtotal": 450.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Episodic",
+              "quantity": 1.0,
+              "unit": "epis...",
+              "multiplier": 1.0,
+              "rate": 450.0,
+              "subtotal": 450.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3420",
+          "description": "SOUND PACKAGE RENTALS",
+          "position": "Main Sound Package",
+          "quantity": 1.6,
+          "unit": "weeks",
+          "rate": 2750.0,
+          "subtotal": 4400.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Main Sound Package",
+              "quantity": 1.6,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": 2750.0,
+              "subtotal": 4400.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3422",
+          "description": "WALKIE TALKIES",
+          "position": "Walkies",
+          "quantity": 1.6,
+          "unit": "weeks",
+          "rate": 10.0,
+          "subtotal": 1200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Walkies",
+              "quantity": 1.6,
+              "unit": "weeks",
+              "multiplier": 75.0,
+              "rate": 10.0,
+              "subtotal": 1200.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION EXPENSE",
+      "account": "3600",
+      "total": 283644.0,
+      "line_items": [
+        {
+          "account": "3606",
+          "description": "SCOUTING/SURVEYCOSTS",
+          "position": "Scouting/SurveyCosts",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 250.0,
+          "subtotal": 1000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Scouting/SurveyCosts",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 250.0,
+              "subtotal": 1000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3609",
+          "description": "COURTESY PAYMENTS",
+          "position": "Courtesy Payments /Liaisons",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 660.0,
+          "subtotal": 2640.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Courtesy Payments /Liaisons",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 660.0,
+              "subtotal": 2640.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3630",
+          "description": "LOCATION SECURITY",
+          "position": "Security - Location",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 3000.0,
+          "subtotal": 14000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Security - Location",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 3000.0,
+              "subtotal": 12000.0,
+              "total": null
+            },
+            {
+              "position": "Security - Stage OT",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 5.0,
+              "rate": 100.0,
+              "subtotal": 2000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3631",
+          "description": "POLICE/FIREMEN",
+          "position": "Motor Units",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 100.0,
+          "subtotal": 1200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Motor Units",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 3.0,
+              "rate": 100.0,
+              "subtotal": 1200.0,
+              "total": null
+            },
+            {
+              "position": "Fire Safety Officer (min 4 hrs)",
+              "quantity": 0.0,
+              "unit": "days",
+              "multiplier": 18.0,
+              "rate": 172.15,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3685",
+          "description": "MISC EXPENSES",
+          "position": "Misc. Expense (Relocations, etc.)",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5200.0,
+          "subtotal": 5200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Misc. Expense (Relocations, etc.)",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5200.0,
+              "subtotal": 5200.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3698",
+          "description": "LOSS & DAMAGE",
+          "position": "Restoration",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 1000.0,
+          "subtotal": 4000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Restoration",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 1000.0,
+              "subtotal": 4000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION EXPENSE",
+      "account": "3600",
+      "total": 283644.0,
+      "line_items": [
+        {
+          "account": "3606",
+          "description": "SCOUTING/SURVEYCOSTS",
+          "position": "Scouting/SurveyCosts",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 250.0,
+          "subtotal": 1000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Scouting/SurveyCosts",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 250.0,
+              "subtotal": 1000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3609",
+          "description": "COURTESY PAYMENTS",
+          "position": "Courtesy Payments /Liaisons",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 660.0,
+          "subtotal": 2640.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Courtesy Payments /Liaisons",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 660.0,
+              "subtotal": 2640.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3630",
+          "description": "LOCATION SECURITY",
+          "position": "Security - Location",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 3000.0,
+          "subtotal": 14000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Security - Location",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 3000.0,
+              "subtotal": 12000.0,
+              "total": null
+            },
+            {
+              "position": "Security - Stage OT",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 5.0,
+              "rate": 100.0,
+              "subtotal": 2000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3631",
+          "description": "POLICE/FIREMEN",
+          "position": "Motor Units",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 100.0,
+          "subtotal": 1200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Motor Units",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 3.0,
+              "rate": 100.0,
+              "subtotal": 1200.0,
+              "total": null
+            },
+            {
+              "position": "Fire Safety Officer (min 4 hrs)",
+              "quantity": 0.0,
+              "unit": "days",
+              "multiplier": 18.0,
+              "rate": 172.15,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3685",
+          "description": "MISC EXPENSES",
+          "position": "Misc. Expense (Relocations, etc.)",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5200.0,
+          "subtotal": 5200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Misc. Expense (Relocations, etc.)",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5200.0,
+              "subtotal": 5200.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3698",
+          "description": "LOSS & DAMAGE",
+          "position": "Restoration",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 1000.0,
+          "subtotal": 4000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Restoration",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 1000.0,
+              "subtotal": 4000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION EXPENSE",
+      "account": "3600",
+      "total": 283644.0,
+      "line_items": [
+        {
+          "account": "3606",
+          "description": "SCOUTING/SURVEYCOSTS",
+          "position": "Scouting/SurveyCosts",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 250.0,
+          "subtotal": 1000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Scouting/SurveyCosts",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 250.0,
+              "subtotal": 1000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3609",
+          "description": "COURTESY PAYMENTS",
+          "position": "Courtesy Payments /Liaisons",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 660.0,
+          "subtotal": 2640.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Courtesy Payments /Liaisons",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 660.0,
+              "subtotal": 2640.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3630",
+          "description": "LOCATION SECURITY",
+          "position": "Security - Location",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 3000.0,
+          "subtotal": 14000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Security - Location",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 3000.0,
+              "subtotal": 12000.0,
+              "total": null
+            },
+            {
+              "position": "Security - Stage OT",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 5.0,
+              "rate": 100.0,
+              "subtotal": 2000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3631",
+          "description": "POLICE/FIREMEN",
+          "position": "Motor Units",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 100.0,
+          "subtotal": 1200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Motor Units",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 3.0,
+              "rate": 100.0,
+              "subtotal": 1200.0,
+              "total": null
+            },
+            {
+              "position": "Fire Safety Officer (min 4 hrs)",
+              "quantity": 0.0,
+              "unit": "days",
+              "multiplier": 18.0,
+              "rate": 172.15,
+              "subtotal": 0.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3685",
+          "description": "MISC EXPENSES",
+          "position": "Misc. Expense (Relocations, etc.)",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": 5200.0,
+          "subtotal": 5200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Misc. Expense (Relocations, etc.)",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": 5200.0,
+              "subtotal": 5200.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "3698",
+          "description": "LOSS & DAMAGE",
+          "position": "Restoration",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": 1000.0,
+          "subtotal": 4000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Restoration",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": 1000.0,
+              "subtotal": 4000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "VFX",
+      "account": "4400",
+      "total": 111873.0,
+      "line_items": [
+        {
+          "account": "4602",
+          "description": "COMPOSERS",
+          "position": "Composer (Series)",
+          "quantity": 1.0,
+          "unit": "epis...",
+          "rate": 15000.0,
+          "subtotal": 15000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Composer (Series)",
+              "quantity": 1.0,
+              "unit": "epis...",
+              "multiplier": 1.0,
+              "rate": 15000.0,
+              "subtotal": 15000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "4605",
+          "description": "MUSIC SUPERVISION",
+          "position": "Music Supervisor (Series)",
+          "quantity": 1.0,
+          "unit": "epis...",
+          "rate": 5000.0,
+          "subtotal": 5000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Music Supervisor (Series)",
+              "quantity": 1.0,
+              "unit": "epis...",
+              "multiplier": 1.0,
+              "rate": 5000.0,
+              "subtotal": 5000.0,
+              "total": null
+            }
+          ]
+        },
+        {
+          "account": "4646",
+          "description": "MUSIC LICENSE AMXT BUYOUT",
+          "position": "Music Rights",
+          "quantity": 1.0,
+          "unit": "epis...",
+          "rate": 90000.0,
+          "subtotal": 90000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Music Rights",
+              "quantity": 1.0,
+              "unit": "epis...",
+              "multiplier": 1.0,
+              "rate": 90000.0,
+              "subtotal": 90000.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "INSURANCE",
+      "account": "6700",
+      "total": 7039.0,
+      "line_items": [
+        {
+          "account": "6702",
+          "description": "NEGATIVEINSURANCE",
+          "position": "Negative Insurance",
+          "quantity": 1.0,
+          "unit": "epis...",
+          "rate": 356.0,
+          "subtotal": 712.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Negative Insurance",
+              "quantity": 1.0,
+              "unit": "epis...",
+              "multiplier": 2.0,
+              "rate": 356.0,
+              "subtotal": 712.0,
+              "total": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "extraction_stats": {
+    "total_pages": 52,
+    "departments_found": 16,
+    "line_items_found": 53
+  }
+}

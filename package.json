@@ -1,0 +1,15 @@
+{
+  "name": "ai-budget-system",
+  "version": "1.0.0",
+  "description": "AI-Powered Production Budgeting System",
+  "scripts": {
+    "extract-agreements": "node scripts/extract-agreements.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "openai": "^6.9.1",
+    "pdf-parse": "^2.4.5",
+    "pdf-text-extract": "^1.5.0",
+    "pg": "^8.16.3"
+  }
+}

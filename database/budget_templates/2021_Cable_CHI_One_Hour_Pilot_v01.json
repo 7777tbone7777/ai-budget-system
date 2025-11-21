@@ -1,0 +1,1238 @@
+{
+  "metadata": {
+    "filename": "2021 Cable CHI One Hour Pilot v01.pdf",
+    "location": "Chicago,IL Shoot-15LocalLocationDays",
+    "production_type": null,
+    "shoot_days": 15,
+    "shoot_dates": "3/1/21-3/19/21",
+    "total_budget": null,
+    "atl_total": null,
+    "btl_total": null,
+    "other_total": null,
+    "post_total": null,
+    "production_total": null,
+    "pdf_path": "/Users/anthonyvazquez/Documents/budgets/2021 Pilot - 1Hr/Chicago/Ver 01/2021 Cable CHI One Hour Pilot v01.pdf"
+  },
+  "departments": [
+    {
+      "name": "DIRECTOR&STAFF",
+      "account": "1300",
+      "total": 203130.0,
+      "line_items": [
+        {
+          "account": "1301",
+          "description": "DIRECTOR",
+          "position": "TBD",
+          "quantity": 1.0,
+          "unit": "corp",
+          "rate": null,
+          "subtotal": 150000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "TBD",
+              "quantity": 1.0,
+              "unit": "corp",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 150000.0,
+              "total": 150000.0
+            }
+          ]
+        },
+        {
+          "account": "1385",
+          "description": "MISCELLANEOUS",
+          "position": "Miscdirectorexpense",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 25000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Miscdirectorexpense",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 25000.0,
+              "total": 25000.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PRODUCTIONSTAFF",
+      "account": "2000",
+      "total": 884453.0,
+      "line_items": [
+        {
+          "account": "2015",
+          "description": "BOARDPREP",
+          "position": "Board/ScriptBreakdown",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 8500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Board/ScriptBreakdown",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 8500.0,
+              "total": 8500.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EXTRATALENT",
+      "account": "2100",
+      "total": 114525.0,
+      "line_items": [
+        {
+          "account": "2107",
+          "description": "WARDROBEFITTINGS",
+          "position": "Fittings/Rehearsals/Stills",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Fittings/Rehearsals/Stills",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 500.0,
+              "total": 500.0
+            }
+          ]
+        },
+        {
+          "account": "2110",
+          "description": "EXTRASCASTINGCOORDINATOR",
+          "position": "ExtrasCastingCoordinator-ratelocationspecific",
+          "quantity": 4.0,
+          "unit": "weeks",
+          "rate": null,
+          "subtotal": 25.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "ExtrasCastingCoordinator-ratelocationspecific",
+              "quantity": 4.0,
+              "unit": "weeks",
+              "multiplier": 70.0,
+              "rate": null,
+              "subtotal": 25.0,
+              "total": 7000.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EXTRATALENT",
+      "account": "2100",
+      "total": 114525.0,
+      "line_items": [
+        {
+          "account": "2107",
+          "description": "WARDROBEFITTINGS",
+          "position": "Fittings/Rehearsals/Stills",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Fittings/Rehearsals/Stills",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 500.0,
+              "total": 500.0
+            }
+          ]
+        },
+        {
+          "account": "2110",
+          "description": "EXTRASCASTINGCOORDINATOR",
+          "position": "ExtrasCastingCoordinator-ratelocationspecific",
+          "quantity": 4.0,
+          "unit": "weeks",
+          "rate": null,
+          "subtotal": 25.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "ExtrasCastingCoordinator-ratelocationspecific",
+              "quantity": 4.0,
+              "unit": "weeks",
+              "multiplier": 70.0,
+              "rate": null,
+              "subtotal": 25.0,
+              "total": 7000.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SETCONSTRUCTION",
+      "account": "2300",
+      "total": 253596.0,
+      "line_items": [
+        {
+          "account": "2307",
+          "description": "BACKINGS",
+          "position": "Graphics",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 10000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Graphics",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 5000.0,
+              "total": 5000.0
+            },
+            {
+              "position": "Assumerentedthroughservicecompany:\nBackings/Translites",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.1,
+              "rate": null,
+              "subtotal": 5000.0,
+              "total": 5500.0
+            }
+          ]
+        },
+        {
+          "account": "2308",
+          "description": "GREENS",
+          "position": "LocalHire-Local476\nGreensForeman\nPrep",
+          "quantity": 10.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 71.78,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "LocalHire-Local476\nGreensForeman\nPrep",
+              "quantity": 10.0,
+              "unit": "days",
+              "multiplier": 12.5,
+              "rate": null,
+              "subtotal": 37.68,
+              "total": 4710.0
+            },
+            {
+              "position": "Greensman\nPrep",
+              "quantity": 10.0,
+              "unit": "days",
+              "multiplier": 12.5,
+              "rate": null,
+              "subtotal": 34.1,
+              "total": 4263.0
+            }
+          ]
+        },
+        {
+          "account": "2385",
+          "description": "OTHERCOSTS",
+          "position": "Misc.Allowance-Lifts",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 5000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Misc.Allowance-Lifts",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 5000.0,
+              "total": 5000.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SPECIALEFFECTS",
+      "account": "2600",
+      "total": 26672.0,
+      "line_items": [
+        {
+          "account": "2616",
+          "description": "MFG-PURCHASES&RENTALS",
+          "position": "Rentals/Materials",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 6250.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Rentals/Materials",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 6250.0,
+              "total": 6250.0
+            }
+          ]
+        },
+        {
+          "account": "2618",
+          "description": "EQUIPMENTRENTALS",
+          "position": "SFXKit/Truck(throughpayroll)",
+          "quantity": 7.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "SFXKit/Truck(throughpayroll)",
+              "quantity": 7.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 500.0,
+              "total": 3500.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PROPERTY",
+      "account": "2800",
+      "total": 85673.0,
+      "line_items": [
+        {
+          "account": "2817",
+          "description": "BOXRENTALS",
+          "position": "PropMaster",
+          "quantity": 3.0,
+          "unit": "weeks",
+          "rate": null,
+          "subtotal": 500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "PropMaster",
+              "quantity": 3.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 500.0,
+              "total": 1500.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PICTUREVEHICLES&ANIMALS",
+      "account": "3000",
+      "total": 25000.0,
+      "line_items": [
+        {
+          "account": "3007",
+          "description": "PICTUREVEHICLERENTALS",
+          "position": "PictureVehicles&Animals",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 25000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "PictureVehicles&Animals",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 25000.0,
+              "total": 25000.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LIGHTING",
+      "account": "3200",
+      "total": 212522.0,
+      "line_items": [
+        {
+          "account": "3221",
+          "description": "CONDORSANDLIFTS",
+          "position": "Boom/ScissorAllowance",
+          "quantity": 4.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 750.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Boom/ScissorAllowance",
+              "quantity": 4.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 750.0,
+              "total": 3000.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PRODUCTIONSOUND",
+      "account": "3400",
+      "total": 62365.0,
+      "line_items": [
+        {
+          "account": "3404",
+          "description": "VIDEOASSISTOPERATOR",
+          "position": "SeeAcct3303DITforPlayback",
+          "quantity": 1.0,
+          "unit": null,
+          "rate": null,
+          "subtotal": 0.01,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "SeeAcct3303DITforPlayback",
+              "quantity": 1.0,
+              "unit": null,
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 0.01,
+              "total": 0.0
+            }
+          ]
+        },
+        {
+          "account": "3416",
+          "description": "PURCHASES",
+          "position": "Expendables",
+          "quantity": 15.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 100.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Expendables",
+              "quantity": 15.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 100.0,
+              "total": 1500.0
+            }
+          ]
+        },
+        {
+          "account": "3418",
+          "description": "EQUIPMENTRENTALS",
+          "position": "VideoVillage'",
+          "quantity": 3.0,
+          "unit": "weeks",
+          "rate": null,
+          "subtotal": 1450.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "VideoVillage'",
+              "quantity": 3.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 1450.0,
+              "total": 4350.0
+            }
+          ]
+        },
+        {
+          "account": "3420",
+          "description": "SOUND/VIDEOPACKAGE",
+          "position": "MainSoundPackage",
+          "quantity": 3.0,
+          "unit": "weeks",
+          "rate": null,
+          "subtotal": 2750.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "MainSoundPackage",
+              "quantity": 3.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 2750.0,
+              "total": 8250.0
+            }
+          ]
+        },
+        {
+          "account": "3422",
+          "description": "WALKIETALKIES",
+          "position": "Walkies",
+          "quantity": 3.0,
+          "unit": "weeks",
+          "rate": null,
+          "subtotal": 10.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Walkies",
+              "quantity": 3.0,
+              "unit": "weeks",
+              "multiplier": 75.0,
+              "rate": null,
+              "subtotal": 10.0,
+              "total": 2250.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION",
+      "account": "3600",
+      "total": 848246.0,
+      "line_items": [
+        {
+          "account": "3605",
+          "description": "GROUNDTRANSPORTATION",
+          "position": "AirportTranspo-LosAngeles",
+          "quantity": 10.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 125.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "AirportTranspo-LosAngeles",
+              "quantity": 10.0,
+              "unit": "allow",
+              "multiplier": 2.0,
+              "rate": null,
+              "subtotal": 125.0,
+              "total": 2500.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION",
+      "account": "3600",
+      "total": 915248.0,
+      "line_items": [
+        {
+          "account": "3605",
+          "description": "GROUNDTRANSPORTATION",
+          "position": "AirportTranspo-LosAngeles",
+          "quantity": 10.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 125.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "AirportTranspo-LosAngeles",
+              "quantity": 10.0,
+              "unit": "allow",
+              "multiplier": 2.0,
+              "rate": null,
+              "subtotal": 125.0,
+              "total": 2500.0
+            }
+          ]
+        },
+        {
+          "account": "3606",
+          "description": "SCOUTING/SURVEYCOSTS",
+          "position": "ScoutingCosts",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 5000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "ScoutingCosts",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 5000.0,
+              "total": 5000.0
+            }
+          ]
+        },
+        {
+          "account": "3609",
+          "description": "PERMITS",
+          "position": "Permits -locationspecific",
+          "quantity": 15.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 1250.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Permits -locationspecific",
+              "quantity": 15.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 1250.0,
+              "total": 18750.0
+            }
+          ]
+        },
+        {
+          "account": "3613",
+          "description": "SHIPPING-FEDEX,FREIGHT",
+          "position": "ShipCameraMasterstoLA",
+          "quantity": 4.0,
+          "unit": "weeks",
+          "rate": null,
+          "subtotal": 500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "ShipCameraMasterstoLA",
+              "quantity": 4.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 500.0,
+              "total": 2000.0
+            }
+          ]
+        },
+        {
+          "account": "3627",
+          "description": "FIRSTAIDKITRENTAL",
+          "position": "MedKit-Shoot+testday",
+          "quantity": 16.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 25.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "MedKit-Shoot+testday",
+              "quantity": 16.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 25.0,
+              "total": 400.0
+            }
+          ]
+        },
+        {
+          "account": "3630",
+          "description": "SECURITYSERVICES",
+          "position": "SecurityServices",
+          "quantity": 15.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 3000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "SecurityServices",
+              "quantity": 15.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 3000.0,
+              "total": 45000.0
+            }
+          ]
+        },
+        {
+          "account": "3632",
+          "description": "MISCLOCALEMPLOYEES",
+          "position": "SiteRep",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 4200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "SiteRep",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 4200.0,
+              "total": 4200.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION",
+      "account": "3600",
+      "total": 915248.0,
+      "line_items": [
+        {
+          "account": "3605",
+          "description": "GROUNDTRANSPORTATION",
+          "position": "AirportTranspo-LosAngeles",
+          "quantity": 10.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 125.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "AirportTranspo-LosAngeles",
+              "quantity": 10.0,
+              "unit": "allow",
+              "multiplier": 2.0,
+              "rate": null,
+              "subtotal": 125.0,
+              "total": 2500.0
+            }
+          ]
+        },
+        {
+          "account": "3606",
+          "description": "SCOUTING/SURVEYCOSTS",
+          "position": "ScoutingCosts",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 5000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "ScoutingCosts",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 5000.0,
+              "total": 5000.0
+            }
+          ]
+        },
+        {
+          "account": "3609",
+          "description": "PERMITS",
+          "position": "Permits -locationspecific",
+          "quantity": 15.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 1250.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Permits -locationspecific",
+              "quantity": 15.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 1250.0,
+              "total": 18750.0
+            }
+          ]
+        },
+        {
+          "account": "3613",
+          "description": "SHIPPING-FEDEX,FREIGHT",
+          "position": "ShipCameraMasterstoLA",
+          "quantity": 4.0,
+          "unit": "weeks",
+          "rate": null,
+          "subtotal": 500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "ShipCameraMasterstoLA",
+              "quantity": 4.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 500.0,
+              "total": 2000.0
+            }
+          ]
+        },
+        {
+          "account": "3627",
+          "description": "FIRSTAIDKITRENTAL",
+          "position": "MedKit-Shoot+testday",
+          "quantity": 16.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 25.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "MedKit-Shoot+testday",
+              "quantity": 16.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 25.0,
+              "total": 400.0
+            }
+          ]
+        },
+        {
+          "account": "3630",
+          "description": "SECURITYSERVICES",
+          "position": "SecurityServices",
+          "quantity": 15.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 3000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "SecurityServices",
+              "quantity": 15.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 3000.0,
+              "total": 45000.0
+            }
+          ]
+        },
+        {
+          "account": "3632",
+          "description": "MISCLOCALEMPLOYEES",
+          "position": "SiteRep",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 4200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "SiteRep",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 4200.0,
+              "total": 4200.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LOCATION",
+      "account": "3600",
+      "total": 915248.0,
+      "line_items": [
+        {
+          "account": "3605",
+          "description": "GROUNDTRANSPORTATION",
+          "position": "AirportTranspo-LosAngeles",
+          "quantity": 10.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 125.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "AirportTranspo-LosAngeles",
+              "quantity": 10.0,
+              "unit": "allow",
+              "multiplier": 2.0,
+              "rate": null,
+              "subtotal": 125.0,
+              "total": 2500.0
+            }
+          ]
+        },
+        {
+          "account": "3606",
+          "description": "SCOUTING/SURVEYCOSTS",
+          "position": "ScoutingCosts",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 5000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "ScoutingCosts",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 5000.0,
+              "total": 5000.0
+            }
+          ]
+        },
+        {
+          "account": "3609",
+          "description": "PERMITS",
+          "position": "Permits -locationspecific",
+          "quantity": 15.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 1250.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Permits -locationspecific",
+              "quantity": 15.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 1250.0,
+              "total": 18750.0
+            }
+          ]
+        },
+        {
+          "account": "3613",
+          "description": "SHIPPING-FEDEX,FREIGHT",
+          "position": "ShipCameraMasterstoLA",
+          "quantity": 4.0,
+          "unit": "weeks",
+          "rate": null,
+          "subtotal": 500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "ShipCameraMasterstoLA",
+              "quantity": 4.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 500.0,
+              "total": 2000.0
+            }
+          ]
+        },
+        {
+          "account": "3627",
+          "description": "FIRSTAIDKITRENTAL",
+          "position": "MedKit-Shoot+testday",
+          "quantity": 16.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 25.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "MedKit-Shoot+testday",
+              "quantity": 16.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 25.0,
+              "total": 400.0
+            }
+          ]
+        },
+        {
+          "account": "3630",
+          "description": "SECURITYSERVICES",
+          "position": "SecurityServices",
+          "quantity": 15.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 3000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "SecurityServices",
+              "quantity": 15.0,
+              "unit": "days",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 3000.0,
+              "total": 45000.0
+            }
+          ]
+        },
+        {
+          "account": "3632",
+          "description": "MISCLOCALEMPLOYEES",
+          "position": "SiteRep",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 4200.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "SiteRep",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 4200.0,
+              "total": 4200.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PRODUCTIONFILM&LAB",
+      "account": "3700",
+      "total": 12000.0,
+      "line_items": [
+        {
+          "account": "4206",
+          "description": "OTHERSTAGES&FACILITIES",
+          "position": "AdditionalParking",
+          "quantity": 1.0,
+          "unit": "month",
+          "rate": null,
+          "subtotal": 2500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "AdditionalParking",
+              "quantity": 1.0,
+              "unit": "month",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 2500.0,
+              "total": 2500.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "INSURANCE",
+      "account": "6700",
+      "total": 12116.0,
+      "line_items": [
+        {
+          "account": "6701",
+          "description": "PRODUCTIONINSURANCE",
+          "position": "Basedonthegrossbudgetless6701\nProductionInsurance",
+          "quantity": 0.16,
+          "unit": "%",
+          "rate": null,
+          "subtotal": 6682331.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Basedonthegrossbudgetless6701\nProductionInsurance",
+              "quantity": 0.16,
+              "unit": "%",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 6682331.0,
+              "total": 10692.0
+            }
+          ]
+        },
+        {
+          "account": "6702",
+          "description": "NEGATIVEINSURANCE",
+          "position": "NegativeInsurance",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 356.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "NegativeInsurance",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 2.0,
+              "rate": null,
+              "subtotal": 356.0,
+              "total": 712.0
+            }
+          ]
+        },
+        {
+          "account": "6703",
+          "description": "ERRORS&OMISSIONS",
+          "position": "Errors&Omissions",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 356.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Errors&Omissions",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 2.0,
+              "rate": null,
+              "subtotal": 356.0,
+              "total": 712.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "INSURANCE",
+      "account": "6700",
+      "total": 12116.0,
+      "line_items": [
+        {
+          "account": "6701",
+          "description": "PRODUCTIONINSURANCE",
+          "position": "Basedonthegrossbudgetless6701\nProductionInsurance",
+          "quantity": 0.16,
+          "unit": "%",
+          "rate": null,
+          "subtotal": 6682331.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Basedonthegrossbudgetless6701\nProductionInsurance",
+              "quantity": 0.16,
+              "unit": "%",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 6682331.0,
+              "total": 10692.0
+            }
+          ]
+        },
+        {
+          "account": "6702",
+          "description": "NEGATIVEINSURANCE",
+          "position": "NegativeInsurance",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 356.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "NegativeInsurance",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 2.0,
+              "rate": null,
+              "subtotal": 356.0,
+              "total": 712.0
+            }
+          ]
+        },
+        {
+          "account": "6703",
+          "description": "ERRORS&OMISSIONS",
+          "position": "Errors&Omissions",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 356.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Errors&Omissions",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 2.0,
+              "rate": null,
+              "subtotal": 356.0,
+              "total": 712.0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "extraction_stats": {
+    "total_pages": 54,
+    "departments_found": 17,
+    "line_items_found": 49
+  }
+}

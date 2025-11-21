@@ -1,0 +1,709 @@
+{
+  "metadata": {
+    "filename": "2021 Multicam S1 Amort 12Eps v06.pdf",
+    "location": null,
+    "production_type": "multicam_pilot",
+    "shoot_days": null,
+    "shoot_dates": "8/16/21-12/3/21",
+    "total_budget": null,
+    "atl_total": null,
+    "btl_total": null,
+    "other_total": null,
+    "post_total": null,
+    "production_total": null,
+    "pdf_path": "/Users/anthonyvazquez/Documents/budgets/2021 Multicam S1 Amort 12Eps v06.pdf"
+  },
+  "departments": [
+    {
+      "name": "PRODUCTIONSTAFF",
+      "account": "2000",
+      "total": 4000.0,
+      "line_items": [
+        {
+          "account": "2101",
+          "description": "STAND-INS",
+          "position": "Stand-Ins-Holidays(5perday)-...",
+          "quantity": null,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 26.125,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Stand-Ins-Holidays(5perday)-...",
+              "quantity": 0.0,
+              "unit": "days",
+              "multiplier": 8.0,
+              "rate": null,
+              "subtotal": 26.125,
+              "total": 0.0
+            }
+          ]
+        },
+        {
+          "account": "2110",
+          "description": "EXTRASCASTING",
+          "position": "CentralCastingPrepFee",
+          "quantity": 2.0,
+          "unit": "weeks",
+          "rate": null,
+          "subtotal": 2000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "CentralCastingPrepFee",
+              "quantity": 2.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 2000.0,
+              "total": 4000.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EXTRATALENT",
+      "account": "2100",
+      "total": 4000.0,
+      "line_items": [
+        {
+          "account": "2101",
+          "description": "STAND-INS",
+          "position": "Stand-Ins-Holidays(5perday)-...",
+          "quantity": null,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 26.125,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Stand-Ins-Holidays(5perday)-...",
+              "quantity": 0.0,
+              "unit": "days",
+              "multiplier": 8.0,
+              "rate": null,
+              "subtotal": 26.125,
+              "total": 0.0
+            }
+          ]
+        },
+        {
+          "account": "2110",
+          "description": "EXTRASCASTING",
+          "position": "CentralCastingPrepFee",
+          "quantity": 2.0,
+          "unit": "weeks",
+          "rate": null,
+          "subtotal": 2000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "CentralCastingPrepFee",
+              "quantity": 2.0,
+              "unit": "weeks",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 2000.0,
+              "total": 4000.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SETCONSTRUCTION",
+      "account": "2300",
+      "total": 66852.0,
+      "line_items": [
+        {
+          "account": "2497",
+          "description": "BINS&DISPOSAL",
+          "position": "Bins&Disposal",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 1000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Bins&Disposal",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 1000.0,
+              "total": 1000.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SETDRESSING",
+      "account": "2700",
+      "total": 40483.0,
+      "line_items": [
+        {
+          "account": "2703",
+          "description": "SWINGGANG",
+          "position": "On-SetDresser\nPrep10Hours",
+          "quantity": 5.0,
+          "unit": "days",
+          "rate": null,
+          "subtotal": 35.79,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "On-SetDresser\nPrep10Hours",
+              "quantity": 5.0,
+              "unit": "days",
+              "multiplier": 11.0,
+              "rate": null,
+              "subtotal": 35.79,
+              "total": 1968.0
+            }
+          ]
+        },
+        {
+          "account": "2816",
+          "description": "PROPPURCHASES",
+          "position": "Purchases",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 2500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Purchases",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 2500.0,
+              "total": 2500.0
+            }
+          ]
+        },
+        {
+          "account": "2818",
+          "description": "PROPRENTALS",
+          "position": "Rentals",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 5000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Rentals",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 5000.0,
+              "total": 5000.0
+            }
+          ]
+        },
+        {
+          "account": "2898",
+          "description": "LOSS&DAMAGE",
+          "position": "L&D",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "L&D",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 500.0,
+              "total": 500.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "WARDROBE",
+      "account": "2900",
+      "total": 10223.0,
+      "line_items": [
+        {
+          "account": "2918",
+          "description": "WARDROBERENTALS",
+          "position": "Rentals",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 1500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Rentals",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 1500.0,
+              "total": 1500.0
+            }
+          ]
+        },
+        {
+          "account": "3114",
+          "description": "WIG&HAIRPURCHASE",
+          "position": "Allow",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 4000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Allow",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 4000.0,
+              "total": 4000.0
+            }
+          ]
+        },
+        {
+          "account": "3116",
+          "description": "MAKEUP/HAIRSUPPLIES",
+          "position": "Purchases",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 4000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Purchases",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 4000.0,
+              "total": 4000.0
+            }
+          ]
+        },
+        {
+          "account": "3117",
+          "description": "MAKE-UP/HAIRKITRENTALS",
+          "position": "BoxRental-Tests",
+          "quantity": 1.0,
+          "unit": "day",
+          "rate": null,
+          "subtotal": 35.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "BoxRental-Tests",
+              "quantity": 1.0,
+              "unit": "day",
+              "multiplier": 2.0,
+              "rate": null,
+              "subtotal": 35.0,
+              "total": 70.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ELECTRICAL",
+      "account": "3200",
+      "total": 69860.0,
+      "line_items": [
+        {
+          "account": "4250",
+          "description": "TRASHREMOVAL/DRESSINGROOMS",
+          "position": "DressingRoom-RugCleaning",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 1500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "DressingRoom-RugCleaning",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 1500.0,
+              "total": 1500.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PRODUCTIONSOUND",
+      "account": "3400",
+      "total": 69860.0,
+      "line_items": [
+        {
+          "account": "4250",
+          "description": "TRASHREMOVAL/DRESSINGROOMS",
+          "position": "DressingRoom-RugCleaning",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 1500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "DressingRoom-RugCleaning",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 1500.0,
+              "total": 1500.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TESTS",
+      "account": "4100",
+      "total": 69860.0,
+      "line_items": [
+        {
+          "account": "4250",
+          "description": "TRASHREMOVAL/DRESSINGROOMS",
+          "position": "DressingRoom-RugCleaning",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 1500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "DressingRoom-RugCleaning",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 1500.0,
+              "total": 1500.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "INSURANCE",
+      "account": "6700",
+      "total": 530837.0,
+      "line_items": [
+        {
+          "account": "6803",
+          "description": "XEROX",
+          "position": "Xerox(WB)",
+          "quantity": 6.54,
+          "unit": "months",
+          "rate": null,
+          "subtotal": 3000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Xerox(WB)",
+              "quantity": 6.54,
+              "unit": "months",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 3000.0,
+              "total": 19628.0
+            }
+          ]
+        },
+        {
+          "account": "6829",
+          "description": "LEGALFEES",
+          "position": "LEGALFEES",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 2500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "LEGALFEES",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 2500.0,
+              "total": 2500.0
+            }
+          ]
+        },
+        {
+          "account": "6835",
+          "description": "ELECTRICGOLFCARTS",
+          "position": "Rental(6Carts)",
+          "quantity": 6.47,
+          "unit": "months",
+          "rate": null,
+          "subtotal": 2000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Rental(6Carts)",
+              "quantity": 6.47,
+              "unit": "months",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 2000.0,
+              "total": 12933.0
+            }
+          ]
+        },
+        {
+          "account": "6861",
+          "description": "COMPUTERRENTAL",
+          "position": "WritersRoomPro",
+          "quantity": 12.0,
+          "unit": "episodes",
+          "rate": null,
+          "subtotal": 550.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "WritersRoomPro",
+              "quantity": 12.0,
+              "unit": "episodes",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 550.0,
+              "total": 6600.0
+            }
+          ]
+        },
+        {
+          "account": "6864",
+          "description": "ACCOUNTING",
+          "position": "DocumentScanning",
+          "quantity": 12.0,
+          "unit": "episodes",
+          "rate": null,
+          "subtotal": 1000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "DocumentScanning",
+              "quantity": 12.0,
+              "unit": "episodes",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 1000.0,
+              "total": 12000.0
+            }
+          ]
+        },
+        {
+          "account": "6885",
+          "description": "MISCEXPENSES",
+          "position": "LABusinessTax",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 750.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "LABusinessTax",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 750.0,
+              "total": 750.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "INSURANCE",
+      "account": "6700",
+      "total": 530837.0,
+      "line_items": [
+        {
+          "account": "6803",
+          "description": "XEROX",
+          "position": "Xerox(WB)",
+          "quantity": 6.54,
+          "unit": "months",
+          "rate": null,
+          "subtotal": 3000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Xerox(WB)",
+              "quantity": 6.54,
+              "unit": "months",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 3000.0,
+              "total": 19628.0
+            }
+          ]
+        },
+        {
+          "account": "6829",
+          "description": "LEGALFEES",
+          "position": "LEGALFEES",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 2500.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "LEGALFEES",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 2500.0,
+              "total": 2500.0
+            }
+          ]
+        },
+        {
+          "account": "6835",
+          "description": "ELECTRICGOLFCARTS",
+          "position": "Rental(6Carts)",
+          "quantity": 6.47,
+          "unit": "months",
+          "rate": null,
+          "subtotal": 2000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "Rental(6Carts)",
+              "quantity": 6.47,
+              "unit": "months",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 2000.0,
+              "total": 12933.0
+            }
+          ]
+        },
+        {
+          "account": "6861",
+          "description": "COMPUTERRENTAL",
+          "position": "WritersRoomPro",
+          "quantity": 12.0,
+          "unit": "episodes",
+          "rate": null,
+          "subtotal": 550.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "WritersRoomPro",
+              "quantity": 12.0,
+              "unit": "episodes",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 550.0,
+              "total": 6600.0
+            }
+          ]
+        },
+        {
+          "account": "6864",
+          "description": "ACCOUNTING",
+          "position": "DocumentScanning",
+          "quantity": 12.0,
+          "unit": "episodes",
+          "rate": null,
+          "subtotal": 1000.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "DocumentScanning",
+              "quantity": 12.0,
+              "unit": "episodes",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 1000.0,
+              "total": 12000.0
+            }
+          ]
+        },
+        {
+          "account": "6885",
+          "description": "MISCEXPENSES",
+          "position": "LABusinessTax",
+          "quantity": 1.0,
+          "unit": "allow",
+          "rate": null,
+          "subtotal": 750.0,
+          "total": null,
+          "periods": {},
+          "detail_lines": [
+            {
+              "position": "LABusinessTax",
+              "quantity": 1.0,
+              "unit": "allow",
+              "multiplier": 1.0,
+              "rate": null,
+              "subtotal": 750.0,
+              "total": 750.0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "extraction_stats": {
+    "total_pages": 34,
+    "departments_found": 10,
+    "line_items_found": 28
+  }
+}
