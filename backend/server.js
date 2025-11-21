@@ -124,6 +124,27 @@ app.get('/api/rate-cards/position/:classification', async (req, res) => {
 // API ROUTES - SIDELETTER RULES
 // ============================================================================
 
+// Get all sideletter rules
+app.get('/api/sideletters', async (req, res) => {
+  try {
+    const result = await db.query(
+      'SELECT * FROM sideletter_rules ORDER BY sideletter_name'
+    );
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows,
+    });
+  } catch (error) {
+    console.error('Error fetching sideletter rules:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
 // Get applicable sideletter based on production parameters
 app.post('/api/sideletters/determine', async (req, res) => {
   try {
