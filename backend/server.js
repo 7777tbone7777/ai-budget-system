@@ -2021,6 +2021,187 @@ app.get('/api/productions/:production_id/budget-summary', async (req, res) => {
   }
 });
 
+// ============================================================================
+// API ROUTES - LOCATION COMPARISON
+// ============================================================================
+
+// Get location comparison data from analyzed budgets
+app.get('/api/location-comparison', async (req, res) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const csvPath = path.join(__dirname, '../database/budget_summaries.csv');
+
+    // Read CSV file
+    const csvData = fs.readFileSync(csvPath, 'utf8');
+    const lines = csvData.split('\n').filter(line => line.trim());
+    const headers = lines[0].split(',');
+
+    // Parse CSV data
+    const budgets = lines.slice(1).map(line => {
+      const values = line.split(',');
+      return {
+        filename: values[0],
+        location: values[1],
+        grand_total: parseFloat(values[2]) || 0,
+        atl_total: parseFloat(values[3]) || 0,
+        btl_total: parseFloat(values[4]) || 0,
+        other_total: parseFloat(values[5]) || 0,
+        production_total: parseFloat(values[6]) || 0,
+        post_total: parseFloat(values[7]) || 0
+      };
+    }).filter(b => b.grand_total > 0 && b.location && b.location !== 'Unknown');
+
+    // Group by location and calculate averages
+    const locationStats = {};
+    budgets.forEach(budget => {
+      if (!locationStats[budget.location]) {
+        locationStats[budget.location] = {
+          location: budget.location,
+          budgets: [],
+          avg_total: 0,
+          avg_atl: 0,
+          avg_btl: 0,
+          atl_percentage: 0,
+          btl_percentage: 0,
+          count: 0
+        };
+      }
+      locationStats[budget.location].budgets.push(budget);
+    });
+
+    // Calculate statistics
+    Object.values(locationStats).forEach(loc => {
+      loc.count = loc.budgets.length;
+      loc.avg_total = loc.budgets.reduce((sum, b) => sum + b.grand_total, 0) / loc.count;
+      loc.avg_atl = loc.budgets.reduce((sum, b) => sum + b.atl_total, 0) / loc.count;
+      loc.avg_btl = loc.budgets.reduce((sum, b) => sum + b.btl_total, 0) / loc.count;
+      loc.atl_percentage = (loc.avg_atl / loc.avg_total) * 100;
+      loc.btl_percentage = (loc.avg_btl / loc.avg_total) * 100;
+    });
+
+    // Sort by cost (cheapest first)
+    const sorted = Object.values(locationStats).sort((a, b) => a.avg_total - b.avg_total);
+
+    res.json({
+      success: true,
+      locations: sorted,
+      total_budgets_analyzed: budgets.length,
+      location_count: sorted.length
+    });
+  } catch (error) {
+    console.error('Error loading location comparison:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Compare specific locations with recommendations
+app.post('/api/location-comparison/compare', async (req, res) => {
+  try {
+    const { locations, budget_size } = req.body;
+
+    if (!locations || locations.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'At least one location is required'
+      });
+    }
+
+    const fs = require('fs');
+    const path = require('path');
+    const csvPath = path.join(__dirname, '../database/budget_summaries.csv');
+
+    // Read and parse CSV
+    const csvData = fs.readFileSync(csvPath, 'utf8');
+    const lines = csvData.split('\n').filter(line => line.trim());
+
+    const budgets = lines.slice(1).map(line => {
+      const values = line.split(',');
+      return {
+        location: values[1],
+        grand_total: parseFloat(values[2]) || 0,
+        atl_total: parseFloat(values[3]) || 0,
+        btl_total: parseFloat(values[4]) || 0,
+        other_total: parseFloat(values[5]) || 0
+      };
+    }).filter(b =>
+      b.grand_total > 0 &&
+      b.location &&
+      locations.includes(b.location)
+    );
+
+    // Calculate averages per location
+    const comparison = {};
+    budgets.forEach(budget => {
+      if (!comparison[budget.location]) {
+        comparison[budget.location] = {
+          location: budget.location,
+          totals: [],
+          avg_total: 0,
+          avg_atl: 0,
+          avg_btl: 0,
+          atl_percentage: 0
+        };
+      }
+      comparison[budget.location].totals.push(budget.grand_total);
+      comparison[budget.location].avg_total += budget.grand_total;
+      comparison[budget.location].avg_atl += budget.atl_total;
+      comparison[budget.location].avg_btl += budget.btl_total;
+    });
+
+    Object.values(comparison).forEach(loc => {
+      const count = loc.totals.length;
+      loc.avg_total /= count;
+      loc.avg_atl /= count;
+      loc.avg_btl /= count;
+      loc.atl_percentage = (loc.avg_atl / loc.avg_total) * 100;
+      loc.budget_count = count;
+    });
+
+    // Sort by cost
+    const sorted = Object.values(comparison).sort((a, b) => a.avg_total - b.avg_total);
+
+    // Calculate savings
+    const cheapest = sorted[0];
+    const mostExpensive = sorted[sorted.length - 1];
+    const savings = mostExpensive.avg_total - cheapest.avg_total;
+    const savingsPercent = (savings / mostExpensive.avg_total) * 100;
+
+    // Generate recommendation
+    let recommendation = '';
+    if (budget_size) {
+      const closestMatch = sorted.reduce((prev, curr) => {
+        return Math.abs(curr.avg_total - budget_size) < Math.abs(prev.avg_total - budget_size) ? curr : prev;
+      });
+      recommendation = `For a $${(budget_size / 1000000).toFixed(1)}M budget, ${closestMatch.location} (avg: $${(closestMatch.avg_total / 1000000).toFixed(2)}M) is the closest match. ${cheapest.location} offers the best value at $${(cheapest.avg_total / 1000000).toFixed(2)}M average.`;
+    } else {
+      recommendation = `${cheapest.location} offers the lowest production costs at $${(cheapest.avg_total / 1000000).toFixed(2)}M average, saving $${(savings / 1000000).toFixed(2)}M (${savingsPercent.toFixed(1)}%) vs ${mostExpensive.location}.`;
+    }
+
+    res.json({
+      success: true,
+      comparison: sorted,
+      cheapest: cheapest.location,
+      most_expensive: mostExpensive.location,
+      savings: {
+        amount: savings,
+        percent: savingsPercent
+      },
+      recommendation,
+      budget_count: budgets.length
+    });
+  } catch (error) {
+    console.error('Error comparing locations:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
