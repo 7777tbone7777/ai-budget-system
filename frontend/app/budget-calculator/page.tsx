@@ -16,7 +16,64 @@ interface CrewMember {
   quantity: number
   weeks: number
   union: string
+  department: string
   subtotal: number
+}
+
+// Map unions to departments
+const getDepartment = (union: string, position: string): string => {
+  const unionLower = union.toLowerCase()
+  const posLower = position.toLowerCase()
+
+  // DGA - Production/Directing
+  if (unionLower.includes('dga')) return 'Production'
+
+  // Camera
+  if (unionLower.includes('600') || posLower.includes('camera') || posLower.includes('photographer') || posLower.includes('dit')) return 'Camera'
+
+  // Electric
+  if (unionLower.includes('728') || posLower.includes('gaffer') || posLower.includes('electric')) return 'Electric'
+
+  // Grip
+  if (unionLower.includes('80') || posLower.includes('grip')) return 'Grip'
+
+  // Sound
+  if (unionLower.includes('695') || posLower.includes('sound') || posLower.includes('boom')) return 'Sound'
+
+  // Art Department
+  if (unionLower.includes('800') || posLower.includes('designer') || posLower.includes('art director')) return 'Art Department'
+
+  // Set Decoration / Props
+  if (unionLower.includes('44') || posLower.includes('decorator') || posLower.includes('prop')) return 'Set Decoration'
+
+  // Hair & Makeup
+  if (unionLower.includes('706') || posLower.includes('makeup') || posLower.includes('hair')) return 'Hair & Makeup'
+
+  // Costume
+  if (unionLower.includes('705') || unionLower.includes('892') || posLower.includes('costume')) return 'Costume'
+
+  // Post / Editors
+  if (unionLower.includes('700') || posLower.includes('editor')) return 'Post Production'
+
+  // Production Coordinators
+  if (unionLower.includes('161') || posLower.includes('coordinator') || posLower.includes('secretary')) return 'Production Office'
+
+  // Teamsters - Transportation & Location
+  if (unionLower.includes('399') || unionLower.includes('teamster')) {
+    if (posLower.includes('location')) return 'Location'
+    return 'Transportation'
+  }
+
+  // SAG
+  if (unionLower.includes('sag') || posLower.includes('actor') || posLower.includes('performer')) return 'Cast'
+
+  // WGA
+  if (unionLower.includes('wga') || posLower.includes('writer')) return 'Writing'
+
+  // Animation
+  if (unionLower.includes('839') || posLower.includes('animator')) return 'Animation'
+
+  return 'Other'
 }
 
 interface RateLookupResult {
@@ -71,6 +128,8 @@ export default function BudgetCalculator() {
   const [templateCategories, setTemplateCategories] = useState<string[]>([])
   const [showTemplateModal, setShowTemplateModal] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [groupByDepartment, setGroupByDepartment] = useState(false)
+  const [collapsedDepartments, setCollapsedDepartments] = useState<Record<string, boolean>>({})
 
   const searchRates = async () => {
     if (!searchTerm.trim()) return
@@ -97,6 +156,7 @@ export default function BudgetCalculator() {
       quantity: 1,
       weeks: productionWeeks,
       union: result.union_local,
+      department: getDepartment(result.union_local, result.job_classification),
       subtotal: 0
     }
     newMember.subtotal = calculateSubtotal(newMember)
@@ -403,6 +463,7 @@ export default function BudgetCalculator() {
               quantity: pos.quantity,
               weeks: pos.weeks,
               union: rateData.union_local,
+              department: getDepartment(rateData.union_local, rateData.job_classification),
               subtotal: 0
             })
           } else {
@@ -415,6 +476,7 @@ export default function BudgetCalculator() {
               quantity: pos.quantity,
               weeks: pos.weeks,
               union: pos.union,
+              department: getDepartment(pos.union, pos.position),
               subtotal: 0
             })
           }
@@ -428,6 +490,7 @@ export default function BudgetCalculator() {
             quantity: pos.quantity,
             weeks: pos.weeks,
             union: pos.union,
+            department: getDepartment(pos.union, pos.position),
             subtotal: 0
           })
         }
@@ -575,7 +638,15 @@ export default function BudgetCalculator() {
 
       {/* Crew List */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Crew List ({crew.length})</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">Crew List ({crew.length})</h2>
+          <button
+            onClick={() => setGroupByDepartment(!groupByDepartment)}
+            className={`px-3 py-1 text-sm rounded-md ${groupByDepartment ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+          >
+            {groupByDepartment ? 'Grouped by Dept' : 'Group by Dept'}
+          </button>
+        </div>
 
         {crew.length === 0 ? (
           <p className="text-gray-500 text-center py-8">
@@ -586,6 +657,7 @@ export default function BudgetCalculator() {
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead>
                 <tr>
+                  {groupByDepartment && <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Dept</th>}
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Position</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Union</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
@@ -597,8 +669,18 @@ export default function BudgetCalculator() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {crew.map((member) => (
+                {(groupByDepartment
+                  ? [...crew].sort((a, b) => (a.department || 'Other').localeCompare(b.department || 'Other'))
+                  : crew
+                ).map((member, idx, arr) => (
                   <tr key={member.id}>
+                    {groupByDepartment && (
+                      <td className="px-4 py-2 text-sm">
+                        {idx === 0 || arr[idx - 1]?.department !== member.department ? (
+                          <span className="font-semibold text-purple-600">{member.department || 'Other'}</span>
+                        ) : ''}
+                      </td>
+                    )}
                     <td className="px-4 py-2 font-medium">{member.position}</td>
                     <td className="px-4 py-2 text-sm text-gray-500">{member.union}</td>
                     <td className="px-4 py-2">
@@ -671,6 +753,28 @@ export default function BudgetCalculator() {
               </button>
             </div>
           </div>
+          {/* Department Breakdown */}
+          {groupByDepartment && crew.length > 0 && (
+            <div className="mb-4 border-b pb-4">
+              <h4 className="text-sm font-medium text-gray-500 mb-2">By Department</h4>
+              <div className="space-y-1 text-sm">
+                {Object.entries(
+                  crew.reduce((acc, m) => {
+                    const dept = m.department || 'Other'
+                    acc[dept] = (acc[dept] || 0) + m.subtotal
+                    return acc
+                  }, {} as Record<string, number>)
+                )
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([dept, total]) => (
+                    <div key={dept} className="flex justify-between">
+                      <span className="text-gray-600">{dept}</span>
+                      <span>{formatCurrency(total)}</span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
           <div className="space-y-3">
             <div className="flex justify-between text-lg">
               <span>Labor Subtotal:</span>
