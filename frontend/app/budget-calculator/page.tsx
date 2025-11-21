@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import * as XLSX from 'xlsx'
 import jsPDF from 'jspdf'
@@ -191,6 +191,11 @@ export default function BudgetCalculator() {
   const [collapsedAccounts, setCollapsedAccounts] = useState<Record<string, boolean>>({})
   const [showAddLineModal, setShowAddLineModal] = useState(false)
   const [newLineType, setNewLineType] = useState<'equipment' | 'rental' | 'purchase' | 'allowance'>('equipment')
+
+  // Tax Incentive State
+  const [taxIncentiveStates, setTaxIncentiveStates] = useState<{id: string, state: string, incentive_min_percent: string, incentive_max_percent: string, incentive_type: string, incentive_mechanism: string, minimum_spend: string | null, qualified_spend_percent: string | null}[]>([])
+  const [selectedState, setSelectedState] = useState<string>('')
+  const [qualifiedSpendPercent, setQualifiedSpendPercent] = useState(80) // % of budget that qualifies
 
   const totalProductionWeeks = prepWeeks + shootWeeks + wrapWeeks
 
@@ -607,6 +612,32 @@ export default function BudgetCalculator() {
       console.error('Error loading crew templates:', error)
     }
   }
+
+  const loadTaxIncentives = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/tax-incentives`)
+      if (response.data.success) {
+        setTaxIncentiveStates(response.data.data.sort((a: {state: string}, b: {state: string}) => a.state.localeCompare(b.state)))
+      }
+    } catch (error) {
+      console.error('Error loading tax incentives:', error)
+    }
+  }
+
+  // Load tax incentives on mount
+  useEffect(() => {
+    loadTaxIncentives()
+  }, [])
+
+  // Calculate tax incentive
+  const selectedIncentive = taxIncentiveStates.find(s => s.state === selectedState)
+  const qualifiedSpend = grandTotal * (qualifiedSpendPercent / 100)
+  const minPercent = selectedIncentive ? parseFloat(selectedIncentive.incentive_min_percent) : 0
+  const maxPercent = selectedIncentive ? parseFloat(selectedIncentive.incentive_max_percent) : 0
+  const avgIncentiveRate = (minPercent + maxPercent) / 2
+  const estimatedCredit = qualifiedSpend * (avgIncentiveRate / 100)
+  const netCostAfterCredit = grandTotal - estimatedCredit
+  const meetsMinimumSpend = !selectedIncentive?.minimum_spend || grandTotal >= parseFloat(selectedIncentive.minimum_spend)
 
   const applyTemplate = async (template: CrewTemplate) => {
     setLoading(true)
@@ -1147,6 +1178,93 @@ export default function BudgetCalculator() {
               <span>Grand Total:</span>
               <span className="text-green-600">{formatCurrency(grandTotal)}</span>
             </div>
+          </div>
+
+          {/* Tax Incentive Section */}
+          <div className="mt-6 pt-4 border-t">
+            <h3 className="text-md font-semibold mb-3">Tax Incentive Estimate</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Production State</label>
+                <select
+                  value={selectedState}
+                  onChange={(e) => setSelectedState(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 text-sm"
+                >
+                  <option value="">Select State...</option>
+                  {taxIncentiveStates.map((state) => (
+                    <option key={state.id} value={state.state}>
+                      {state.state} ({state.incentive_min_percent}-{state.incentive_max_percent}%)
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Qualified Spend %</label>
+                <input
+                  type="number"
+                  value={qualifiedSpendPercent}
+                  onChange={(e) => setQualifiedSpendPercent(Number(e.target.value))}
+                  className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 text-sm"
+                  min="0"
+                  max="100"
+                />
+              </div>
+              <div className="flex items-end">
+                <a
+                  href="/tax-incentives"
+                  className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm"
+                >
+                  Compare All States
+                </a>
+              </div>
+            </div>
+
+            {selectedState && (
+              <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <div className="text-purple-600 dark:text-purple-400 font-medium">Incentive Type</div>
+                    <div className="font-semibold">{selectedIncentive?.incentive_type} {selectedIncentive?.incentive_mechanism}</div>
+                  </div>
+                  <div>
+                    <div className="text-purple-600 dark:text-purple-400 font-medium">Rate Range</div>
+                    <div className="font-semibold">{minPercent}% - {maxPercent}%</div>
+                  </div>
+                  <div>
+                    <div className="text-purple-600 dark:text-purple-400 font-medium">Qualified Spend</div>
+                    <div className="font-semibold">{formatCurrency(qualifiedSpend)}</div>
+                  </div>
+                  <div>
+                    <div className="text-purple-600 dark:text-purple-400 font-medium">Min. Spend Required</div>
+                    <div className={`font-semibold ${meetsMinimumSpend ? 'text-green-600' : 'text-red-600'}`}>
+                      {selectedIncentive?.minimum_spend ? formatCurrency(parseFloat(selectedIncentive.minimum_spend)) : 'None'}
+                      {!meetsMinimumSpend && ' (Not Met)'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-purple-200 dark:border-purple-700 space-y-2">
+                  <div className="flex justify-between text-lg">
+                    <span>Estimated Tax Credit:</span>
+                    <span className="font-bold text-purple-600">
+                      {meetsMinimumSpend ? formatCurrency(estimatedCredit) : '$0 (below minimum)'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xl font-bold">
+                    <span>Net Cost After Credit:</span>
+                    <span className="text-green-600">
+                      {meetsMinimumSpend ? formatCurrency(netCostAfterCredit) : formatCurrency(grandTotal)}
+                    </span>
+                  </div>
+                  {meetsMinimumSpend && estimatedCredit > 0 && (
+                    <div className="text-sm text-gray-500 dark:text-gray-400 text-right">
+                      Effective savings: {((estimatedCredit / grandTotal) * 100).toFixed(1)}%
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

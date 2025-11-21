@@ -45,6 +45,9 @@ export default function RootLayout({
                 <a href="/rate-comparison" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
                   Compare Rates
                 </a>
+                <a href="/tax-incentives" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                  Tax Incentives
+                </a>
               </div>
             </div>
           </div>
