@@ -3267,6 +3267,126 @@ app.post('/api/ai/parse', async (req, res) => {
 });
 
 // ============================================================================
+// REFERENCE DOCS API (Movie Magic Manual, etc.)
+// ============================================================================
+
+// Get all reference docs (summary view)
+app.get('/api/reference-docs', async (req, res) => {
+  try {
+    const { topic, doc_type, search } = req.query;
+
+    let query = `
+      SELECT id, doc_name, doc_type, source, section, page_start, page_end,
+             summary, topics, created_at
+      FROM reference_docs
+      WHERE 1=1
+    `;
+    const params = [];
+    let paramIndex = 1;
+
+    if (topic) {
+      query += ` AND $${paramIndex} = ANY(topics)`;
+      params.push(topic);
+      paramIndex++;
+    }
+
+    if (doc_type) {
+      query += ` AND doc_type = $${paramIndex}`;
+      params.push(doc_type);
+      paramIndex++;
+    }
+
+    if (search) {
+      query += ` AND (content ILIKE $${paramIndex} OR summary ILIKE $${paramIndex})`;
+      params.push(`%${search}%`);
+      paramIndex++;
+    }
+
+    query += ` ORDER BY page_start NULLS LAST`;
+
+    const result = await db.query(query, params);
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows
+    });
+  } catch (error) {
+    appLogger.error('Error fetching reference docs', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get full content of a specific reference doc
+app.get('/api/reference-docs/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db.query(`
+      SELECT * FROM reference_docs WHERE id = $1
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Document not found' });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0]
+    });
+  } catch (error) {
+    appLogger.error('Error fetching reference doc', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Search reference docs by topic
+app.get('/api/reference-docs/topic/:topic', async (req, res) => {
+  try {
+    const { topic } = req.params;
+
+    const result = await db.query(`
+      SELECT id, doc_name, doc_type, section, page_start, page_end,
+             summary, topics
+      FROM reference_docs
+      WHERE $1 = ANY(topics)
+      ORDER BY page_start NULLS LAST
+    `, [topic]);
+
+    res.json({
+      success: true,
+      topic,
+      count: result.rows.length,
+      data: result.rows
+    });
+  } catch (error) {
+    appLogger.error('Error searching reference docs by topic', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get list of available topics
+app.get('/api/reference-docs/topics/list', async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT DISTINCT unnest(topics) as topic,
+             COUNT(*) as doc_count
+      FROM reference_docs
+      GROUP BY topic
+      ORDER BY doc_count DESC
+    `);
+
+    res.json({
+      success: true,
+      data: result.rows
+    });
+  } catch (error) {
+    appLogger.error('Error fetching topics list', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ============================================================================
 // ERROR HANDLING MIDDLEWARE
 // ============================================================================
 
