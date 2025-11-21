@@ -190,7 +190,7 @@ export default function BudgetCalculator() {
   const [viewMode, setViewMode] = useState<'flat' | 'byAccount' | 'byDepartment'>('byAccount')
   const [collapsedAccounts, setCollapsedAccounts] = useState<Record<string, boolean>>({})
   const [showAddLineModal, setShowAddLineModal] = useState(false)
-  const [newLineType, setNewLineType] = useState<'labor' | 'equipment' | 'rental' | 'purchase' | 'allowance'>('labor')
+  const [newLineType, setNewLineType] = useState<'equipment' | 'rental' | 'purchase' | 'allowance'>('equipment')
 
   const totalProductionWeeks = prepWeeks + shootWeeks + wrapWeeks
 
