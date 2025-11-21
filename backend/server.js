@@ -318,6 +318,770 @@ app.get('/api/tax-incentives', async (req, res) => {
 });
 
 // ============================================================================
+// API ROUTES - GLOBALS
+// ============================================================================
+
+// Get all globals for a production
+app.get('/api/productions/:production_id/globals', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const { global_group } = req.query;
+
+    let query = 'SELECT * FROM globals WHERE production_id = $1';
+    const params = [production_id];
+
+    if (global_group) {
+      query += ' AND global_group = $2';
+      params.push(global_group);
+    }
+
+    query += ' ORDER BY global_group NULLS LAST, name';
+
+    const result = await db.query(query, params);
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows,
+    });
+  } catch (error) {
+    console.error('Error fetching globals:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Get single global by ID
+app.get('/api/globals/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db.query(
+      'SELECT * FROM globals WHERE id = $1',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Global not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error fetching global:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Create new global
+app.post('/api/productions/:production_id/globals', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const { name, value, precision, description, global_group } = req.body;
+
+    // Validate required fields
+    if (!name || value === undefined || value === null) {
+      return res.status(400).json({
+        success: false,
+        error: 'Name and value are required',
+      });
+    }
+
+    const result = await db.query(
+      `INSERT INTO globals
+       (production_id, name, value, precision, description, global_group)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING *`,
+      [production_id, name, value, precision || 2, description, global_group]
+    );
+
+    res.status(201).json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error creating global:', error);
+
+    // Handle unique constraint violation
+    if (error.code === '23505') {
+      return res.status(409).json({
+        success: false,
+        error: 'A global with this name already exists for this production',
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Update global
+app.put('/api/globals/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, value, precision, description, global_group } = req.body;
+
+    const result = await db.query(
+      `UPDATE globals
+       SET name = COALESCE($1, name),
+           value = COALESCE($2, value),
+           precision = COALESCE($3, precision),
+           description = COALESCE($4, description),
+           global_group = COALESCE($5, global_group),
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = $6
+       RETURNING *`,
+      [name, value, precision, description, global_group, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Global not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error updating global:', error);
+
+    if (error.code === '23505') {
+      return res.status(409).json({
+        success: false,
+        error: 'A global with this name already exists for this production',
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Delete global
+app.delete('/api/globals/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if any line items reference this global
+    const lineItemCheck = await db.query(
+      `SELECT COUNT(*) as count
+       FROM budget_line_items bli
+       JOIN globals g ON bli.global_reference = g.name
+       WHERE g.id = $1`,
+      [id]
+    );
+
+    if (lineItemCheck.rows[0].count > 0) {
+      return res.status(409).json({
+        success: false,
+        error: `Cannot delete global: ${lineItemCheck.rows[0].count} line item(s) reference this global`,
+      });
+    }
+
+    const result = await db.query(
+      'DELETE FROM globals WHERE id = $1 RETURNING *',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Global not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Global deleted successfully',
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error deleting global:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Resolve global value by name
+app.get('/api/productions/:production_id/globals/:name/value', async (req, res) => {
+  try {
+    const { production_id, name } = req.params;
+
+    const result = await db.query(
+      'SELECT resolve_global_value($1, $2) as value',
+      [production_id, name]
+    );
+
+    res.json({
+      success: true,
+      name,
+      value: result.rows[0].value,
+    });
+  } catch (error) {
+    console.error('Error resolving global value:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// ============================================================================
+// API ROUTES - BUDGET GROUPS
+// ============================================================================
+
+// Get all groups for a production
+app.get('/api/productions/:production_id/groups', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+
+    const result = await db.query(
+      `SELECT * FROM budget_groups
+       WHERE production_id = $1
+       ORDER BY sort_order, name`,
+      [production_id]
+    );
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows,
+    });
+  } catch (error) {
+    console.error('Error fetching budget groups:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Get single group by ID
+app.get('/api/groups/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db.query(
+      'SELECT * FROM budget_groups WHERE id = $1',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Budget group not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error fetching budget group:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Create new group
+app.post('/api/productions/:production_id/groups', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const { name, description, color, include_in_total, sort_order } = req.body;
+
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        error: 'Group name is required',
+      });
+    }
+
+    const result = await db.query(
+      `INSERT INTO budget_groups
+       (production_id, name, description, color, include_in_total, sort_order)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING *`,
+      [production_id, name, description, color, include_in_total !== false, sort_order || 0]
+    );
+
+    res.status(201).json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error creating budget group:', error);
+
+    if (error.code === '23505') {
+      return res.status(409).json({
+        success: false,
+        error: 'A group with this name already exists for this production',
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Update group
+app.put('/api/groups/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, color, include_in_total, sort_order } = req.body;
+
+    const result = await db.query(
+      `UPDATE budget_groups
+       SET name = COALESCE($1, name),
+           description = COALESCE($2, description),
+           color = COALESCE($3, color),
+           include_in_total = COALESCE($4, include_in_total),
+           sort_order = COALESCE($5, sort_order),
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = $6
+       RETURNING *`,
+      [name, description, color, include_in_total, sort_order, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Budget group not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error updating budget group:', error);
+
+    if (error.code === '23505') {
+      return res.status(409).json({
+        success: false,
+        error: 'A group with this name already exists for this production',
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Delete group
+app.delete('/api/groups/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if any line items are in this group
+    const lineItemCheck = await db.query(
+      'SELECT COUNT(*) as count FROM budget_line_item_groups WHERE group_id = $1',
+      [id]
+    );
+
+    if (lineItemCheck.rows[0].count > 0) {
+      return res.status(409).json({
+        success: false,
+        error: `Cannot delete group: ${lineItemCheck.rows[0].count} line item(s) are in this group`,
+      });
+    }
+
+    const result = await db.query(
+      'DELETE FROM budget_groups WHERE id = $1 RETURNING *',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Budget group not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Budget group deleted successfully',
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error deleting budget group:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Add line item to group
+app.post('/api/groups/:group_id/line-items/:line_item_id', async (req, res) => {
+  try {
+    const { group_id, line_item_id } = req.params;
+
+    await db.query(
+      `INSERT INTO budget_line_item_groups (line_item_id, group_id)
+       VALUES ($1, $2)
+       ON CONFLICT DO NOTHING`,
+      [line_item_id, group_id]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Line item added to group',
+    });
+  } catch (error) {
+    console.error('Error adding line item to group:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Remove line item from group
+app.delete('/api/groups/:group_id/line-items/:line_item_id', async (req, res) => {
+  try {
+    const { group_id, line_item_id } = req.params;
+
+    const result = await db.query(
+      'DELETE FROM budget_line_item_groups WHERE line_item_id = $1 AND group_id = $2',
+      [line_item_id, group_id]
+    );
+
+    res.json({
+      success: true,
+      message: 'Line item removed from group',
+    });
+  } catch (error) {
+    console.error('Error removing line item from group:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Get all line items in a group
+app.get('/api/groups/:group_id/line-items', async (req, res) => {
+  try {
+    const { group_id } = req.params;
+
+    const result = await db.query(
+      `SELECT bli.*
+       FROM budget_line_items bli
+       JOIN budget_line_item_groups blig ON bli.id = blig.line_item_id
+       WHERE blig.group_id = $1
+       ORDER BY bli.account_code, bli.position_title`,
+      [group_id]
+    );
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows,
+    });
+  } catch (error) {
+    console.error('Error fetching group line items:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// ============================================================================
+// API ROUTES - CONTRACTUAL CHARGES
+// ============================================================================
+
+// Get all contractual charges for a production
+app.get('/api/productions/:production_id/contractual-charges', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const { active } = req.query;
+
+    let query = 'SELECT * FROM contractual_charges WHERE production_id = $1';
+    const params = [production_id];
+
+    if (active !== undefined) {
+      query += ' AND active = $2';
+      params.push(active === 'true');
+    }
+
+    query += ' ORDER BY sort_order, name';
+
+    const result = await db.query(query, params);
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows,
+    });
+  } catch (error) {
+    console.error('Error fetching contractual charges:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Get single contractual charge by ID
+app.get('/api/contractual-charges/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db.query(
+      'SELECT * FROM contractual_charges WHERE id = $1',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Contractual charge not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error fetching contractual charge:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Create new contractual charge
+app.post('/api/productions/:production_id/contractual-charges', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const { name, charge_type, rate, applies_to, exclusions, sort_order, active } = req.body;
+
+    // Validate required fields
+    if (!name || !charge_type || rate === undefined || rate === null) {
+      return res.status(400).json({
+        success: false,
+        error: 'Name, charge_type, and rate are required',
+      });
+    }
+
+    // Validate charge_type
+    if (!['percentage', 'flat_fee'].includes(charge_type)) {
+      return res.status(400).json({
+        success: false,
+        error: 'charge_type must be either "percentage" or "flat_fee"',
+      });
+    }
+
+    const result = await db.query(
+      `INSERT INTO contractual_charges
+       (production_id, name, charge_type, rate, applies_to, exclusions, sort_order, active)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING *`,
+      [
+        production_id,
+        name,
+        charge_type,
+        rate,
+        applies_to || 'all',
+        JSON.stringify(exclusions || []),
+        sort_order || 0,
+        active !== false
+      ]
+    );
+
+    res.status(201).json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error creating contractual charge:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Update contractual charge
+app.put('/api/contractual-charges/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, charge_type, rate, applies_to, exclusions, sort_order, active } = req.body;
+
+    // Validate charge_type if provided
+    if (charge_type && !['percentage', 'flat_fee'].includes(charge_type)) {
+      return res.status(400).json({
+        success: false,
+        error: 'charge_type must be either "percentage" or "flat_fee"',
+      });
+    }
+
+    const result = await db.query(
+      `UPDATE contractual_charges
+       SET name = COALESCE($1, name),
+           charge_type = COALESCE($2, charge_type),
+           rate = COALESCE($3, rate),
+           applies_to = COALESCE($4, applies_to),
+           exclusions = COALESCE($5, exclusions),
+           sort_order = COALESCE($6, sort_order),
+           active = COALESCE($7, active),
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = $8
+       RETURNING *`,
+      [
+        name,
+        charge_type,
+        rate,
+        applies_to,
+        exclusions ? JSON.stringify(exclusions) : null,
+        sort_order,
+        active,
+        id
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Contractual charge not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error updating contractual charge:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Delete contractual charge
+app.delete('/api/contractual-charges/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db.query(
+      'DELETE FROM contractual_charges WHERE id = $1 RETURNING *',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Contractual charge not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Contractual charge deleted successfully',
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error deleting contractual charge:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Calculate total contractual charges for a production
+app.get('/api/productions/:production_id/contractual-charges/calculate', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const { budget_total } = req.query;
+
+    if (!budget_total) {
+      return res.status(400).json({
+        success: false,
+        error: 'budget_total query parameter is required',
+      });
+    }
+
+    // Get all active contractual charges
+    const charges = await db.query(
+      `SELECT * FROM contractual_charges
+       WHERE production_id = $1 AND active = true
+       ORDER BY sort_order`,
+      [production_id]
+    );
+
+    let totalCharges = 0;
+    const breakdown = [];
+
+    charges.rows.forEach(charge => {
+      let amount = 0;
+
+      if (charge.charge_type === 'percentage') {
+        amount = (parseFloat(budget_total) * charge.rate) / 100;
+      } else {
+        amount = parseFloat(charge.rate);
+      }
+
+      totalCharges += amount;
+      breakdown.push({
+        id: charge.id,
+        name: charge.name,
+        charge_type: charge.charge_type,
+        rate: charge.rate,
+        applies_to: charge.applies_to,
+        amount: amount.toFixed(2),
+      });
+    });
+
+    res.json({
+      success: true,
+      budget_total: parseFloat(budget_total),
+      total_charges: totalCharges.toFixed(2),
+      grand_total: (parseFloat(budget_total) + totalCharges).toFixed(2),
+      breakdown,
+    });
+  } catch (error) {
+    console.error('Error calculating contractual charges:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// ============================================================================
 // API ROUTES - PRODUCTIONS
 // ============================================================================
 
