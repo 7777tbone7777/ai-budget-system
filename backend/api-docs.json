@@ -1,0 +1,340 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AI Budget System API",
+    "version": "1.0.0",
+    "description": "API for managing film production budgets with union rate cards"
+  },
+  "servers": [
+    {
+      "url": "https://backend-production-8e04.up.railway.app",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost:3001",
+      "description": "Local development"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "Server is healthy"
+          }
+        }
+      }
+    },
+    "/api/rate-cards": {
+      "get": {
+        "summary": "Get all rate cards",
+        "parameters": [
+          {
+            "name": "union_local",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by union (e.g., IATSE Local 600)"
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by location (e.g., Los Angeles)"
+          },
+          {
+            "name": "production_type",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by production type (theatrical, television)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of rate cards",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "count": { "type": "integer" },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/RateCard" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rate-cards/smart-lookup": {
+      "get": {
+        "summary": "Smart rate lookup with fuzzy matching and alias resolution",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Search term (e.g., Gaffer, DP, Key Grip)"
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by location"
+          },
+          {
+            "name": "production_type",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by production type"
+          },
+          {
+            "name": "rate_type",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["hourly", "daily", "weekly", "flat"] },
+            "description": "Filter by rate type"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching rate cards with match scores",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "query": { "type": "string" },
+                    "alias_match": {
+                      "type": "object",
+                      "properties": {
+                        "canonical_name": { "type": "string" },
+                        "union_local": { "type": "string" }
+                      }
+                    },
+                    "count": { "type": "integer" },
+                    "data": { "type": "array" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rate-cards/compare": {
+      "get": {
+        "summary": "Compare rates across locations or production types",
+        "parameters": [
+          {
+            "name": "job_classification",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Job classification to compare"
+          },
+          {
+            "name": "compare_by",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["location", "production_type"] },
+            "description": "Field to group comparison by"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rate comparison data"
+          }
+        }
+      }
+    },
+    "/api/rate-cards/aliases": {
+      "get": {
+        "summary": "Get all job classification aliases",
+        "responses": {
+          "200": {
+            "description": "List of aliases mapping common terms to canonical names"
+          }
+        }
+      }
+    },
+    "/api/productions": {
+      "get": {
+        "summary": "Get all productions",
+        "responses": {
+          "200": { "description": "List of productions" }
+        }
+      },
+      "post": {
+        "summary": "Create a new production",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProductionCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Production created" }
+        }
+      }
+    },
+    "/api/productions/{id}": {
+      "get": {
+        "summary": "Get production by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Production details" },
+          "404": { "description": "Production not found" }
+        }
+      }
+    },
+    "/api/productions/{production_id}/line-items": {
+      "get": {
+        "summary": "Get all line items for a production",
+        "parameters": [
+          {
+            "name": "production_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "List of budget line items" }
+        }
+      },
+      "post": {
+        "summary": "Create a new budget line item with automatic rate lookup",
+        "parameters": [
+          {
+            "name": "production_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LineItemCreate" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Line item created with calculated totals" }
+        }
+      }
+    },
+    "/api/fringes/calculate": {
+      "post": {
+        "summary": "Calculate fringe benefits for a position",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "union_local": { "type": "string" },
+                  "state": { "type": "string" },
+                  "gross_wages": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Fringe calculation breakdown" }
+        }
+      }
+    },
+    "/api/tax-incentives": {
+      "get": {
+        "summary": "Get all tax incentives by state",
+        "responses": {
+          "200": { "description": "List of state tax incentives" }
+        }
+      }
+    },
+    "/api/tax-incentives/calculate": {
+      "post": {
+        "summary": "Calculate estimated tax incentive for a production",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "state": { "type": "string" },
+                  "totalBudget": { "type": "number" },
+                  "qualifiedSpend": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Tax incentive calculation" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RateCard": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "union_local": { "type": "string" },
+          "job_classification": { "type": "string" },
+          "rate_type": { "type": "string", "enum": ["hourly", "daily", "weekly", "flat", "program"] },
+          "base_rate": { "type": "string" },
+          "location": { "type": "string" },
+          "production_type": { "type": "string" },
+          "effective_date": { "type": "string", "format": "date" },
+          "contract_year": { "type": "integer" }
+        }
+      },
+      "ProductionCreate": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "production_type": { "type": "string" },
+          "distribution_platform": { "type": "string" },
+          "shooting_location": { "type": "string" },
+          "state": { "type": "string" },
+          "budget_target": { "type": "number" },
+          "episode_count": { "type": "integer" },
+          "season_number": { "type": "integer" }
+        }
+      },
+      "LineItemCreate": {
+        "type": "object",
+        "properties": {
+          "account_code": { "type": "string" },
+          "description": { "type": "string" },
+          "position_id": { "type": "string", "format": "uuid" },
+          "quantity": { "type": "number" },
+          "rate_override": { "type": "number" },
+          "union_local": { "type": "string" },
+          "job_classification": { "type": "string" },
+          "location": { "type": "string" },
+          "production_type": { "type": "string" }
+        }
+      }
+    }
+  }
+}

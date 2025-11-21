@@ -142,6 +142,168 @@ app.get('/api/rate-cards/position/:classification', async (req, res) => {
   }
 });
 
+// Smart rate lookup - fuzzy matches aliases and job titles
+app.get('/api/rate-cards/smart-lookup', async (req, res) => {
+  try {
+    const { query, location, production_type, rate_type } = req.query;
+
+    if (!query) {
+      return res.status(400).json({
+        success: false,
+        error: 'Query parameter is required',
+      });
+    }
+
+    // First check aliases table
+    const aliasResult = await db.query(
+      `SELECT canonical_name, union_local
+       FROM job_classification_aliases
+       WHERE LOWER(alias) = LOWER($1)
+       LIMIT 1`,
+      [query]
+    );
+
+    let searchTerms = [query];
+    let preferredUnion = null;
+
+    if (aliasResult.rows.length > 0) {
+      searchTerms = [aliasResult.rows[0].canonical_name, query];
+      preferredUnion = aliasResult.rows[0].union_local;
+    }
+
+    // Build query with fuzzy matching
+    let sqlQuery = `
+      SELECT DISTINCT ON (job_classification, union_local, rate_type)
+        r.*,
+        CASE
+          WHEN LOWER(job_classification) = LOWER($1) THEN 100
+          WHEN LOWER(job_classification) LIKE LOWER($1) || '%' THEN 80
+          WHEN LOWER(job_classification) LIKE '%' || LOWER($1) || '%' THEN 60
+          ELSE 40
+        END as match_score
+      FROM current_rate_cards r
+      WHERE (
+        LOWER(job_classification) LIKE '%' || LOWER($1) || '%'
+        ${searchTerms.length > 1 ? "OR LOWER(job_classification) LIKE '%' || LOWER($2) || '%'" : ''}
+      )
+    `;
+
+    const params = searchTerms;
+    let paramCount = searchTerms.length + 1;
+
+    if (location) {
+      sqlQuery += ` AND LOWER(location) LIKE '%' || LOWER($${paramCount++}) || '%'`;
+      params.push(location);
+    }
+
+    if (production_type) {
+      sqlQuery += ` AND LOWER(production_type) LIKE '%' || LOWER($${paramCount++}) || '%'`;
+      params.push(production_type);
+    }
+
+    if (rate_type) {
+      sqlQuery += ` AND rate_type = $${paramCount++}`;
+      params.push(rate_type);
+    }
+
+    sqlQuery += ` ORDER BY job_classification, union_local, rate_type, match_score DESC LIMIT 20`;
+
+    const result = await db.query(sqlQuery, params);
+
+    // Sort by match score and preferred union
+    let sortedResults = result.rows.sort((a, b) => {
+      // Prefer exact union match from alias
+      if (preferredUnion) {
+        if (a.union_local === preferredUnion && b.union_local !== preferredUnion) return -1;
+        if (b.union_local === preferredUnion && a.union_local !== preferredUnion) return 1;
+      }
+      return b.match_score - a.match_score;
+    });
+
+    res.json({
+      success: true,
+      query,
+      alias_match: aliasResult.rows.length > 0 ? aliasResult.rows[0] : null,
+      count: sortedResults.length,
+      data: sortedResults,
+    });
+  } catch (error) {
+    console.error('Error in smart lookup:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Get all job classification aliases
+app.get('/api/rate-cards/aliases', async (req, res) => {
+  try {
+    const result = await db.query(
+      `SELECT alias, canonical_name, union_local
+       FROM job_classification_aliases
+       ORDER BY alias`
+    );
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows,
+    });
+  } catch (error) {
+    console.error('Error fetching aliases:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Rate comparison - compare rates across locations/production types
+app.get('/api/rate-cards/compare', async (req, res) => {
+  try {
+    const { job_classification, compare_by } = req.query;
+
+    if (!job_classification) {
+      return res.status(400).json({
+        success: false,
+        error: 'job_classification is required',
+      });
+    }
+
+    let groupBy = compare_by || 'location';
+
+    const result = await db.query(`
+      SELECT
+        ${groupBy},
+        rate_type,
+        union_local,
+        AVG(base_rate::numeric)::decimal(10,2) as avg_rate,
+        MIN(base_rate::numeric)::decimal(10,2) as min_rate,
+        MAX(base_rate::numeric)::decimal(10,2) as max_rate,
+        COUNT(*) as sample_count
+      FROM current_rate_cards
+      WHERE LOWER(job_classification) LIKE '%' || LOWER($1) || '%'
+      GROUP BY ${groupBy}, rate_type, union_local
+      ORDER BY ${groupBy}, rate_type
+    `, [job_classification]);
+
+    res.json({
+      success: true,
+      job_classification,
+      compare_by: groupBy,
+      count: result.rows.length,
+      data: result.rows,
+    });
+  } catch (error) {
+    console.error('Error comparing rates:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
 // ============================================================================
 // API ROUTES - SIDELETTER RULES
 // ============================================================================
