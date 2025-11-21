@@ -6,6 +6,7 @@ const morgan = require('morgan');
 require('dotenv').config();
 
 const db = require('./db');
+const { parseFormula, extractGlobalNames, calculateLineItemTotal } = require('./formula-parser');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -539,6 +540,90 @@ app.get('/api/productions/:production_id/globals/:name/value', async (req, res) 
   } catch (error) {
     console.error('Error resolving global value:', error);
     res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// ============================================================================
+// API ROUTES - FORMULA EVALUATION
+// ============================================================================
+
+// Evaluate a formula with globals
+app.post('/api/productions/:production_id/formulas/evaluate', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const { formula } = req.body;
+
+    if (!formula) {
+      return res.status(400).json({
+        success: false,
+        error: 'Formula is required',
+      });
+    }
+
+    const result = await parseFormula(formula, production_id);
+
+    res.json({
+      success: true,
+      formula,
+      value: result.value,
+      resolved: result.resolved,
+      globals_used: result.globals,
+    });
+  } catch (error) {
+    console.error('Error evaluating formula:', error);
+    res.status(400).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Extract global names from a formula
+app.post('/api/formulas/extract-globals', async (req, res) => {
+  try {
+    const { formula } = req.body;
+
+    if (!formula) {
+      return res.status(400).json({
+        success: false,
+        error: 'Formula is required',
+      });
+    }
+
+    const globalNames = extractGlobalNames(formula);
+
+    res.json({
+      success: true,
+      formula,
+      globals: globalNames,
+    });
+  } catch (error) {
+    console.error('Error extracting globals:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Calculate line item total with formulas
+app.post('/api/productions/:production_id/line-items/calculate', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const lineItemData = req.body;
+
+    const totals = await calculateLineItemTotal(lineItemData, production_id);
+
+    res.json({
+      success: true,
+      ...totals,
+    });
+  } catch (error) {
+    console.error('Error calculating line item:', error);
+    res.status(400).json({
       success: false,
       error: error.message,
     });
@@ -1171,6 +1256,306 @@ app.get('/api/productions/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       error: error.message,
+    });
+  }
+});
+
+// ============================================================================
+// API ROUTES - TAX INCENTIVES
+// ============================================================================
+
+// Get all tax incentives
+app.get('/api/tax-incentives', async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT
+        id,
+        state,
+        country,
+        incentive_min_percent,
+        incentive_max_percent,
+        incentive_type,
+        incentive_mechanism,
+        minimum_spend,
+        project_cap,
+        annual_cap
+      FROM tax_incentives
+      ORDER BY state
+    `);
+
+    res.json({
+      success: true,
+      data: result.rows,
+      count: result.rows.length
+    });
+  } catch (error) {
+    console.error('Error fetching tax incentives:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch tax incentives'
+    });
+  }
+});
+
+// Get detailed tax incentive information for a specific state
+app.get('/api/tax-incentives/:state', async (req, res) => {
+  try {
+    const { state } = req.params;
+
+    const result = await db.query(`
+      SELECT *
+      FROM tax_incentives
+      WHERE LOWER(state) = LOWER($1)
+    `, [state]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: `No tax incentive found for state: ${state}`
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error fetching tax incentive:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch tax incentive'
+    });
+  }
+});
+
+// Calculate estimated tax incentive for a production
+app.post('/api/tax-incentives/calculate', async (req, res) => {
+  try {
+    const {
+      state,
+      totalBudget,
+      residentAtlSpend = 0,
+      residentBtlSpend = 0,
+      nonResidentAtlSpend = 0,
+      nonResidentBtlSpend = 0,
+      qualifiedSpend,
+      hasVfx = false,
+      vfxSpend = 0,
+      hasLocalHire = false,
+      isVeteranOwned = false
+    } = req.body;
+
+    // Get state tax incentive details
+    const incentiveResult = await db.query(`
+      SELECT *
+      FROM tax_incentives
+      WHERE LOWER(state) = LOWER($1)
+    `, [state]);
+
+    if (incentiveResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: `No tax incentive found for state: ${state}`
+      });
+    }
+
+    const incentive = incentiveResult.rows[0];
+
+    // Check minimum spend requirement
+    if (incentive.minimum_spend && totalBudget < incentive.minimum_spend) {
+      return res.json({
+        success: true,
+        eligible: false,
+        reason: `Budget ($${totalBudget.toLocaleString()}) is below minimum spend requirement ($${incentive.minimum_spend.toLocaleString()})`,
+        minimumSpend: incentive.minimum_spend
+      });
+    }
+
+    // Calculate base credit from labor
+    let laborCredit = 0;
+    if (incentive.resident_atl_percent) {
+      laborCredit += residentAtlSpend * (incentive.resident_atl_percent / 100);
+    }
+    if (incentive.resident_btl_percent) {
+      laborCredit += residentBtlSpend * (incentive.resident_btl_percent / 100);
+    }
+    if (incentive.non_resident_atl_percent) {
+      laborCredit += nonResidentAtlSpend * (incentive.non_resident_atl_percent / 100);
+    }
+    if (incentive.non_resident_btl_percent) {
+      laborCredit += nonResidentBtlSpend * (incentive.non_resident_btl_percent / 100);
+    }
+
+    // Calculate credit from qualified spend
+    let spendCredit = 0;
+    if (incentive.qualified_spend_percent && qualifiedSpend) {
+      spendCredit = qualifiedSpend * (incentive.qualified_spend_percent / 100);
+    }
+
+    // Calculate base credit
+    let baseCredit = laborCredit + spendCredit;
+
+    // Apply project cap if exists
+    if (incentive.project_cap && baseCredit > incentive.project_cap) {
+      baseCredit = incentive.project_cap;
+    }
+
+    // Calculate uplifts (simplified)
+    const uplifts = [];
+    let totalUplifts = 0;
+
+    const finalCredit = baseCredit + totalUplifts;
+    const effectiveCreditRate = totalBudget > 0 ? (finalCredit / totalBudget) * 100 : 0;
+
+    res.json({
+      success: true,
+      eligible: true,
+      calculation: {
+        state: incentive.state,
+        totalBudget,
+        laborCredit,
+        spendCredit,
+        baseCredit,
+        uplifts,
+        totalUplifts,
+        finalCredit,
+        effectiveCreditRate: effectiveCreditRate.toFixed(2),
+        incentiveType: incentive.incentive_type,
+        mechanism: incentive.incentive_mechanism
+      },
+      details: {
+        minimumSpend: incentive.minimum_spend,
+        projectCap: incentive.project_cap,
+        annualCap: incentive.annual_cap,
+        compensationCap: incentive.compensation_cap
+      }
+    });
+  } catch (error) {
+    console.error('Error calculating tax incentive:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to calculate tax incentive'
+    });
+  }
+});
+
+// Compare tax incentives across multiple states
+app.post('/api/tax-incentives/compare', async (req, res) => {
+  try {
+    const {
+      states,
+      totalBudget,
+      residentAtlSpend = 0,
+      residentBtlSpend = 0,
+      nonResidentAtlSpend = 0,
+      nonResidentBtlSpend = 0,
+      qualifiedSpend
+    } = req.body;
+
+    if (!Array.isArray(states) || states.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'States array is required'
+      });
+    }
+
+    const comparisons = [];
+
+    for (const state of states) {
+      // Get state tax incentive details
+      const incentiveResult = await db.query(`
+        SELECT *
+        FROM tax_incentives
+        WHERE LOWER(state) = LOWER($1)
+      `, [state]);
+
+      if (incentiveResult.rows.length === 0) {
+        comparisons.push({
+          state,
+          eligible: false,
+          reason: 'No tax incentive program found'
+        });
+        continue;
+      }
+
+      const incentive = incentiveResult.rows[0];
+
+      // Check minimum spend
+      if (incentive.minimum_spend && totalBudget < incentive.minimum_spend) {
+        comparisons.push({
+          state: incentive.state,
+          eligible: false,
+          reason: `Below minimum spend ($${incentive.minimum_spend.toLocaleString()})`,
+          minimumSpend: incentive.minimum_spend
+        });
+        continue;
+      }
+
+      // Calculate credit
+      let laborCredit = 0;
+      if (incentive.resident_atl_percent) {
+        laborCredit += residentAtlSpend * (incentive.resident_atl_percent / 100);
+      }
+      if (incentive.resident_btl_percent) {
+        laborCredit += residentBtlSpend * (incentive.resident_btl_percent / 100);
+      }
+      if (incentive.non_resident_atl_percent) {
+        laborCredit += nonResidentAtlSpend * (incentive.non_resident_atl_percent / 100);
+      }
+      if (incentive.non_resident_btl_percent) {
+        laborCredit += nonResidentBtlSpend * (incentive.non_resident_btl_percent / 100);
+      }
+
+      let spendCredit = 0;
+      if (incentive.qualified_spend_percent && qualifiedSpend) {
+        spendCredit = qualifiedSpend * (incentive.qualified_spend_percent / 100);
+      }
+
+      let totalCredit = laborCredit + spendCredit;
+
+      // Apply project cap
+      if (incentive.project_cap && totalCredit > incentive.project_cap) {
+        totalCredit = incentive.project_cap;
+      }
+
+      const effectiveRate = totalBudget > 0 ? (totalCredit / totalBudget) * 100 : 0;
+
+      comparisons.push({
+        state: incentive.state,
+        eligible: true,
+        totalCredit,
+        effectiveRate: effectiveRate.toFixed(2),
+        incentiveType: incentive.incentive_type,
+        mechanism: incentive.incentive_mechanism,
+        minPercent: incentive.incentive_min_percent,
+        maxPercent: incentive.incentive_max_percent,
+        projectCap: incentive.project_cap,
+        annualCap: incentive.annual_cap
+      });
+    }
+
+    // Sort by total credit (highest first)
+    comparisons.sort((a, b) => {
+      if (!a.eligible) return 1;
+      if (!b.eligible) return -1;
+      return (b.totalCredit || 0) - (a.totalCredit || 0);
+    });
+
+    res.json({
+      success: true,
+      data: comparisons,
+      summary: {
+        totalStatesCompared: states.length,
+        eligibleStates: comparisons.filter(c => c.eligible).length,
+        bestState: comparisons.find(c => c.eligible)?.state || null,
+        bestCredit: comparisons.find(c => c.eligible)?.totalCredit || 0
+      }
+    });
+  } catch (error) {
+    console.error('Error comparing tax incentives:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to compare tax incentives'
     });
   }
 });
