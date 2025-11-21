@@ -7,6 +7,16 @@ require('dotenv').config();
 
 const db = require('./db');
 const { parseFormula, extractGlobalNames, calculateLineItemTotal } = require('./formula-parser');
+const { requestLogger, errorLogger, createLogger } = require('./logger');
+const { generateBudget, parseNaturalLanguage } = require('./ai-budget-generator');
+
+// Create context-specific loggers
+const appLogger = createLogger('APP');
+const apiLogger = createLogger('API');
+const templateLogger = createLogger('TEMPLATES');
+const budgetLogger = createLogger('BUDGETS');
+const dbLogger = createLogger('DATABASE');
+const aiLogger = createLogger('AI');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -16,8 +26,10 @@ const PORT = process.env.PORT || 3001;
 // ============================================================================
 app.use(helmet()); // Security headers
 app.use(cors()); // Enable CORS
-app.use(morgan('dev')); // Request logging
 app.use(express.json()); // Parse JSON bodies
+
+// Logging middleware - logs all requests and responses
+app.use(requestLogger(appLogger));
 
 // ============================================================================
 // HEALTH CHECK
@@ -26,12 +38,21 @@ app.get('/health', async (req, res) => {
   try {
     // Test database connection
     await db.query('SELECT NOW()');
+
+    appLogger.debug('Health check passed', {
+      database: 'connected'
+    });
+
     res.json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
       database: 'connected',
     });
   } catch (error) {
+    appLogger.error('Health check failed', error, {
+      database: 'disconnected'
+    });
+
     res.status(500).json({
       status: 'unhealthy',
       timestamp: new Date().toISOString(),
@@ -287,9 +308,7 @@ app.get('/api/tax-incentives', async (req, res) => {
   try {
     const { state, country } = req.query;
 
-    let query = `SELECT * FROM tax_incentives
-                 WHERE effective_date_start <= CURRENT_DATE
-                 AND (effective_date_end IS NULL OR effective_date_end >= CURRENT_DATE)`;
+    let query = `SELECT * FROM tax_incentives WHERE 1=1`;
     const params = [];
     let paramCount = 1;
 
@@ -302,6 +321,8 @@ app.get('/api/tax-incentives', async (req, res) => {
       query += ` AND country = $${paramCount++}`;
       params.push(country);
     }
+
+    query += ` ORDER BY state`;
 
     const result = await db.query(query, params);
     res.json({
@@ -1598,10 +1619,6 @@ app.post('/api/tax-incentives/compare', async (req, res) => {
 });
 
 // ============================================================================
-// ERROR HANDLING
-// ============================================================================
-
-// ============================================================================
 // API ROUTES - BUDGET LINE ITEMS
 // ============================================================================
 
@@ -2208,9 +2225,17 @@ app.post('/api/location-comparison/compare', async (req, res) => {
 
 // Get all templates (with optional filtering)
 app.get('/api/templates', async (req, res) => {
-  try {
-    const { location, production_type, budget_min, budget_max } = req.query;
+  const startTime = Date.now();
+  const { location, production_type, budget_min, budget_max } = req.query;
 
+  templateLogger.info('Fetching templates', {
+    location,
+    production_type,
+    budget_min,
+    budget_max
+  });
+
+  try {
     let query = `
       SELECT
         id,
@@ -2255,7 +2280,19 @@ app.get('/api/templates', async (req, res) => {
 
     query += ` ORDER BY completeness_score DESC, line_item_count DESC`;
 
-    const result = await pool.query(query, params);
+    dbLogger.debug('Template query', {
+      query: query.substring(0, 200),
+      params
+    });
+
+    const result = await db.query(query, params);
+    const executionTime = Date.now() - startTime;
+
+    templateLogger.info('Templates fetched successfully', {
+      count: result.rows.length,
+      execution_time_ms: executionTime,
+      filters_applied: { location, production_type, budget_min, budget_max }
+    });
 
     res.json({
       success: true,
@@ -2263,7 +2300,14 @@ app.get('/api/templates', async (req, res) => {
       count: result.rows.length
     });
   } catch (error) {
-    console.error('Error fetching templates:', error);
+    templateLogger.error('Failed to fetch templates', error, {
+      location,
+      production_type,
+      budget_min,
+      budget_max,
+      execution_time_ms: Date.now() - startTime
+    });
+
     res.status(500).json({
       success: false,
       error: error.message
@@ -2273,15 +2317,19 @@ app.get('/api/templates', async (req, res) => {
 
 // Get template by ID with full details
 app.get('/api/templates/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
+  const startTime = Date.now();
+  const { id } = req.params;
 
+  templateLogger.info('Fetching template by ID', { template_id: id });
+
+  try {
     // Get template metadata
-    const templateResult = await pool.query(`
+    const templateResult = await db.query(`
       SELECT * FROM budget_templates WHERE id = $1 AND is_active = true
     `, [id]);
 
     if (templateResult.rows.length === 0) {
+      templateLogger.warn('Template not found', { template_id: id });
       return res.status(404).json({
         success: false,
         error: 'Template not found'
@@ -2290,8 +2338,15 @@ app.get('/api/templates/:id', async (req, res) => {
 
     const template = templateResult.rows[0];
 
+    templateLogger.debug('Template metadata retrieved', {
+      template_id: id,
+      name: template.name,
+      location: template.location,
+      department_count: template.department_count
+    });
+
     // Get departments with line items
-    const deptResult = await pool.query(`
+    const deptResult = await db.query(`
       SELECT
         d.id,
         d.name,
@@ -2305,7 +2360,7 @@ app.get('/api/templates/:id', async (req, res) => {
 
     // Get line items for each department
     for (const dept of deptResult.rows) {
-      const itemsResult = await pool.query(`
+      const itemsResult = await db.query(`
         SELECT
           account,
           description,
@@ -2326,13 +2381,26 @@ app.get('/api/templates/:id', async (req, res) => {
     }
 
     template.departments = deptResult.rows;
+    const executionTime = Date.now() - startTime;
+
+    templateLogger.info('Template fetched successfully', {
+      template_id: id,
+      name: template.name,
+      department_count: deptResult.rows.length,
+      total_line_items: deptResult.rows.reduce((sum, d) => sum + (d.line_items?.length || 0), 0),
+      execution_time_ms: executionTime
+    });
 
     res.json({
       success: true,
       template: template
     });
   } catch (error) {
-    console.error('Error fetching template:', error);
+    templateLogger.error('Failed to fetch template', error, {
+      template_id: id,
+      execution_time_ms: Date.now() - startTime
+    });
+
     res.status(500).json({
       success: false,
       error: error.message
@@ -2342,16 +2410,43 @@ app.get('/api/templates/:id', async (req, res) => {
 
 // Apply template to production (creates budget groups and line items)
 app.post('/api/productions/:production_id/apply-template', async (req, res) => {
+  const startTime = Date.now();
+  const { production_id } = req.params;
+  const { template_id, scale_to_budget } = req.body;
+
+  templateLogger.info('Applying template to production', {
+    production_id,
+    template_id,
+    scale_to_budget
+  });
+
+  let groupsCreated = 0;
+  let itemsCreated = 0;
+
   try {
-    const { production_id } = req.params;
-    const { template_id, scale_to_budget } = req.body;
+    // Validate input
+    if (!template_id) {
+      templateLogger.warn('Template application attempted without template_id', {
+        production_id
+      });
+      return res.status(400).json({
+        success: false,
+        error: 'template_id is required'
+      });
+    }
 
     // Get template with full details
-    const templateResult = await pool.query(`
+    templateLogger.debug('Fetching template data', { template_id });
+
+    const templateResult = await db.query(`
       SELECT template_data FROM budget_templates WHERE id = $1 AND is_active = true
     `, [template_id]);
 
     if (templateResult.rows.length === 0) {
+      templateLogger.warn('Template not found for application', {
+        template_id,
+        production_id
+      });
       return res.status(404).json({
         success: false,
         error: 'Template not found'
@@ -2361,63 +2456,116 @@ app.post('/api/productions/:production_id/apply-template', async (req, res) => {
     const templateData = templateResult.rows[0].template_data;
     const departments = templateData.departments || [];
 
+    templateLogger.info('Template data loaded', {
+      template_id,
+      department_count: departments.length
+    });
+
     // Calculate scaling factor if requested
     let scaleFactor = 1.0;
     if (scale_to_budget && templateData.metadata && templateData.metadata.total_budget) {
-      scaleFactor = scale_to_budget / templateData.metadata.total_budget;
-    }
+      const originalBudget = templateData.metadata.total_budget;
+      scaleFactor = scale_to_budget / originalBudget;
 
-    let groupsCreated = 0;
-    let itemsCreated = 0;
+      templateLogger.info('Applying budget scaling', {
+        original_budget: originalBudget,
+        target_budget: scale_to_budget,
+        scale_factor: scaleFactor.toFixed(4)
+      });
+    }
 
     // Create groups and line items from template
-    for (const dept of departments) {
-      // Create budget group
-      const groupResult = await pool.query(`
-        INSERT INTO budget_groups (production_id, name, account_number, sort_order)
-        VALUES ($1, $2, $3, $4)
-        RETURNING id
-      `, [production_id, dept.name, dept.account, groupsCreated]);
+    for (const [index, dept] of departments.entries()) {
+      templateLogger.debug('Creating department', {
+        production_id,
+        department_name: dept.name,
+        index: index + 1,
+        total: departments.length
+      });
 
-      const groupId = groupResult.rows[0].id;
-      groupsCreated++;
+      try {
+        // Create budget group
+        const groupResult = await db.query(`
+          INSERT INTO budget_groups (production_id, name, account_number, sort_order)
+          VALUES ($1, $2, $3, $4)
+          RETURNING id
+        `, [production_id, dept.name, dept.account, groupsCreated]);
 
-      // Create line items
-      for (const item of dept.line_items || []) {
-        const scaledRate = item.rate ? item.rate * scaleFactor : 0;
-        const scaledSubtotal = item.subtotal ? item.subtotal * scaleFactor : 0;
+        const groupId = groupResult.rows[0].id;
+        groupsCreated++;
 
-        await pool.query(`
-          INSERT INTO budget_line_items (
-            production_id,
-            group_id,
-            account_number,
-            description,
-            quantity,
-            unit,
-            rate,
-            rate_override,
-            subtotal,
-            fringe_total,
-            total
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-        `, [
+        // Create line items
+        for (const item of dept.line_items || []) {
+          const scaledRate = item.rate ? item.rate * scaleFactor : 0;
+          const scaledSubtotal = item.subtotal ? item.subtotal * scaleFactor : 0;
+
+          try {
+            await db.query(`
+              INSERT INTO budget_line_items (
+                production_id,
+                group_id,
+                account_number,
+                description,
+                quantity,
+                unit,
+                rate,
+                rate_override,
+                subtotal,
+                fringe_total,
+                total
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            `, [
+              production_id,
+              groupId,
+              item.account,
+              item.description || item.position,
+              item.quantity || 0,
+              item.unit,
+              0, // base rate (will use override)
+              scaledRate, // rate_override
+              scaledSubtotal,
+              0, // fringe_total (will be calculated)
+              scaledSubtotal // total
+            ]);
+
+            itemsCreated++;
+          } catch (itemError) {
+            templateLogger.error('Failed to create line item', itemError, {
+              production_id,
+              group_id: groupId,
+              item_description: item.description,
+              department: dept.name
+            });
+            // Continue with other items
+          }
+        }
+
+        templateLogger.debug('Department created', {
           production_id,
-          groupId,
-          item.account,
-          item.description || item.position,
-          item.quantity || 0,
-          item.unit,
-          0, // base rate (will use override)
-          scaledRate, // rate_override
-          scaledSubtotal,
-          0, // fringe_total (will be calculated)
-          scaledSubtotal // total
-        ]);
-
-        itemsCreated++;
+          department_name: dept.name,
+          group_id: groupId,
+          items_created: dept.line_items?.length || 0
+        });
+      } catch (deptError) {
+        templateLogger.error('Failed to create department', deptError, {
+          production_id,
+          department_name: dept.name,
+          index: index + 1
+        });
+        // Continue with other departments
       }
     }
+
+    const executionTime = Date.now() - startTime;
+
+    templateLogger.info('Template applied successfully', {
+      production_id,
+      template_id,
+      groups_created: groupsCreated,
+      items_created: itemsCreated,
+      execution_time_ms: executionTime,
+      scale_factor: scaleFactor.toFixed(4)
+    });
 
     res.json({
       success: true,
@@ -2427,7 +2575,14 @@ app.post('/api/productions/:production_id/apply-template', async (req, res) => {
       scale_factor: scaleFactor.toFixed(4)
     });
   } catch (error) {
-    console.error('Error applying template:', error);
+    templateLogger.error('Template application failed', error, {
+      production_id,
+      template_id,
+      groups_created: groupsCreated,
+      items_created: itemsCreated,
+      execution_time_ms: Date.now() - startTime
+    });
+
     res.status(500).json({
       success: false,
       error: error.message
@@ -2437,10 +2592,16 @@ app.post('/api/productions/:production_id/apply-template', async (req, res) => {
 
 // Get position rate suggestions by location
 app.get('/api/templates/rates/:position', async (req, res) => {
-  try {
-    const { position } = req.params;
-    const { location } = req.query;
+  const startTime = Date.now();
+  const { position } = req.params;
+  const { location } = req.query;
 
+  templateLogger.info('Fetching position rate suggestions', {
+    position,
+    location
+  });
+
+  try {
     let query = `
       SELECT
         position,
@@ -2463,7 +2624,15 @@ app.get('/api/templates/rates/:position', async (req, res) => {
 
     query += ` ORDER BY sample_count DESC, avg_rate DESC LIMIT 10`;
 
-    const result = await pool.query(query, params);
+    const result = await db.query(query, params);
+    const executionTime = Date.now() - startTime;
+
+    templateLogger.info('Rate suggestions fetched successfully', {
+      position,
+      location,
+      count: result.rows.length,
+      execution_time_ms: executionTime
+    });
 
     res.json({
       success: true,
@@ -2471,7 +2640,12 @@ app.get('/api/templates/rates/:position', async (req, res) => {
       count: result.rows.length
     });
   } catch (error) {
-    console.error('Error fetching rates:', error);
+    templateLogger.error('Failed to fetch rate suggestions', error, {
+      position,
+      location,
+      execution_time_ms: Date.now() - startTime
+    });
+
     res.status(500).json({
       success: false,
       error: error.message
@@ -2481,8 +2655,12 @@ app.get('/api/templates/rates/:position', async (req, res) => {
 
 // Get template statistics
 app.get('/api/templates/stats', async (req, res) => {
+  const startTime = Date.now();
+
+  templateLogger.info('Fetching template statistics');
+
   try {
-    const statsResult = await pool.query(`
+    const statsResult = await db.query(`
       SELECT
         location,
         COUNT(*) as template_count,
@@ -2496,7 +2674,7 @@ app.get('/api/templates/stats', async (req, res) => {
       ORDER BY avg_budget
     `);
 
-    const overallResult = await pool.query(`
+    const overallResult = await db.query(`
       SELECT
         COUNT(*) as total_templates,
         SUM(department_count) as total_departments,
@@ -2506,13 +2684,24 @@ app.get('/api/templates/stats', async (req, res) => {
       WHERE is_active = true
     `);
 
+    const executionTime = Date.now() - startTime;
+
+    templateLogger.info('Template statistics fetched successfully', {
+      location_count: statsResult.rows.length,
+      total_templates: overallResult.rows[0]?.total_templates || 0,
+      execution_time_ms: executionTime
+    });
+
     res.json({
       success: true,
       by_location: statsResult.rows,
       overall: overallResult.rows[0]
     });
   } catch (error) {
-    console.error('Error fetching stats:', error);
+    templateLogger.error('Failed to fetch template statistics', error, {
+      execution_time_ms: Date.now() - startTime
+    });
+
     res.status(500).json({
       success: false,
       error: error.message
@@ -2520,8 +2709,117 @@ app.get('/api/templates/stats', async (req, res) => {
   }
 });
 
+// ============================================================================
+// API ROUTES - AI BUDGET GENERATOR
+// ============================================================================
+
+// Generate budget from natural language
+app.post('/api/ai/generate-budget', async (req, res) => {
+  const startTime = Date.now();
+  const { production_id, prompt } = req.body;
+
+  aiLogger.info('AI budget generation requested', {
+    production_id,
+    prompt
+  });
+
+  try {
+    // Validate input
+    if (!production_id) {
+      aiLogger.warn('Missing production_id');
+      return res.status(400).json({
+        success: false,
+        error: 'production_id is required'
+      });
+    }
+
+    if (!prompt || typeof prompt !== 'string' || prompt.trim() === '') {
+      aiLogger.warn('Invalid or missing prompt');
+      return res.status(400).json({
+        success: false,
+        error: 'prompt is required and must be a non-empty string'
+      });
+    }
+
+    // Generate budget using AI
+    const result = await generateBudget(db, production_id, prompt);
+
+    const executionTime = Date.now() - startTime;
+
+    aiLogger.info('AI budget generated successfully', {
+      production_id,
+      template_id: result.template_used.id,
+      groups_created: result.groups_created,
+      items_created: result.items_created,
+      execution_time_ms: executionTime
+    });
+
+    res.json(result);
+  } catch (error) {
+    const executionTime = Date.now() - startTime;
+
+    aiLogger.error('AI budget generation failed', error, {
+      production_id,
+      prompt,
+      execution_time_ms: executionTime
+    });
+
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Parse natural language (for testing/preview)
+app.post('/api/ai/parse', async (req, res) => {
+  const { prompt } = req.body;
+
+  aiLogger.info('Natural language parse requested', { prompt });
+
+  try {
+    if (!prompt) {
+      return res.status(400).json({
+        success: false,
+        error: 'prompt is required'
+      });
+    }
+
+    const parsed = parseNaturalLanguage(prompt);
+
+    aiLogger.info('Natural language parsed', parsed);
+
+    res.json({
+      success: true,
+      ...parsed
+    });
+  } catch (error) {
+    aiLogger.error('Natural language parsing failed', error, {
+      prompt
+    });
+
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// ============================================================================
+// ERROR HANDLING MIDDLEWARE
+// ============================================================================
+
+// Error logging middleware (logs all errors before handling)
+app.use(errorLogger(appLogger));
+
 // 404 handler
 app.use((req, res) => {
+  appLogger.warn('Route not found', {
+    method: req.method,
+    url: req.originalUrl || req.url,
+    ip: req.ip
+  });
+
   res.status(404).json({
     success: false,
     error: 'Route not found',
@@ -2530,7 +2828,14 @@ app.use((req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error('Global error handler:', err);
+  appLogger.error('Unhandled server error', err, {
+    method: req.method,
+    url: req.originalUrl || req.url,
+    body: req.body,
+    params: req.params,
+    query: req.query
+  });
+
   res.status(500).json({
     success: false,
     error: err.message || 'Internal server error',
@@ -2542,6 +2847,13 @@ app.use((err, req, res, next) => {
 // ============================================================================
 
 app.listen(PORT, () => {
+  appLogger.info('AI Budget System API started', {
+    port: PORT,
+    environment: process.env.NODE_ENV || 'development',
+    health_check: `http://localhost:${PORT}/health`,
+    api_base_url: `http://localhost:${PORT}/api`
+  });
+
   console.log(`\n🚀 AI Budget System API running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
   console.log(`📚 API Base URL: http://localhost:${PORT}/api\n`);

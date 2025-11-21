@@ -1,0 +1,62 @@
+{
+  "union_local": "SAG-AFTRA",
+  "rate_count": 4,
+  "rates": [
+    {
+      "union_local": "SAG-AFTRA",
+      "craft": "Actors",
+      "job_classification": "Artists and the Alliance of Motion Picture and Television Producers, the",
+      "occupation_code": "",
+      "base_rate": 2020.0,
+      "rate_type": "weekly",
+      "effective_period": [
+        "7/01/20",
+        "7/01/21"
+      ],
+      "section": "",
+      "source_file": "SAG-AFTRA_TV-Theatrical_2023_MOA.txt"
+    },
+    {
+      "union_local": "SAG-AFTRA",
+      "craft": "Actors",
+      "job_classification": "Artists and the Alliance of Motion Picture and Television Producers and the",
+      "occupation_code": "",
+      "base_rate": 2022.0,
+      "rate_type": "weekly",
+      "effective_period": [
+        "7/01/20",
+        "7/01/21"
+      ],
+      "section": "",
+      "source_file": "SAG-AFTRA_TV-Theatrical_2023_MOA.txt"
+    },
+    {
+      "union_local": "SAG-AFTRA",
+      "craft": "Actors",
+      "job_classification": "at a Salary of at Least",
+      "occupation_code": "",
+      "base_rate": 10000.0,
+      "rate_type": "weekly",
+      "effective_period": [
+        "7/01/20",
+        "7/01/21"
+      ],
+      "section": "",
+      "source_file": "SAG-AFTRA_TV-Theatrical_2023_MOA.txt"
+    },
+    {
+      "union_local": "SAG-AFTRA",
+      "craft": "Actors",
+      "job_classification": "of Exhibit E to the",
+      "occupation_code": "",
+      "base_rate": 2011.0,
+      "rate_type": "weekly",
+      "effective_period": [
+        "7/01/20",
+        "7/01/21"
+      ],
+      "section": "including but not limited to the Schedules that inIcorporate Schedules A, B or C and the",
+      "source_file": "SAG-AFTRA_TV-Theatrical_2023_MOA.txt"
+    }
+  ]
+}

@@ -1,0 +1,215 @@
+{
+  "union_local": "IATSE Local 728",
+  "rate_count": 19,
+  "rates": [
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "ACLT",
+      "occupation_code": "1819",
+      "base_rate": 1711.2,
+      "rate_type": "hourly",
+      "effective_period": "8/4/24 to 8/2/25 1818 CLT 1,882.80 47.07 435.12 54",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "Chief Rigging",
+      "occupation_code": "1822",
+      "base_rate": 1711.2,
+      "rate_type": "hourly",
+      "effective_period": "8/4/24 to 8/2/25 1818 CLT 1,882.80 47.07 435.12 54",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "CLT",
+      "occupation_code": "1818",
+      "base_rate": 2152.8,
+      "rate_type": "weekly",
+      "effective_period": "8/4/24 to 8/2/25 1818 CLT 1,882.80 47.07 435.12 54",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "ACLT",
+      "occupation_code": "1819",
+      "base_rate": 1946.0,
+      "rate_type": "weekly",
+      "effective_period": "8/4/24 to 8/2/25 1818 CLT 1,882.80 47.07 435.12 54",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "Chief Rigging",
+      "occupation_code": "1822",
+      "base_rate": 2152.8,
+      "rate_type": "weekly",
+      "effective_period": "8/4/24 to 8/2/25 1818 CLT 1,882.80 47.07 435.12 54",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "ACLT",
+      "occupation_code": "1819",
+      "base_rate": 1552.8,
+      "rate_type": "weekly",
+      "effective_period": "8/4/24 to 8/2/25 1818 CLT 1,882.80 47.07 435.12 54",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "Chief Rigging",
+      "occupation_code": "1822",
+      "base_rate": 1552.8,
+      "rate_type": "weekly",
+      "effective_period": "12.5% Reduction 1821 Lighting Tech 1,518.80 37.97 ",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "HR. WEEKLY VIDEO TAPE AGREEMENT",
+      "occupation_code": "",
+      "base_rate": 5422.0,
+      "rate_type": "weekly",
+      "effective_period": "12.5% Reduction 1821 Lighting Tech 1,518.80 37.97 ",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "Studio Minimum Rates",
+      "occupation_code": "",
+      "base_rate": 5423.0,
+      "rate_type": "hourly",
+      "effective_period": "12.5% Reduction 1821 Lighting Tech 1,518.80 37.97 ",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "ACLT",
+      "occupation_code": "1819",
+      "base_rate": 1891.6,
+      "rate_type": "hourly",
+      "effective_period": "1818 CLT 2,093.20 52.33 435.12 54.39 effective: 9/",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "Lighting Tech",
+      "occupation_code": "1821",
+      "base_rate": 1674.0,
+      "rate_type": "weekly",
+      "effective_period": "1818 CLT 2,093.20 52.33 435.12 54.39 effective: 9/",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "Chief Rigging",
+      "occupation_code": "1822",
+      "base_rate": 2093.2,
+      "rate_type": "weekly",
+      "effective_period": "1818 CLT 2,093.20 52.33 435.12 54.39 effective: 9/",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "EMPLOYERS RADFORD STUDIO",
+      "occupation_code": "",
+      "base_rate": 4024.0,
+      "rate_type": "weekly",
+      "effective_period": "1818 CLT 2,093.20 52.33 435.12 54.39 effective: 9/",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "Culver City, CA",
+      "occupation_code": "",
+      "base_rate": 90232.0,
+      "rate_type": "weekly",
+      "effective_period": "1818 CLT 2,093.20 52.33 435.12 54.39 effective: 9/",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "CULVER STUDIOS",
+      "occupation_code": "",
+      "base_rate": 9336.0,
+      "rate_type": "weekly",
+      "effective_period": "1818 CLT 2,093.20 52.33 435.12 54.39 effective: 9/",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "Culver City, CA",
+      "occupation_code": "",
+      "base_rate": 90230.0,
+      "rate_type": "weekly",
+      "effective_period": "1818 CLT 2,093.20 52.33 435.12 54.39 effective: 9/",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "SUNSET-GOWER",
+      "occupation_code": "",
+      "base_rate": 1438.0,
+      "rate_type": "weekly",
+      "effective_period": "1818 CLT 2,093.20 52.33 435.12 54.39 effective: 9/",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "SUNSET-LAS PALMAS",
+      "occupation_code": "3673",
+      "base_rate": 1040.0,
+      "rate_type": "weekly",
+      "effective_period": "1818 CLT 2,093.20 52.33 435.12 54.39 effective: 9/",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    },
+    {
+      "union_local": "IATSE Local 728",
+      "craft": "Lighting Technicians",
+      "job_classification": "PARAMOUNT",
+      "occupation_code": "",
+      "base_rate": 5555.0,
+      "rate_type": "weekly",
+      "effective_period": "1818 CLT 2,093.20 52.33 435.12 54.39 effective: 9/",
+      "section": "RATE SCHEDULE (Wage Scale#3) Studio Minimum Rates 9/29/24 to 9/27/25 (3% Discount) Studio Minimum Ra",
+      "source_file": "Local_728_2024_Rate_Card.txt"
+    }
+  ]
+}

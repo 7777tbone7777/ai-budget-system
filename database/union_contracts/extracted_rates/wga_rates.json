@@ -1,0 +1,84 @@
+{
+  "extracted_at": "2025-11-21T10:49:35.930482",
+  "source": "/Users/anthonyvazquez/ai-budget-system/database/union_contracts/extracted_text/WGA/WGA_2023_Schedule_of_Minimums_Full.txt",
+  "total_rates": 11,
+  "rates": [
+    {
+      "union_local": "WGA",
+      "job_classification": "Screenplay, Including Treatment (High Budget)",
+      "rate_type": "flat",
+      "base_rate": 170655.0,
+      "effective_date": "2025-05-02"
+    },
+    {
+      "union_local": "WGA",
+      "job_classification": "Screenplay, Including Treatment (High Budget)",
+      "rate_type": "flat",
+      "base_rate": 147920.0,
+      "effective_date": "2025-05-02"
+    },
+    {
+      "union_local": "WGA",
+      "job_classification": "Non-Original Screenplay (High Budget)",
+      "rate_type": "flat",
+      "base_rate": 102288.0,
+      "effective_date": "2025-05-02"
+    },
+    {
+      "union_local": "WGA",
+      "job_classification": "Rewrite (High Budget)",
+      "rate_type": "flat",
+      "base_rate": 45470.0,
+      "effective_date": "2025-05-02"
+    },
+    {
+      "union_local": "WGA",
+      "job_classification": "Polish (High Budget)",
+      "rate_type": "flat",
+      "base_rate": 22736.0,
+      "effective_date": "2025-05-02"
+    },
+    {
+      "union_local": "WGA",
+      "job_classification": "Screenplay, Including Treatment (Low Budget)",
+      "rate_type": "flat",
+      "base_rate": 90904.0,
+      "effective_date": "2025-05-02"
+    },
+    {
+      "union_local": "WGA",
+      "job_classification": "Screenplay, Including Treatment (Low Budget)",
+      "rate_type": "flat",
+      "base_rate": 79542.0,
+      "effective_date": "2025-05-02"
+    },
+    {
+      "union_local": "WGA",
+      "job_classification": "Non-Original Screenplay (Low Budget)",
+      "rate_type": "flat",
+      "base_rate": 49702.0,
+      "effective_date": "2025-05-02"
+    },
+    {
+      "union_local": "WGA",
+      "job_classification": "Rewrite (Low Budget)",
+      "rate_type": "flat",
+      "base_rate": 29826.0,
+      "effective_date": "2025-05-02"
+    },
+    {
+      "union_local": "WGA",
+      "job_classification": "Polish (Low Budget)",
+      "rate_type": "flat",
+      "base_rate": 14924.0,
+      "effective_date": "2025-05-02"
+    },
+    {
+      "union_local": "WGA",
+      "job_classification": "Staff Writer (Week-to-Week)",
+      "rate_type": "weekly",
+      "base_rate": 5935.0,
+      "effective_date": "2025-05-02"
+    }
+  ]
+}

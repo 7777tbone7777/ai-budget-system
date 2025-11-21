@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import axios from 'axios'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-8e04.up.railway.app'
@@ -19,59 +19,152 @@ interface RateCard {
 
 export default function RateCards() {
   const [rateCards, setRateCards] = useState<RateCard[]>([])
+  const [allRates, setAllRates] = useState<RateCard[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
   const [filters, setFilters] = useState({
     union_local: '',
     location: '',
     production_type: '',
+    rate_type: '',
   })
 
+  // Comprehensive list of all union locals in the database
   const unionLocals = [
+    'DGA',
+    'DGC',
+    'EPC',
+    'IATSE',
     'IATSE Local 44',
+    'IATSE Local 52',
     'IATSE Local 80',
+    'IATSE Local 161',
+    'IATSE Local 209',
+    'IATSE Local 399',
+    'IATSE Local 411',
+    'IATSE Local 477',
+    'IATSE Local 479',
+    'IATSE Local 480',
+    'IATSE Local 481',
+    'IATSE Local 492',
     'IATSE Local 600',
+    'IATSE Local 695',
     'IATSE Local 700',
     'IATSE Local 706',
     'IATSE Local 728',
+    'IATSE Local 798',
+    'IATSE Local 800',
+    'IATSE Local 839',
+    'IATSE Local 871',
+    'IATSE Local 873',
+    'IATSE Local 892',
+    'SAG-AFTRA',
+    'Teamsters Local 399',
+    'WGA',
   ]
 
   const locations = [
-    'Los Angeles - Studio',
-    'Los Angeles - Distant',
+    'Los Angeles',
     'New York',
     'Atlanta',
     'Albuquerque',
+    'New Orleans',
+    'Florida',
+    'Ohio',
+    'Kentucky',
+    'Pennsylvania',
   ]
 
   const productionTypes = [
     'theatrical',
-    'network_tv',
-    'hb_svod',
-    'hb_avod',
-    'multi_camera',
-    'single_camera',
+    'television',
+    'Feature Film',
+    'Television',
+    'Theatrical',
+    'Low Budget',
+    'SVOD',
+  ]
+
+  const rateTypes = [
+    'hourly',
+    'daily',
+    'weekly',
+    'flat',
+    'program',
   ]
 
   useEffect(() => {
     fetchRateCards()
-  }, [filters])
+  }, [])
+
+  useEffect(() => {
+    filterRateCards()
+  }, [filters, searchTerm, allRates])
 
   const fetchRateCards = async () => {
     try {
       setLoading(true)
-      const params = new URLSearchParams()
-      if (filters.union_local) params.append('union_local', filters.union_local)
-      if (filters.location) params.append('location', filters.location)
-      if (filters.production_type) params.append('production_type', filters.production_type)
-
-      const response = await axios.get(`${API_URL}/api/rate-cards?${params.toString()}`)
-      setRateCards(response.data.data || [])
+      const response = await axios.get(`${API_URL}/api/rate-cards`)
+      const data = response.data.data || []
+      setAllRates(data)
+      setRateCards(data)
     } catch (error) {
       console.error('Error fetching rate cards:', error)
     } finally {
       setLoading(false)
     }
   }
+
+  const filterRateCards = () => {
+    let filtered = [...allRates]
+
+    // Filter by union local
+    if (filters.union_local) {
+      filtered = filtered.filter(card => card.union_local === filters.union_local)
+    }
+
+    // Filter by location (partial match)
+    if (filters.location) {
+      filtered = filtered.filter(card =>
+        card.location?.toLowerCase().includes(filters.location.toLowerCase())
+      )
+    }
+
+    // Filter by production type
+    if (filters.production_type) {
+      filtered = filtered.filter(card =>
+        card.production_type?.toLowerCase().includes(filters.production_type.toLowerCase())
+      )
+    }
+
+    // Filter by rate type
+    if (filters.rate_type) {
+      filtered = filtered.filter(card => card.rate_type === filters.rate_type)
+    }
+
+    // Search by job classification
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase()
+      filtered = filtered.filter(card =>
+        card.job_classification?.toLowerCase().includes(search) ||
+        card.union_local?.toLowerCase().includes(search)
+      )
+    }
+
+    setRateCards(filtered)
+  }
+
+  // Calculate statistics
+  const stats = useMemo(() => {
+    const uniqueUnions = new Set(allRates.map(r => r.union_local)).size
+    const uniquePositions = new Set(allRates.map(r => r.job_classification)).size
+    return {
+      totalRates: allRates.length,
+      uniqueUnions,
+      uniquePositions,
+      filteredCount: rateCards.length,
+    }
+  }, [allRates, rateCards])
 
   const formatCurrency = (amount: string) => {
     return new Intl.NumberFormat('en-US', {
@@ -95,24 +188,66 @@ export default function RateCards() {
           Union Rate Cards
         </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-300">
-          Browse and search IATSE 2024 minimum rates
+          Browse and search 2024-2027 union minimum rates
         </p>
+      </div>
+
+      {/* Stats Summary */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            {stats.totalRates}
+          </div>
+          <div className="text-sm text-blue-700 dark:text-blue-300">Total Rates</div>
+        </div>
+        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+          <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+            {stats.uniqueUnions}
+          </div>
+          <div className="text-sm text-green-700 dark:text-green-300">Unions</div>
+        </div>
+        <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+            {stats.uniquePositions}
+          </div>
+          <div className="text-sm text-purple-700 dark:text-purple-300">Positions</div>
+        </div>
+        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4">
+          <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+            {stats.filteredCount}
+          </div>
+          <div className="text-sm text-orange-700 dark:text-orange-300">Showing</div>
+        </div>
+      </div>
+
+      {/* Search Box */}
+      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Search Positions
+        </label>
+        <input
+          type="text"
+          placeholder="Search by position (e.g., Key Grip, Camera Operator, Director...)"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-lg"
+        />
       </div>
 
       {/* Filters */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <h2 className="text-lg font-semibold mb-4">Filters</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Union Local
+              Union / Guild
             </label>
             <select
               value={filters.union_local}
               onChange={(e) => setFilters({ ...filters, union_local: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
-              <option value="">All Locals</option>
+              <option value="">All Unions</option>
               {unionLocals.map((local) => (
                 <option key={local} value={local}>
                   {local}
@@ -141,6 +276,24 @@ export default function RateCards() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Rate Type
+            </label>
+            <select
+              value={filters.rate_type}
+              onChange={(e) => setFilters({ ...filters, rate_type: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            >
+              <option value="">All Rate Types</option>
+              {rateTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Production Type
             </label>
             <select
@@ -151,7 +304,7 @@ export default function RateCards() {
               <option value="">All Types</option>
               {productionTypes.map((type) => (
                 <option key={type} value={type}>
-                  {type.replace(/_/g, ' ').toUpperCase()}
+                  {type.replace(/_/g, ' ')}
                 </option>
               ))}
             </select>
@@ -159,10 +312,13 @@ export default function RateCards() {
         </div>
 
         <button
-          onClick={() => setFilters({ union_local: '', location: '', production_type: '' })}
+          onClick={() => {
+            setFilters({ union_local: '', location: '', production_type: '', rate_type: '' })
+            setSearchTerm('')
+          }}
           className="mt-4 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
         >
-          Clear Filters
+          Clear All Filters
         </button>
       </div>
 

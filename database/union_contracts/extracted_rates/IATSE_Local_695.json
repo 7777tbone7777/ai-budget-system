@@ -1,0 +1,292 @@
+{
+  "union_local": "IATSE Local 695",
+  "rate_count": 26,
+  "rates": [
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "rate -",
+      "occupation_code": "",
+      "base_rate": 2821.19,
+      "rate_type": "weekly",
+      "effective_period": "July 30, 2017",
+      "section": "2018-21 Local #695 Wage Schedules",
+      "source_file": "Local_695_2018-21_Wage_Schedules.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "Sound",
+      "occupation_code": "",
+      "base_rate": 161.0,
+      "rate_type": "hourly",
+      "effective_period": "July 30, 2017",
+      "section": "2018-21 Local #695 Wage Schedules",
+      "source_file": "Local_695_2018-21_Wage_Schedules.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "rate -",
+      "occupation_code": "",
+      "base_rate": 2905.83,
+      "rate_type": "weekly",
+      "effective_period": "July 30, 2017",
+      "section": "2018-21 Local #695 Wage Schedules",
+      "source_file": "Local_695_2018-21_Wage_Schedules.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "rate -",
+      "occupation_code": "",
+      "base_rate": 2993.0,
+      "rate_type": "weekly",
+      "effective_period": "July 30, 2017",
+      "section": "2018-21 Local #695 Wage Schedules",
+      "source_file": "Local_695_2018-21_Wage_Schedules.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "rate -",
+      "occupation_code": "",
+      "base_rate": 3082.79,
+      "rate_type": "weekly",
+      "effective_period": "July 30, 2017",
+      "section": "2018-21 Local #695 Wage Schedules",
+      "source_file": "Local_695_2018-21_Wage_Schedules.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "Chief Projectionist",
+      "occupation_code": "8159",
+      "base_rate": 2497.89,
+      "rate_type": "weekly",
+      "effective_period": "July 30, 2017",
+      "section": "2018-21 Local #695 Wage Schedules",
+      "source_file": "Local_695_2018-21_Wage_Schedules.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "Chief Projectionist",
+      "occupation_code": "8159",
+      "base_rate": 2572.83,
+      "rate_type": "weekly",
+      "effective_period": "July 30, 2017",
+      "section": "2018-21 Local #695 Wage Schedules",
+      "source_file": "Local_695_2018-21_Wage_Schedules.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "Chief Projectionist",
+      "occupation_code": "8159",
+      "base_rate": 2650.01,
+      "rate_type": "weekly",
+      "effective_period": "July 30, 2017",
+      "section": "2018-21 Local #695 Wage Schedules",
+      "source_file": "Local_695_2018-21_Wage_Schedules.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "Chief Projectionist",
+      "occupation_code": "8159",
+      "base_rate": 2729.51,
+      "rate_type": "weekly",
+      "effective_period": "July 30, 2017",
+      "section": "2018-21 Local #695 Wage Schedules",
+      "source_file": "Local_695_2018-21_Wage_Schedules.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "Chief Projectionist",
+      "occupation_code": "8159",
+      "base_rate": 2569.92,
+      "rate_type": "weekly",
+      "effective_period": "July 30, 2017",
+      "section": "2018-21 Local #695 Wage Schedules",
+      "source_file": "Local_695_2018-21_Wage_Schedules.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "Chief Projectionist",
+      "occupation_code": "8159",
+      "base_rate": 2647.02,
+      "rate_type": "weekly",
+      "effective_period": "July 30, 2017",
+      "section": "2018-21 Local #695 Wage Schedules",
+      "source_file": "Local_695_2018-21_Wage_Schedules.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "Chief Projectionist",
+      "occupation_code": "8159",
+      "base_rate": 2726.43,
+      "rate_type": "weekly",
+      "effective_period": "July 30, 2017",
+      "section": "2018-21 Local #695 Wage Schedules",
+      "source_file": "Local_695_2018-21_Wage_Schedules.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "Chief Projectionist",
+      "occupation_code": "8159",
+      "base_rate": 2808.22,
+      "rate_type": "weekly",
+      "effective_period": "July 30, 2017",
+      "section": "2018-21 Local #695 Wage Schedules",
+      "source_file": "Local_695_2018-21_Wage_Schedules.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "HalfHrDigi",
+      "occupation_code": "",
+      "base_rate": 161.0,
+      "rate_type": "hourly",
+      "effective_period": "July 30, 2017",
+      "section": "2018-21 Local #695 Wage Schedules",
+      "source_file": "Local_695_2018-21_Wage_Schedules.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "J -",
+      "occupation_code": "",
+      "base_rate": 8105.0,
+      "rate_type": "weekly",
+      "effective_period": "",
+      "section": "",
+      "source_file": "Local_695_Constitution_Bylaws.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "J -",
+      "occupation_code": "",
+      "base_rate": 8109.0,
+      "rate_type": "weekly",
+      "effective_period": "",
+      "section": "",
+      "source_file": "Local_695_Constitution_Bylaws.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "J -",
+      "occupation_code": "",
+      "base_rate": 8111.0,
+      "rate_type": "weekly",
+      "effective_period": "",
+      "section": "",
+      "source_file": "Local_695_Constitution_Bylaws.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "J -",
+      "occupation_code": "",
+      "base_rate": 8131.0,
+      "rate_type": "weekly",
+      "effective_period": "",
+      "section": "",
+      "source_file": "Local_695_Constitution_Bylaws.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "J -",
+      "occupation_code": "",
+      "base_rate": 8141.0,
+      "rate_type": "weekly",
+      "effective_period": "",
+      "section": "",
+      "source_file": "Local_695_Constitution_Bylaws.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "a J -",
+      "occupation_code": "",
+      "base_rate": 8144.0,
+      "rate_type": "weekly",
+      "effective_period": "",
+      "section": "",
+      "source_file": "Local_695_Constitution_Bylaws.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "J -",
+      "occupation_code": "",
+      "base_rate": 8151.0,
+      "rate_type": "weekly",
+      "effective_period": "",
+      "section": "",
+      "source_file": "Local_695_Constitution_Bylaws.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "J -",
+      "occupation_code": "",
+      "base_rate": 8161.0,
+      "rate_type": "weekly",
+      "effective_period": "",
+      "section": "",
+      "source_file": "Local_695_Constitution_Bylaws.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "J -",
+      "occupation_code": "",
+      "base_rate": 8194.0,
+      "rate_type": "weekly",
+      "effective_period": "",
+      "section": "",
+      "source_file": "Local_695_Constitution_Bylaws.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "First Engineer",
+      "occupation_code": "",
+      "base_rate": 8163.0,
+      "rate_type": "weekly",
+      "effective_period": "",
+      "section": "",
+      "source_file": "Local_695_Constitution_Bylaws.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "Projection Engineer",
+      "occupation_code": "",
+      "base_rate": 8168.0,
+      "rate_type": "weekly",
+      "effective_period": "",
+      "section": "",
+      "source_file": "Local_695_Constitution_Bylaws.txt"
+    },
+    {
+      "union_local": "IATSE Local 695",
+      "craft": "Production Sound",
+      "job_classification": "Trainee Projectionist",
+      "occupation_code": "",
+      "base_rate": 8169.0,
+      "rate_type": "weekly",
+      "effective_period": "",
+      "section": "",
+      "source_file": "Local_695_Constitution_Bylaws.txt"
+    }
+  ]
+}

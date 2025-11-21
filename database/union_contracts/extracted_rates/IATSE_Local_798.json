@@ -1,0 +1,39 @@
+{
+  "union_local": "IATSE Local 798",
+  "rate_count": 3,
+  "rates": [
+    {
+      "union_local": "IATSE Local 798",
+      "craft": "Makeup & Hair Stylists",
+      "job_classification": "Assistant Senior",
+      "occupation_code": "",
+      "base_rate": 1387.65,
+      "rate_type": "weekly",
+      "effective_period": "9/30/19- 1/2/23- 7/8/24- 7/7/25-",
+      "section": "",
+      "source_file": "Local_798_2020-2026_ABC_Agreement.txt"
+    },
+    {
+      "union_local": "IATSE Local 798",
+      "craft": "Makeup & Hair Stylists",
+      "job_classification": "SVOD Program shall be those set forth in the",
+      "occupation_code": "",
+      "base_rate": 2022.0,
+      "rate_type": "weekly",
+      "effective_period": "March 1, 2019",
+      "section": "",
+      "source_file": "Local_798_2022_Majors_MOA.txt"
+    },
+    {
+      "union_local": "IATSE Local 798",
+      "craft": "Makeup & Hair Stylists",
+      "job_classification": "Mid-Budget SVOD Program shall be those set forth in the",
+      "occupation_code": "",
+      "base_rate": 2019.0,
+      "rate_type": "weekly",
+      "effective_period": "March 1, 2019",
+      "section": "",
+      "source_file": "Local_798_2022_Majors_MOA.txt"
+    }
+  ]
+}
