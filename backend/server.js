@@ -2030,7 +2030,7 @@ app.get('/api/location-comparison', async (req, res) => {
   try {
     const fs = require('fs');
     const path = require('path');
-    const csvPath = path.join(__dirname, '../database/budget_summaries.csv');
+    const csvPath = path.join(__dirname, 'data/budget_summaries.csv');
 
     // Read CSV file
     const csvData = fs.readFileSync(csvPath, 'utf8');
@@ -2112,7 +2112,7 @@ app.post('/api/location-comparison/compare', async (req, res) => {
 
     const fs = require('fs');
     const path = require('path');
-    const csvPath = path.join(__dirname, '../database/budget_summaries.csv');
+    const csvPath = path.join(__dirname, 'data/budget_summaries.csv');
 
     // Read and parse CSV
     const csvData = fs.readFileSync(csvPath, 'utf8');
