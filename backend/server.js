@@ -1564,6 +1564,378 @@ app.post('/api/tax-incentives/compare', async (req, res) => {
 // ERROR HANDLING
 // ============================================================================
 
+// ============================================================================
+// API ROUTES - BUDGET LINE ITEMS
+// ============================================================================
+
+// Get all line items for a production with calculated totals
+app.get('/api/productions/:production_id/line-items', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+
+    const result = await db.query(`
+      SELECT
+        bli.*,
+        cp.position_title,
+        cp.union_local,
+        cp.department,
+        cp.atl_or_btl
+      FROM budget_line_items bli
+      LEFT JOIN crew_positions cp ON bli.position_id = cp.id
+      WHERE bli.production_id = $1
+      ORDER BY bli.account_code, bli.created_at
+    `, [production_id]);
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows
+    });
+  } catch (error) {
+    console.error('Error fetching line items:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Create a new budget line item with automatic rate lookup and fringe calculation
+app.post('/api/productions/:production_id/line-items', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const {
+      account_code,
+      description,
+      position_id,
+      quantity,
+      rate_override,  // Optional: override automatic rate lookup
+      union_local,
+      job_classification,
+      location,
+      production_type,
+      notes
+    } = req.body;
+
+    // Get production details
+    const prodResult = await db.query(
+      'SELECT * FROM productions WHERE id = $1',
+      [production_id]
+    );
+
+    if (prodResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Production not found'
+      });
+    }
+
+    const production = prodResult.rows[0];
+    let finalRate = rate_override;
+
+    // If no rate override, look up rate from rate_cards
+    if (!finalRate && union_local && job_classification) {
+      const rateResult = await db.query(`
+        SELECT base_rate, rate_type
+        FROM current_rate_cards
+        WHERE union_local = $1
+          AND job_classification = $2
+          AND (location = $3 OR location IS NULL)
+          AND (production_type = $4 OR production_type IS NULL)
+        ORDER BY
+          CASE WHEN location = $3 THEN 1 ELSE 2 END,
+          CASE WHEN production_type = $4 THEN 1 ELSE 2 END
+        LIMIT 1
+      `, [
+        union_local,
+        job_classification,
+        location || production.shooting_location,
+        production_type || production.production_type
+      ]);
+
+      if (rateResult.rows.length > 0) {
+        finalRate = rateResult.rows[0].base_rate;
+      }
+    }
+
+    // Calculate subtotal
+    const subtotal = (finalRate || 0) * (quantity || 0);
+
+    // Calculate fringes (get applicable fringe benefits)
+    let totalFringes = 0;
+    if (union_local) {
+      const fringeResult = await db.query(`
+        SELECT benefit_type, rate_type, rate_value
+        FROM fringe_benefits
+        WHERE union_local = $1
+          AND (state = $2 OR state IS NULL)
+        ORDER BY effective_date DESC
+      `, [union_local, production.state]);
+
+      for (const fringe of fringeResult.rows) {
+        if (fringe.rate_type === 'percentage') {
+          totalFringes += subtotal * (fringe.rate_value / 100);
+        } else {
+          totalFringes += fringe.rate_value;
+        }
+      }
+    }
+
+    // Calculate total
+    const total = subtotal + totalFringes;
+
+    // Insert line item
+    const insertResult = await db.query(`
+      INSERT INTO budget_line_items (
+        production_id,
+        account_code,
+        description,
+        position_id,
+        quantity,
+        rate,
+        subtotal,
+        fringes,
+        total,
+        notes
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      RETURNING *
+    `, [
+      production_id,
+      account_code,
+      description,
+      position_id,
+      quantity,
+      finalRate,
+      subtotal,
+      totalFringes,
+      total,
+      notes
+    ]);
+
+    res.json({
+      success: true,
+      data: insertResult.rows[0],
+      calculations: {
+        rate_used: finalRate,
+        subtotal,
+        fringes: totalFringes,
+        total
+      }
+    });
+  } catch (error) {
+    console.error('Error creating line item:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Update a budget line item
+app.put('/api/line-items/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      account_code,
+      description,
+      quantity,
+      rate,
+      notes
+    } = req.body;
+
+    // Recalculate totals
+    const subtotal = (rate || 0) * (quantity || 0);
+
+    // Get existing line item to get production and union info
+    const existingResult = await db.query(`
+      SELECT bli.*, cp.union_local, p.state
+      FROM budget_line_items bli
+      LEFT JOIN crew_positions cp ON bli.position_id = cp.id
+      LEFT JOIN productions p ON bli.production_id = p.id
+      WHERE bli.id = $1
+    `, [id]);
+
+    if (existingResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Line item not found'
+      });
+    }
+
+    const existing = existingResult.rows[0];
+    let totalFringes = 0;
+
+    // Recalculate fringes
+    if (existing.union_local) {
+      const fringeResult = await db.query(`
+        SELECT benefit_type, rate_type, rate_value
+        FROM fringe_benefits
+        WHERE union_local = $1
+          AND (state = $2 OR state IS NULL)
+        ORDER BY effective_date DESC
+      `, [existing.union_local, existing.state]);
+
+      for (const fringe of fringeResult.rows) {
+        if (fringe.rate_type === 'percentage') {
+          totalFringes += subtotal * (fringe.rate_value / 100);
+        } else {
+          totalFringes += fringe.rate_value;
+        }
+      }
+    }
+
+    const total = subtotal + totalFringes;
+
+    // Update line item
+    const updateResult = await db.query(`
+      UPDATE budget_line_items
+      SET
+        account_code = COALESCE($1, account_code),
+        description = COALESCE($2, description),
+        quantity = COALESCE($3, quantity),
+        rate = COALESCE($4, rate),
+        subtotal = $5,
+        fringes = $6,
+        total = $7,
+        notes = COALESCE($8, notes)
+      WHERE id = $9
+      RETURNING *
+    `, [
+      account_code,
+      description,
+      quantity,
+      rate,
+      subtotal,
+      totalFringes,
+      total,
+      notes,
+      id
+    ]);
+
+    res.json({
+      success: true,
+      data: updateResult.rows[0]
+    });
+  } catch (error) {
+    console.error('Error updating line item:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Delete a budget line item
+app.delete('/api/line-items/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db.query(
+      'DELETE FROM budget_line_items WHERE id = $1 RETURNING *',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Line item not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Line item deleted successfully',
+      data: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error deleting line item:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Get production budget summary with ATL/BTL grouping
+app.get('/api/productions/:production_id/budget-summary', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+
+    // Get production details
+    const prodResult = await db.query(
+      'SELECT * FROM productions WHERE id = $1',
+      [production_id]
+    );
+
+    if (prodResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Production not found'
+      });
+    }
+
+    // Get line items grouped by department/account code
+    const lineItemsResult = await db.query(`
+      SELECT
+        bli.*,
+        cp.position_title,
+        cp.union_local,
+        cp.department,
+        cp.atl_or_btl,
+        cp.account_code as position_account_code
+      FROM budget_line_items bli
+      LEFT JOIN crew_positions cp ON bli.position_id = cp.id
+      WHERE bli.production_id = $1
+      ORDER BY bli.account_code, bli.created_at
+    `, [production_id]);
+
+    // Group by ATL/BTL
+    const groups = {
+      atl: [],
+      btl: [],
+      other: []
+    };
+
+    let totalATL = 0;
+    let totalBTL = 0;
+    let totalOther = 0;
+
+    for (const item of lineItemsResult.rows) {
+      if (item.atl_or_btl === 'ATL') {
+        groups.atl.push(item);
+        totalATL += parseFloat(item.total || 0);
+      } else if (item.atl_or_btl === 'BTL') {
+        groups.btl.push(item);
+        totalBTL += parseFloat(item.total || 0);
+      } else {
+        groups.other.push(item);
+        totalOther += parseFloat(item.total || 0);
+      }
+    }
+
+    const grandTotal = totalATL + totalBTL + totalOther;
+
+    res.json({
+      success: true,
+      production: prodResult.rows[0],
+      groups,
+      totals: {
+        atl: totalATL,
+        btl: totalBTL,
+        other: totalOther,
+        grand_total: grandTotal
+      },
+      line_item_count: lineItemsResult.rows.length
+    });
+  } catch (error) {
+    console.error('Error fetching budget summary:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
