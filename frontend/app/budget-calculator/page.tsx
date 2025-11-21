@@ -8,72 +8,129 @@ import autoTable from 'jspdf-autotable'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-8e04.up.railway.app'
 
-interface CrewMember {
-  id: string
-  position: string
-  rate: number
-  rateType: 'hourly' | 'daily' | 'weekly'
-  quantity: number
-  weeks: number
-  union: string
-  department: string
-  subtotal: number
+// Industry-standard account code structure
+const ACCOUNT_CATEGORIES = {
+  'ATL': {
+    name: 'Above The Line',
+    accounts: [
+      { code: '1100', name: 'WRITER', department: 'Writing' },
+      { code: '1200', name: 'PRODUCER', department: 'Production' },
+      { code: '1300', name: 'DIRECTOR', department: 'Production' },
+      { code: '1400', name: 'CAST', department: 'Cast' },
+      { code: '1500', name: 'ATL TRAVEL & LIVING', department: 'Travel' },
+    ]
+  },
+  'BTL-PRODUCTION': {
+    name: 'Below The Line - Production',
+    accounts: [
+      { code: '2000', name: 'PRODUCTION STAFF', department: 'Production Office' },
+      { code: '2100', name: 'EXTRA TALENT', department: 'Cast' },
+      { code: '2200', name: 'ART DEPARTMENT', department: 'Art Department' },
+      { code: '2300', name: 'SET CONSTRUCTION', department: 'Construction' },
+      { code: '2400', name: 'SET STRIKING', department: 'Construction' },
+      { code: '2500', name: 'SET OPERATIONS', department: 'Set Operations' },
+      { code: '2600', name: 'SPECIAL EFFECTS', department: 'Special Effects' },
+      { code: '2700', name: 'SET DRESSING', department: 'Set Decoration' },
+      { code: '2800', name: 'PROPERTY', department: 'Props' },
+      { code: '2900', name: 'WARDROBE', department: 'Costume' },
+    ]
+  },
+  'BTL-CAMERA-SOUND': {
+    name: 'Below The Line - Camera & Sound',
+    accounts: [
+      { code: '3000', name: 'MAKEUP & HAIR', department: 'Hair & Makeup' },
+      { code: '3100', name: 'GRIP', department: 'Grip' },
+      { code: '3200', name: 'LIGHTING', department: 'Electric' },
+      { code: '3300', name: 'CAMERA', department: 'Camera' },
+      { code: '3400', name: 'PRODUCTION SOUND', department: 'Sound' },
+      { code: '3500', name: 'TRANSPORTATION', department: 'Transportation' },
+      { code: '3600', name: 'LOCATION', department: 'Location' },
+      { code: '3700', name: 'PRODUCTION FILM & LAB', department: 'Production' },
+    ]
+  },
+  'POST': {
+    name: 'Post Production',
+    accounts: [
+      { code: '4000', name: 'EDITORIAL', department: 'Post Production' },
+      { code: '4100', name: 'MUSIC', department: 'Music' },
+      { code: '4200', name: 'POST SOUND', department: 'Post Sound' },
+      { code: '4300', name: 'POST FILM & LAB', department: 'Post Production' },
+      { code: '4400', name: 'MAIN TITLES', department: 'Post Production' },
+      { code: '4500', name: 'VFX', department: 'VFX' },
+    ]
+  },
+  'OTHER': {
+    name: 'Other',
+    accounts: [
+      { code: '6500', name: 'PUBLICITY', department: 'Publicity' },
+      { code: '6600', name: 'GENERAL EXPENSE', department: 'General' },
+      { code: '6700', name: 'INSURANCE', department: 'Insurance' },
+      { code: '6800', name: 'FRINGE BENEFITS', department: 'Fringes' },
+    ]
+  }
 }
 
-// Map unions to departments
-const getDepartment = (union: string, position: string): string => {
+// Union to account code mapping
+const getAccountCode = (union: string, position: string): string => {
   const unionLower = union.toLowerCase()
   const posLower = position.toLowerCase()
 
-  // DGA - Production/Directing
-  if (unionLower.includes('dga')) return 'Production'
-
-  // Camera
-  if (unionLower.includes('600') || posLower.includes('camera') || posLower.includes('photographer') || posLower.includes('dit')) return 'Camera'
-
-  // Electric
-  if (unionLower.includes('728') || posLower.includes('gaffer') || posLower.includes('electric')) return 'Electric'
-
-  // Grip
-  if (unionLower.includes('80') || posLower.includes('grip')) return 'Grip'
-
-  // Sound
-  if (unionLower.includes('695') || posLower.includes('sound') || posLower.includes('boom')) return 'Sound'
-
-  // Art Department
-  if (unionLower.includes('800') || posLower.includes('designer') || posLower.includes('art director')) return 'Art Department'
-
-  // Set Decoration / Props
-  if (unionLower.includes('44') || posLower.includes('decorator') || posLower.includes('prop')) return 'Set Decoration'
-
-  // Hair & Makeup
-  if (unionLower.includes('706') || posLower.includes('makeup') || posLower.includes('hair')) return 'Hair & Makeup'
-
-  // Costume
-  if (unionLower.includes('705') || unionLower.includes('892') || posLower.includes('costume')) return 'Costume'
-
-  // Post / Editors
-  if (unionLower.includes('700') || posLower.includes('editor')) return 'Post Production'
-
-  // Production Coordinators
-  if (unionLower.includes('161') || posLower.includes('coordinator') || posLower.includes('secretary')) return 'Production Office'
-
-  // Teamsters - Transportation & Location
+  if (unionLower.includes('dga')) return '2000'
+  if (unionLower.includes('600') || posLower.includes('camera') || posLower.includes('photographer') || posLower.includes('dit')) return '3300'
+  if (unionLower.includes('728') || posLower.includes('gaffer') || posLower.includes('electric')) return '3200'
+  if (unionLower.includes('80') || posLower.includes('grip')) return '3100'
+  if (unionLower.includes('695') || posLower.includes('sound') || posLower.includes('boom')) return '3400'
+  if (unionLower.includes('800') || posLower.includes('art director')) return '2200'
+  if (unionLower.includes('44') || posLower.includes('decorator') || posLower.includes('prop')) return '2800'
+  if (unionLower.includes('706') || posLower.includes('makeup') || posLower.includes('hair')) return '3000'
+  if (unionLower.includes('705') || unionLower.includes('892') || posLower.includes('costume')) return '2900'
+  if (unionLower.includes('700') || posLower.includes('editor')) return '4000'
+  if (unionLower.includes('161') || posLower.includes('coordinator') || posLower.includes('secretary')) return '2000'
   if (unionLower.includes('399') || unionLower.includes('teamster')) {
-    if (posLower.includes('location')) return 'Location'
-    return 'Transportation'
+    if (posLower.includes('location')) return '3600'
+    return '3500'
   }
+  if (unionLower.includes('sag') || posLower.includes('actor')) return '1400'
+  if (unionLower.includes('wga') || posLower.includes('writer')) return '1100'
 
-  // SAG
-  if (unionLower.includes('sag') || posLower.includes('actor') || posLower.includes('performer')) return 'Cast'
+  return '2500'
+}
 
-  // WGA
-  if (unionLower.includes('wga') || posLower.includes('writer')) return 'Writing'
-
-  // Animation
-  if (unionLower.includes('839') || posLower.includes('animator')) return 'Animation'
-
+// Get department from account code
+const getDepartmentFromCode = (code: string): string => {
+  for (const category of Object.values(ACCOUNT_CATEGORIES)) {
+    const account = category.accounts.find(a => a.code === code)
+    if (account) return account.department
+  }
   return 'Other'
+}
+
+// Get account name from code
+const getAccountName = (code: string): string => {
+  for (const category of Object.values(ACCOUNT_CATEGORIES)) {
+    const account = category.accounts.find(a => a.code === code)
+    if (account) return account.name
+  }
+  return 'OTHER'
+}
+
+type UnitType = 'hourly' | 'daily' | 'weekly' | 'allow' | 'flat' | 'percent'
+
+interface BudgetLineItem {
+  id: string
+  accountCode: string
+  description: string
+  position: string
+  union: string
+  quantity: number
+  unit: UnitType
+  rate: number
+  multiplier: number  // hours per day, days per week, or percentage
+  prepWeeks: number
+  shootWeeks: number
+  wrapWeeks: number
+  subtotal: number
+  itemType: 'labor' | 'equipment' | 'rental' | 'purchase' | 'allowance' | 'other'
 }
 
 interface RateLookupResult {
@@ -112,12 +169,14 @@ interface CrewTemplate {
 }
 
 export default function BudgetCalculator() {
-  const [crew, setCrew] = useState<CrewMember[]>([])
+  const [lineItems, setLineItems] = useState<BudgetLineItem[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [searchResults, setSearchResults] = useState<RateLookupResult[]>([])
   const [loading, setLoading] = useState(false)
   const [fringeRate, setFringeRate] = useState(30)
-  const [productionWeeks, setProductionWeeks] = useState(12)
+  const [prepWeeks, setPrepWeeks] = useState(4)
+  const [shootWeeks, setShootWeeks] = useState(8)
+  const [wrapWeeks, setWrapWeeks] = useState(2)
   const [savedBudgets, setSavedBudgets] = useState<SavedBudget[]>([])
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [showLoadModal, setShowLoadModal] = useState(false)
@@ -128,8 +187,12 @@ export default function BudgetCalculator() {
   const [templateCategories, setTemplateCategories] = useState<string[]>([])
   const [showTemplateModal, setShowTemplateModal] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>('')
-  const [groupByDepartment, setGroupByDepartment] = useState(false)
-  const [collapsedDepartments, setCollapsedDepartments] = useState<Record<string, boolean>>({})
+  const [viewMode, setViewMode] = useState<'flat' | 'byAccount' | 'byDepartment'>('byAccount')
+  const [collapsedAccounts, setCollapsedAccounts] = useState<Record<string, boolean>>({})
+  const [showAddLineModal, setShowAddLineModal] = useState(false)
+  const [newLineType, setNewLineType] = useState<'labor' | 'equipment' | 'rental' | 'purchase' | 'allowance'>('labor')
+
+  const totalProductionWeeks = prepWeeks + shootWeeks + wrapWeeks
 
   const searchRates = async () => {
     if (!searchTerm.trim()) return
@@ -147,55 +210,113 @@ export default function BudgetCalculator() {
     }
   }
 
-  const addCrewMember = (result: RateLookupResult) => {
-    const newMember: CrewMember = {
-      id: crypto.randomUUID(),
-      position: result.job_classification,
-      rate: parseFloat(result.base_rate),
-      rateType: result.rate_type as 'hourly' | 'daily' | 'weekly',
-      quantity: 1,
-      weeks: productionWeeks,
-      union: result.union_local,
-      department: getDepartment(result.union_local, result.job_classification),
-      subtotal: 0
+  const calculateSubtotal = (item: BudgetLineItem): number => {
+    const totalWeeks = item.prepWeeks + item.shootWeeks + item.wrapWeeks
+
+    switch (item.unit) {
+      case 'hourly':
+        // hours per day × days per week × weeks × quantity × rate
+        return item.rate * item.multiplier * 5 * totalWeeks * item.quantity
+      case 'daily':
+        // days per week × weeks × quantity × rate
+        return item.rate * item.multiplier * totalWeeks * item.quantity
+      case 'weekly':
+        return item.rate * totalWeeks * item.quantity
+      case 'allow':
+      case 'flat':
+        return item.rate * item.quantity
+      case 'percent':
+        // For percentage-based items (like insurance)
+        return item.rate * (item.multiplier / 100)
+      default:
+        return item.rate * item.quantity
     }
-    newMember.subtotal = calculateSubtotal(newMember)
-    setCrew([...crew, newMember])
+  }
+
+  const addCrewMember = (result: RateLookupResult) => {
+    const accountCode = getAccountCode(result.union_local, result.job_classification)
+    const unitType = result.rate_type as UnitType
+
+    const newItem: BudgetLineItem = {
+      id: crypto.randomUUID(),
+      accountCode,
+      description: getAccountName(accountCode),
+      position: result.job_classification,
+      union: result.union_local,
+      quantity: 1,
+      unit: unitType === 'hourly' ? 'hourly' : unitType === 'daily' ? 'daily' : 'weekly',
+      rate: parseFloat(result.base_rate),
+      multiplier: unitType === 'hourly' ? 10 : unitType === 'daily' ? 5 : 1,
+      prepWeeks: Math.floor(prepWeeks * 0.5),  // Default to half prep
+      shootWeeks: shootWeeks,
+      wrapWeeks: Math.floor(wrapWeeks * 0.5),  // Default to half wrap
+      subtotal: 0,
+      itemType: 'labor'
+    }
+    newItem.subtotal = calculateSubtotal(newItem)
+    setLineItems([...lineItems, newItem])
     setSearchTerm('')
     setSearchResults([])
   }
 
-  const calculateSubtotal = (member: CrewMember): number => {
-    switch (member.rateType) {
-      case 'hourly':
-        return member.rate * 10 * 5 * member.weeks * member.quantity // 10hr days, 5 days/week
-      case 'daily':
-        return member.rate * 5 * member.weeks * member.quantity // 5 days/week
-      case 'weekly':
-        return member.rate * member.weeks * member.quantity
-      default:
-        return member.rate * member.quantity
+  const addNonLaborItem = (type: 'equipment' | 'rental' | 'purchase' | 'allowance', accountCode: string) => {
+    const newItem: BudgetLineItem = {
+      id: crypto.randomUUID(),
+      accountCode,
+      description: '',
+      position: type === 'equipment' ? 'Equipment Package' :
+                type === 'rental' ? 'Rental' :
+                type === 'purchase' ? 'Purchase' : 'Allowance',
+      union: '',
+      quantity: 1,
+      unit: type === 'purchase' ? 'allow' : type === 'allowance' ? 'allow' : 'weekly',
+      rate: 0,
+      multiplier: 1,
+      prepWeeks: 0,
+      shootWeeks: shootWeeks,
+      wrapWeeks: 0,
+      subtotal: 0,
+      itemType: type
     }
+    setLineItems([...lineItems, newItem])
+    setShowAddLineModal(false)
   }
 
-  const updateCrewMember = (id: string, field: keyof CrewMember, value: number | string) => {
-    setCrew(crew.map(member => {
-      if (member.id === id) {
-        const updated = { ...member, [field]: value }
+  const updateLineItem = (id: string, field: keyof BudgetLineItem, value: number | string) => {
+    setLineItems(lineItems.map(item => {
+      if (item.id === id) {
+        const updated = { ...item, [field]: value }
         updated.subtotal = calculateSubtotal(updated)
         return updated
       }
-      return member
+      return item
     }))
   }
 
-  const removeCrewMember = (id: string) => {
-    setCrew(crew.filter(m => m.id !== id))
+  const removeLineItem = (id: string) => {
+    setLineItems(lineItems.filter(m => m.id !== id))
   }
 
-  const totalLabor = crew.reduce((sum, m) => sum + m.subtotal, 0)
-  const totalFringes = totalLabor * (fringeRate / 100)
-  const grandTotal = totalLabor + totalFringes
+  // Calculate totals by category
+  const laborItems = lineItems.filter(i => i.itemType === 'labor')
+  const equipmentItems = lineItems.filter(i => i.itemType === 'equipment' || i.itemType === 'rental')
+  const otherItems = lineItems.filter(i => i.itemType === 'purchase' || i.itemType === 'allowance' || i.itemType === 'other')
+
+  const totalLabor = laborItems.reduce((sum, m) => sum + m.subtotal, 0)
+  const totalEquipment = equipmentItems.reduce((sum, m) => sum + m.subtotal, 0)
+  const totalOther = otherItems.reduce((sum, m) => sum + m.subtotal, 0)
+  const totalBeforeFringes = totalLabor + totalEquipment + totalOther
+  const totalFringes = totalLabor * (fringeRate / 100)  // Fringes only on labor
+  const grandTotal = totalBeforeFringes + totalFringes
+
+  // Group by account code
+  const itemsByAccount = lineItems.reduce((acc, item) => {
+    if (!acc[item.accountCode]) {
+      acc[item.accountCode] = []
+    }
+    acc[item.accountCode].push(item)
+    return acc
+  }, {} as Record<string, BudgetLineItem[]>)
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -207,118 +328,133 @@ export default function BudgetCalculator() {
 
   const exportToExcel = () => {
     type ExportRow = {
+      'Acct': string
+      'Description': string
       Position: string
       Union: string
+      Qty: number | string
+      Unit: string
       Rate: number | string
-      'Rate Type': string
-      Quantity: number | string
-      Weeks: number | string
+      'Prep Wks': number | string
+      'Shoot Wks': number | string
+      'Wrap Wks': number | string
       Subtotal: number
     }
 
-    const data: ExportRow[] = crew.map(m => ({
-      Position: m.position,
-      Union: m.union,
-      Rate: m.rate,
-      'Rate Type': m.rateType,
-      Quantity: m.quantity,
-      Weeks: m.weeks,
-      Subtotal: m.subtotal
-    }))
+    const data: ExportRow[] = []
 
+    // Sort by account code
+    const sortedItems = [...lineItems].sort((a, b) => a.accountCode.localeCompare(b.accountCode))
+
+    sortedItems.forEach(m => {
+      data.push({
+        'Acct': m.accountCode,
+        'Description': m.description || getAccountName(m.accountCode),
+        Position: m.position,
+        Union: m.union,
+        Qty: m.quantity,
+        Unit: m.unit,
+        Rate: m.rate,
+        'Prep Wks': m.prepWeeks,
+        'Shoot Wks': m.shootWeeks,
+        'Wrap Wks': m.wrapWeeks,
+        Subtotal: m.subtotal
+      })
+    })
+
+    // Add totals
     data.push({
-      Position: '',
-      Union: '',
-      Rate: '',
-      'Rate Type': '',
-      Quantity: '',
-      Weeks: '',
-      Subtotal: 0
+      'Acct': '', 'Description': '', Position: '', Union: '', Qty: '', Unit: '', Rate: '', 'Prep Wks': '', 'Shoot Wks': '', 'Wrap Wks': '', Subtotal: 0
     })
     data.push({
-      Position: 'Labor Subtotal',
-      Union: '',
-      Rate: '',
-      'Rate Type': '',
-      Quantity: '',
-      Weeks: '',
-      Subtotal: totalLabor
+      'Acct': '', 'Description': 'Labor Subtotal', Position: '', Union: '', Qty: '', Unit: '', Rate: '', 'Prep Wks': '', 'Shoot Wks': '', 'Wrap Wks': '', Subtotal: totalLabor
     })
     data.push({
-      Position: `Fringes (${fringeRate}%)`,
-      Union: '',
-      Rate: '',
-      'Rate Type': '',
-      Quantity: '',
-      Weeks: '',
-      Subtotal: totalFringes
+      'Acct': '', 'Description': 'Equipment & Rentals', Position: '', Union: '', Qty: '', Unit: '', Rate: '', 'Prep Wks': '', 'Shoot Wks': '', 'Wrap Wks': '', Subtotal: totalEquipment
     })
     data.push({
-      Position: 'GRAND TOTAL',
-      Union: '',
-      Rate: '',
-      'Rate Type': '',
-      Quantity: '',
-      Weeks: '',
-      Subtotal: grandTotal
+      'Acct': '', 'Description': 'Other Costs', Position: '', Union: '', Qty: '', Unit: '', Rate: '', 'Prep Wks': '', 'Shoot Wks': '', 'Wrap Wks': '', Subtotal: totalOther
+    })
+    data.push({
+      'Acct': '', 'Description': `Fringes (${fringeRate}% on Labor)`, Position: '', Union: '', Qty: '', Unit: '', Rate: '', 'Prep Wks': '', 'Shoot Wks': '', 'Wrap Wks': '', Subtotal: totalFringes
+    })
+    data.push({
+      'Acct': '', 'Description': 'GRAND TOTAL', Position: '', Union: '', Qty: '', Unit: '', Rate: '', 'Prep Wks': '', 'Shoot Wks': '', 'Wrap Wks': '', Subtotal: grandTotal
     })
 
     const ws = XLSX.utils.json_to_sheet(data)
     const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, 'Crew Budget')
+    XLSX.utils.book_append_sheet(wb, ws, 'Production Budget')
 
     ws['!cols'] = [
-      { wch: 30 }, // Position
-      { wch: 20 }, // Union
-      { wch: 12 }, // Rate
-      { wch: 10 }, // Rate Type
-      { wch: 8 },  // Quantity
-      { wch: 8 },  // Weeks
-      { wch: 15 }  // Subtotal
+      { wch: 6 },  // Acct
+      { wch: 20 }, // Description
+      { wch: 25 }, // Position
+      { wch: 18 }, // Union
+      { wch: 5 },  // Qty
+      { wch: 8 },  // Unit
+      { wch: 10 }, // Rate
+      { wch: 8 },  // Prep
+      { wch: 8 },  // Shoot
+      { wch: 8 },  // Wrap
+      { wch: 12 }  // Subtotal
     ]
 
-    XLSX.writeFile(wb, `crew_budget_${new Date().toISOString().split('T')[0]}.xlsx`)
+    XLSX.writeFile(wb, `production_budget_${new Date().toISOString().split('T')[0]}.xlsx`)
   }
 
   const exportToPDF = () => {
-    const doc = new jsPDF()
+    const doc = new jsPDF('landscape')
 
     doc.setFontSize(20)
-    doc.text('Crew Budget Report', 14, 22)
+    doc.text('Production Budget', 14, 22)
 
     doc.setFontSize(10)
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 30)
-    doc.text(`Production Weeks: ${productionWeeks}`, 14, 36)
+    doc.text(`Schedule: ${prepWeeks} Prep | ${shootWeeks} Shoot | ${wrapWeeks} Wrap = ${totalProductionWeeks} Total Weeks`, 14, 36)
     doc.text(`Fringe Rate: ${fringeRate}%`, 14, 42)
 
-    const tableData = crew.map(m => [
+    // Sort by account code
+    const sortedItems = [...lineItems].sort((a, b) => a.accountCode.localeCompare(b.accountCode))
+
+    const tableData = sortedItems.map(m => [
+      m.accountCode,
       m.position,
-      m.union,
+      m.union || '-',
       formatCurrency(m.rate),
-      m.rateType,
+      m.unit,
       m.quantity.toString(),
-      m.weeks.toString(),
+      m.prepWeeks.toString(),
+      m.shootWeeks.toString(),
+      m.wrapWeeks.toString(),
       formatCurrency(m.subtotal)
     ])
 
     autoTable(doc, {
-      head: [['Position', 'Union', 'Rate', 'Type', 'Qty', 'Weeks', 'Subtotal']],
+      head: [['Acct', 'Position', 'Union', 'Rate', 'Unit', 'Qty', 'Prep', 'Shoot', 'Wrap', 'Subtotal']],
       body: tableData,
       startY: 50,
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [59, 130, 246] }
+      styles: { fontSize: 7 },
+      headStyles: { fillColor: [59, 130, 246] },
+      columnStyles: {
+        0: { cellWidth: 15 },
+        1: { cellWidth: 40 },
+        2: { cellWidth: 30 },
+      }
     })
 
     const finalY = (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10
 
-    doc.setFontSize(11)
+    doc.setFontSize(10)
     doc.text(`Labor Subtotal: ${formatCurrency(totalLabor)}`, 14, finalY)
-    doc.text(`Fringes (${fringeRate}%): ${formatCurrency(totalFringes)}`, 14, finalY + 7)
+    doc.text(`Equipment & Rentals: ${formatCurrency(totalEquipment)}`, 14, finalY + 6)
+    doc.text(`Other Costs: ${formatCurrency(totalOther)}`, 14, finalY + 12)
+    doc.text(`Fringes (${fringeRate}%): ${formatCurrency(totalFringes)}`, 14, finalY + 18)
     doc.setFontSize(14)
     doc.setFont('helvetica', 'bold')
-    doc.text(`Grand Total: ${formatCurrency(grandTotal)}`, 14, finalY + 17)
+    doc.text(`Grand Total: ${formatCurrency(grandTotal)}`, 14, finalY + 28)
 
-    doc.save(`crew_budget_${new Date().toISOString().split('T')[0]}.pdf`)
+    doc.save(`production_budget_${new Date().toISOString().split('T')[0]}.pdf`)
   }
 
   const loadSavedBudgets = async () => {
@@ -331,15 +467,15 @@ export default function BudgetCalculator() {
   }
 
   const saveBudget = async () => {
-    if (!budgetName.trim() || crew.length === 0) return
+    if (!budgetName.trim() || lineItems.length === 0) return
 
     try {
       const payload = {
         name: budgetName,
         description: budgetDescription,
-        production_weeks: productionWeeks,
+        production_weeks: totalProductionWeeks,
         fringe_rate: fringeRate,
-        crew_data: crew,
+        crew_data: lineItems,
         total_labor: totalLabor,
         total_fringes: totalFringes,
         grand_total: grandTotal
@@ -365,8 +501,37 @@ export default function BudgetCalculator() {
       const response = await axios.get(`${API_URL}/api/saved-budgets/${budgetId}`)
       const budget = response.data.data
 
-      setCrew(budget.crew_data)
-      setProductionWeeks(budget.production_weeks)
+      // Handle both old format (crew_data) and new format (lineItems)
+      const data = budget.crew_data
+      if (data && data.length > 0) {
+        // Check if it's old format (has 'weeks' field) or new format (has 'accountCode')
+        if (data[0].weeks !== undefined && data[0].accountCode === undefined) {
+          // Convert old format to new format
+          const converted = data.map((old: { position: string; union: string; rate: number; rateType: string; quantity: number; weeks: number; department?: string }) => ({
+            id: crypto.randomUUID(),
+            accountCode: getAccountCode(old.union, old.position),
+            description: '',
+            position: old.position,
+            union: old.union,
+            quantity: old.quantity,
+            unit: old.rateType as UnitType,
+            rate: old.rate,
+            multiplier: old.rateType === 'hourly' ? 10 : old.rateType === 'daily' ? 5 : 1,
+            prepWeeks: Math.floor(old.weeks * 0.25),
+            shootWeeks: Math.floor(old.weeks * 0.6),
+            wrapWeeks: Math.floor(old.weeks * 0.15),
+            subtotal: 0,
+            itemType: 'labor' as const
+          }))
+          const updated = converted.map((m: BudgetLineItem) => ({ ...m, subtotal: calculateSubtotal(m) }))
+          setLineItems(updated)
+        } else {
+          // New format - recalculate subtotals
+          const updated = data.map((item: BudgetLineItem) => ({ ...item, subtotal: calculateSubtotal(item) }))
+          setLineItems(updated)
+        }
+      }
+
       setFringeRate(parseFloat(budget.fringe_rate))
       setBudgetName(budget.name)
       setBudgetDescription(budget.description || '')
@@ -395,21 +560,23 @@ export default function BudgetCalculator() {
   }
 
   const newBudget = () => {
-    setCrew([])
+    setLineItems([])
     setCurrentBudgetId(null)
     setBudgetName('')
     setBudgetDescription('')
-    setProductionWeeks(12)
+    setPrepWeeks(4)
+    setShootWeeks(8)
+    setWrapWeeks(2)
     setFringeRate(30)
   }
 
   const suggestFringes = async () => {
-    if (crew.length === 0) return
+    if (lineItems.length === 0) return
 
-    // Get the most common union from crew
+    const laborOnly = lineItems.filter(i => i.itemType === 'labor')
     const unionCounts: Record<string, number> = {}
-    crew.forEach(m => {
-      unionCounts[m.union] = (unionCounts[m.union] || 0) + 1
+    laborOnly.forEach(m => {
+      if (m.union) unionCounts[m.union] = (unionCounts[m.union] || 0) + 1
     })
     const primaryUnion = Object.entries(unionCounts)
       .sort((a, b) => b[1] - a[1])[0]?.[0]
@@ -444,10 +611,9 @@ export default function BudgetCalculator() {
   const applyTemplate = async (template: CrewTemplate) => {
     setLoading(true)
     try {
-      const newCrewMembers: CrewMember[] = []
+      const newItems: BudgetLineItem[] = []
 
       for (const pos of template.crew_data) {
-        // Look up the rate for each position
         try {
           const rateResponse = await axios.get(`${API_URL}/api/rate-cards/smart-lookup`, {
             params: { query: pos.position }
@@ -455,56 +621,73 @@ export default function BudgetCalculator() {
 
           if (rateResponse.data.data && rateResponse.data.data.length > 0) {
             const rateData = rateResponse.data.data[0]
-            newCrewMembers.push({
+            const unitType = rateData.rate_type as UnitType
+            const accountCode = getAccountCode(rateData.union_local, rateData.job_classification)
+
+            newItems.push({
               id: crypto.randomUUID(),
+              accountCode,
+              description: '',
               position: rateData.job_classification,
-              rate: parseFloat(rateData.base_rate),
-              rateType: rateData.rate_type as 'hourly' | 'daily' | 'weekly',
-              quantity: pos.quantity,
-              weeks: pos.weeks,
               union: rateData.union_local,
-              department: getDepartment(rateData.union_local, rateData.job_classification),
-              subtotal: 0
+              quantity: pos.quantity,
+              unit: unitType === 'hourly' ? 'hourly' : unitType === 'daily' ? 'daily' : 'weekly',
+              rate: parseFloat(rateData.base_rate),
+              multiplier: unitType === 'hourly' ? 10 : unitType === 'daily' ? 5 : 1,
+              prepWeeks: Math.floor(pos.weeks * 0.25),
+              shootWeeks: Math.floor(pos.weeks * 0.6),
+              wrapWeeks: Math.floor(pos.weeks * 0.15),
+              subtotal: 0,
+              itemType: 'labor'
             })
           } else {
-            // No rate found, add with placeholder
-            newCrewMembers.push({
+            const accountCode = getAccountCode(pos.union, pos.position)
+            newItems.push({
               id: crypto.randomUUID(),
+              accountCode,
+              description: '',
               position: pos.position,
-              rate: 0,
-              rateType: (pos.rateType || 'weekly') as 'hourly' | 'daily' | 'weekly',
-              quantity: pos.quantity,
-              weeks: pos.weeks,
               union: pos.union,
-              department: getDepartment(pos.union, pos.position),
-              subtotal: 0
+              quantity: pos.quantity,
+              unit: (pos.rateType || 'weekly') as UnitType,
+              rate: 0,
+              multiplier: 1,
+              prepWeeks: Math.floor(pos.weeks * 0.25),
+              shootWeeks: Math.floor(pos.weeks * 0.6),
+              wrapWeeks: Math.floor(pos.weeks * 0.15),
+              subtotal: 0,
+              itemType: 'labor'
             })
           }
         } catch {
-          // Add without rate lookup on error
-          newCrewMembers.push({
+          const accountCode = getAccountCode(pos.union, pos.position)
+          newItems.push({
             id: crypto.randomUUID(),
+            accountCode,
+            description: '',
             position: pos.position,
-            rate: 0,
-            rateType: (pos.rateType || 'weekly') as 'hourly' | 'daily' | 'weekly',
-            quantity: pos.quantity,
-            weeks: pos.weeks,
             union: pos.union,
-            department: getDepartment(pos.union, pos.position),
-            subtotal: 0
+            quantity: pos.quantity,
+            unit: (pos.rateType || 'weekly') as UnitType,
+            rate: 0,
+            multiplier: 1,
+            prepWeeks: Math.floor(pos.weeks * 0.25),
+            shootWeeks: Math.floor(pos.weeks * 0.6),
+            wrapWeeks: Math.floor(pos.weeks * 0.15),
+            subtotal: 0,
+            itemType: 'labor'
           })
         }
       }
 
-      // Calculate subtotals
-      const updatedCrew = newCrewMembers.map(m => ({
+      const updatedItems = newItems.map(m => ({
         ...m,
         subtotal: calculateSubtotal(m)
       }))
 
-      setCrew([...crew, ...updatedCrew])
+      setLineItems([...lineItems, ...updatedItems])
       setShowTemplateModal(false)
-      alert(`Added ${updatedCrew.length} positions from "${template.name}" template`)
+      alert(`Added ${updatedItems.length} positions from "${template.name}" template`)
     } catch (error) {
       console.error('Error applying template:', error)
       alert('Failed to apply template')
@@ -513,15 +696,19 @@ export default function BudgetCalculator() {
     }
   }
 
+  const toggleAccountCollapse = (code: string) => {
+    setCollapsedAccounts(prev => ({ ...prev, [code]: !prev[code] }))
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Crew Budget Calculator
+            Production Budget Calculator
           </h1>
           <p className="mt-2 text-gray-600 dark:text-gray-300">
-            {currentBudgetId ? `Editing: ${budgetName}` : 'Build a crew budget using union rates'}
+            {currentBudgetId ? `Editing: ${budgetName}` : 'Build a production budget with industry-standard account codes'}
           </p>
         </div>
         <div className="flex gap-2">
@@ -545,7 +732,7 @@ export default function BudgetCalculator() {
           </button>
           <button
             onClick={() => setShowSaveModal(true)}
-            disabled={crew.length === 0}
+            disabled={lineItems.length === 0}
             className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm disabled:opacity-50"
           >
             Save
@@ -553,20 +740,50 @@ export default function BudgetCalculator() {
         </div>
       </div>
 
-      {/* Production Settings */}
+      {/* Production Schedule */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Production Settings</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <h2 className="text-lg font-semibold mb-4">Production Schedule</h2>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Production Weeks
+              Prep Weeks
             </label>
             <input
               type="number"
-              value={productionWeeks}
-              onChange={(e) => setProductionWeeks(parseInt(e.target.value) || 1)}
+              value={prepWeeks}
+              onChange={(e) => setPrepWeeks(parseInt(e.target.value) || 0)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Shoot Weeks
+            </label>
+            <input
+              type="number"
+              value={shootWeeks}
+              onChange={(e) => setShootWeeks(parseInt(e.target.value) || 1)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Wrap Weeks
+            </label>
+            <input
+              type="number"
+              value={wrapWeeks}
+              onChange={(e) => setWrapWeeks(parseInt(e.target.value) || 0)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Total Weeks
+            </label>
+            <div className="px-3 py-2 bg-gray-100 dark:bg-gray-600 rounded-md font-semibold">
+              {totalProductionWeeks}
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -581,8 +798,8 @@ export default function BudgetCalculator() {
               />
               <button
                 onClick={suggestFringes}
-                disabled={crew.length === 0}
-                className="px-3 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm disabled:opacity-50 whitespace-nowrap"
+                disabled={lineItems.length === 0}
+                className="px-3 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm disabled:opacity-50"
                 title="Auto-suggest based on union rates"
               >
                 Auto
@@ -592,9 +809,17 @@ export default function BudgetCalculator() {
         </div>
       </div>
 
-      {/* Add Crew Member */}
+      {/* Add Line Item */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Add Crew Position</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">Add Line Item</h2>
+          <button
+            onClick={() => setShowAddLineModal(true)}
+            className="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm"
+          >
+            + Non-Labor Item
+          </button>
+        </div>
         <div className="flex gap-4">
           <input
             type="text"
@@ -613,7 +838,6 @@ export default function BudgetCalculator() {
           </button>
         </div>
 
-        {/* Search Results */}
         {searchResults.length > 0 && (
           <div className="mt-4 border rounded-md divide-y dark:border-gray-700 dark:divide-gray-700">
             {searchResults.slice(0, 10).map((result, idx) => (
@@ -636,87 +860,210 @@ export default function BudgetCalculator() {
         )}
       </div>
 
-      {/* Crew List */}
+      {/* Budget Line Items */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Crew List ({crew.length})</h2>
-          <button
-            onClick={() => setGroupByDepartment(!groupByDepartment)}
-            className={`px-3 py-1 text-sm rounded-md ${groupByDepartment ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-          >
-            {groupByDepartment ? 'Grouped by Dept' : 'Group by Dept'}
-          </button>
+          <h2 className="text-lg font-semibold">Budget Line Items ({lineItems.length})</h2>
+          <div className="flex gap-2">
+            <select
+              value={viewMode}
+              onChange={(e) => setViewMode(e.target.value as 'flat' | 'byAccount' | 'byDepartment')}
+              className="px-3 py-1 text-sm border rounded-md dark:bg-gray-700 dark:border-gray-600"
+            >
+              <option value="flat">Flat View</option>
+              <option value="byAccount">By Account</option>
+              <option value="byDepartment">By Department</option>
+            </select>
+          </div>
         </div>
 
-        {crew.length === 0 ? (
+        {lineItems.length === 0 ? (
           <p className="text-gray-500 text-center py-8">
-            No crew members added. Search for positions above to add them.
+            No line items added. Search for positions above or use a template.
           </p>
+        ) : viewMode === 'byAccount' ? (
+          <div className="space-y-4">
+            {Object.entries(itemsByAccount)
+              .sort(([a], [b]) => a.localeCompare(b))
+              .map(([code, items]) => {
+                const accountTotal = items.reduce((sum, i) => sum + i.subtotal, 0)
+                const isCollapsed = collapsedAccounts[code]
+                return (
+                  <div key={code} className="border rounded-md dark:border-gray-700">
+                    <div
+                      className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 cursor-pointer"
+                      onClick={() => toggleAccountCollapse(code)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">{isCollapsed ? '▶' : '▼'}</span>
+                        <span className="font-mono text-sm text-gray-500">{code}</span>
+                        <span className="font-semibold">{getAccountName(code)}</span>
+                        <span className="text-sm text-gray-500">({items.length} items)</span>
+                      </div>
+                      <span className="font-semibold text-green-600">{formatCurrency(accountTotal)}</span>
+                    </div>
+                    {!isCollapsed && (
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                          <thead>
+                            <tr className="bg-gray-50 dark:bg-gray-750">
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Position</th>
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Union</th>
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Prep</th>
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Shoot</th>
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Wrap</th>
+                              <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+                              <th className="px-3 py-2"></th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                            {items.map((item) => (
+                              <tr key={item.id}>
+                                <td className="px-3 py-2 text-sm font-medium">{item.position}</td>
+                                <td className="px-3 py-2 text-sm text-gray-500">{item.union || '-'}</td>
+                                <td className="px-3 py-2">
+                                  <input
+                                    type="number"
+                                    value={item.rate}
+                                    onChange={(e) => updateLineItem(item.id, 'rate', parseFloat(e.target.value) || 0)}
+                                    className="w-20 px-2 py-1 text-sm border rounded dark:bg-gray-700 dark:border-gray-600"
+                                  />
+                                </td>
+                                <td className="px-3 py-2 text-sm">{item.unit}</td>
+                                <td className="px-3 py-2">
+                                  <input
+                                    type="number"
+                                    value={item.quantity}
+                                    onChange={(e) => updateLineItem(item.id, 'quantity', parseInt(e.target.value) || 1)}
+                                    className="w-14 px-2 py-1 text-sm border rounded dark:bg-gray-700 dark:border-gray-600"
+                                  />
+                                </td>
+                                <td className="px-3 py-2">
+                                  <input
+                                    type="number"
+                                    value={item.prepWeeks}
+                                    onChange={(e) => updateLineItem(item.id, 'prepWeeks', parseInt(e.target.value) || 0)}
+                                    className="w-12 px-2 py-1 text-sm border rounded dark:bg-gray-700 dark:border-gray-600"
+                                  />
+                                </td>
+                                <td className="px-3 py-2">
+                                  <input
+                                    type="number"
+                                    value={item.shootWeeks}
+                                    onChange={(e) => updateLineItem(item.id, 'shootWeeks', parseInt(e.target.value) || 0)}
+                                    className="w-12 px-2 py-1 text-sm border rounded dark:bg-gray-700 dark:border-gray-600"
+                                  />
+                                </td>
+                                <td className="px-3 py-2">
+                                  <input
+                                    type="number"
+                                    value={item.wrapWeeks}
+                                    onChange={(e) => updateLineItem(item.id, 'wrapWeeks', parseInt(e.target.value) || 0)}
+                                    className="w-12 px-2 py-1 text-sm border rounded dark:bg-gray-700 dark:border-gray-600"
+                                  />
+                                </td>
+                                <td className="px-3 py-2 text-right font-semibold text-green-600">
+                                  {formatCurrency(item.subtotal)}
+                                </td>
+                                <td className="px-3 py-2">
+                                  <button
+                                    onClick={() => removeLineItem(item.id)}
+                                    className="text-red-600 hover:text-red-800 text-sm"
+                                  >
+                                    ✕
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead>
                 <tr>
-                  {groupByDepartment && <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Dept</th>}
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Position</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Union</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Weeks</th>
-                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
-                  <th className="px-4 py-2"></th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Acct</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Position</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Union</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Prep</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Shoot</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Wrap</th>
+                  <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+                  <th className="px-3 py-2"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {(groupByDepartment
-                  ? [...crew].sort((a, b) => (a.department || 'Other').localeCompare(b.department || 'Other'))
-                  : crew
-                ).map((member, idx, arr) => (
-                  <tr key={member.id}>
-                    {groupByDepartment && (
-                      <td className="px-4 py-2 text-sm">
-                        {idx === 0 || arr[idx - 1]?.department !== member.department ? (
-                          <span className="font-semibold text-purple-600">{member.department || 'Other'}</span>
-                        ) : ''}
-                      </td>
-                    )}
-                    <td className="px-4 py-2 font-medium">{member.position}</td>
-                    <td className="px-4 py-2 text-sm text-gray-500">{member.union}</td>
-                    <td className="px-4 py-2">
+                {[...lineItems]
+                  .sort((a, b) => viewMode === 'byDepartment'
+                    ? getDepartmentFromCode(a.accountCode).localeCompare(getDepartmentFromCode(b.accountCode))
+                    : a.accountCode.localeCompare(b.accountCode))
+                  .map((item) => (
+                  <tr key={item.id}>
+                    <td className="px-3 py-2 text-sm font-mono text-gray-500">{item.accountCode}</td>
+                    <td className="px-3 py-2 text-sm font-medium">{item.position}</td>
+                    <td className="px-3 py-2 text-sm text-gray-500">{item.union || '-'}</td>
+                    <td className="px-3 py-2">
                       <input
                         type="number"
-                        value={member.rate}
-                        onChange={(e) => updateCrewMember(member.id, 'rate', parseFloat(e.target.value) || 0)}
-                        className="w-24 px-2 py-1 border rounded dark:bg-gray-700 dark:border-gray-600"
+                        value={item.rate}
+                        onChange={(e) => updateLineItem(item.id, 'rate', parseFloat(e.target.value) || 0)}
+                        className="w-20 px-2 py-1 text-sm border rounded dark:bg-gray-700 dark:border-gray-600"
                       />
                     </td>
-                    <td className="px-4 py-2 text-sm">{member.rateType}</td>
-                    <td className="px-4 py-2">
+                    <td className="px-3 py-2 text-sm">{item.unit}</td>
+                    <td className="px-3 py-2">
                       <input
                         type="number"
-                        value={member.quantity}
-                        onChange={(e) => updateCrewMember(member.id, 'quantity', parseInt(e.target.value) || 1)}
-                        className="w-16 px-2 py-1 border rounded dark:bg-gray-700 dark:border-gray-600"
+                        value={item.quantity}
+                        onChange={(e) => updateLineItem(item.id, 'quantity', parseInt(e.target.value) || 1)}
+                        className="w-14 px-2 py-1 text-sm border rounded dark:bg-gray-700 dark:border-gray-600"
                       />
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-3 py-2">
                       <input
                         type="number"
-                        value={member.weeks}
-                        onChange={(e) => updateCrewMember(member.id, 'weeks', parseInt(e.target.value) || 1)}
-                        className="w-16 px-2 py-1 border rounded dark:bg-gray-700 dark:border-gray-600"
+                        value={item.prepWeeks}
+                        onChange={(e) => updateLineItem(item.id, 'prepWeeks', parseInt(e.target.value) || 0)}
+                        className="w-12 px-2 py-1 text-sm border rounded dark:bg-gray-700 dark:border-gray-600"
                       />
                     </td>
-                    <td className="px-4 py-2 text-right font-semibold text-green-600">
-                      {formatCurrency(member.subtotal)}
+                    <td className="px-3 py-2">
+                      <input
+                        type="number"
+                        value={item.shootWeeks}
+                        onChange={(e) => updateLineItem(item.id, 'shootWeeks', parseInt(e.target.value) || 0)}
+                        className="w-12 px-2 py-1 text-sm border rounded dark:bg-gray-700 dark:border-gray-600"
+                      />
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-3 py-2">
+                      <input
+                        type="number"
+                        value={item.wrapWeeks}
+                        onChange={(e) => updateLineItem(item.id, 'wrapWeeks', parseInt(e.target.value) || 0)}
+                        className="w-12 px-2 py-1 text-sm border rounded dark:bg-gray-700 dark:border-gray-600"
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-right font-semibold text-green-600">
+                      {formatCurrency(item.subtotal)}
+                    </td>
+                    <td className="px-3 py-2">
                       <button
-                        onClick={() => removeCrewMember(member.id)}
-                        className="text-red-600 hover:text-red-800"
+                        onClick={() => removeLineItem(item.id)}
+                        className="text-red-600 hover:text-red-800 text-sm"
                       >
-                        Remove
+                        ✕
                       </button>
                     </td>
                   </tr>
@@ -727,8 +1074,8 @@ export default function BudgetCalculator() {
         )}
       </div>
 
-      {/* Totals */}
-      {crew.length > 0 && (
+      {/* Budget Summary */}
+      {lineItems.length > 0 && (
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold">Budget Summary</h2>
@@ -753,35 +1100,47 @@ export default function BudgetCalculator() {
               </button>
             </div>
           </div>
-          {/* Department Breakdown */}
-          {groupByDepartment && crew.length > 0 && (
-            <div className="mb-4 border-b pb-4">
-              <h4 className="text-sm font-medium text-gray-500 mb-2">By Department</h4>
-              <div className="space-y-1 text-sm">
-                {Object.entries(
-                  crew.reduce((acc, m) => {
-                    const dept = m.department || 'Other'
-                    acc[dept] = (acc[dept] || 0) + m.subtotal
-                    return acc
-                  }, {} as Record<string, number>)
-                )
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([dept, total]) => (
-                    <div key={dept} className="flex justify-between">
-                      <span className="text-gray-600">{dept}</span>
+
+          {/* Account Totals */}
+          <div className="mb-4 border-b pb-4">
+            <h4 className="text-sm font-medium text-gray-500 mb-2">By Account</h4>
+            <div className="space-y-1 text-sm max-h-48 overflow-y-auto">
+              {Object.entries(itemsByAccount)
+                .sort(([a], [b]) => a.localeCompare(b))
+                .map(([code, items]) => {
+                  const total = items.reduce((sum, i) => sum + i.subtotal, 0)
+                  return (
+                    <div key={code} className="flex justify-between">
+                      <span className="text-gray-600">
+                        <span className="font-mono text-xs text-gray-400 mr-2">{code}</span>
+                        {getAccountName(code)}
+                      </span>
                       <span>{formatCurrency(total)}</span>
                     </div>
-                  ))}
-              </div>
+                  )
+                })}
             </div>
-          )}
+          </div>
+
           <div className="space-y-3">
             <div className="flex justify-between text-lg">
               <span>Labor Subtotal:</span>
               <span className="font-semibold">{formatCurrency(totalLabor)}</span>
             </div>
             <div className="flex justify-between text-lg">
-              <span>Fringes ({fringeRate}%):</span>
+              <span>Equipment & Rentals:</span>
+              <span className="font-semibold">{formatCurrency(totalEquipment)}</span>
+            </div>
+            <div className="flex justify-between text-lg">
+              <span>Other Costs:</span>
+              <span className="font-semibold">{formatCurrency(totalOther)}</span>
+            </div>
+            <div className="flex justify-between text-lg border-t pt-2">
+              <span>Subtotal Before Fringes:</span>
+              <span className="font-semibold">{formatCurrency(totalBeforeFringes)}</span>
+            </div>
+            <div className="flex justify-between text-lg">
+              <span>Fringes ({fringeRate}% on Labor):</span>
               <span className="font-semibold">{formatCurrency(totalFringes)}</span>
             </div>
             <div className="border-t pt-3 flex justify-between text-xl font-bold">
@@ -804,7 +1163,7 @@ export default function BudgetCalculator() {
                   type="text"
                   value={budgetName}
                   onChange={(e) => setBudgetName(e.target.value)}
-                  placeholder="e.g., Feature Film - Camera Dept"
+                  placeholder="e.g., Feature Film - Full Budget"
                   className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
                 />
               </div>
@@ -855,7 +1214,7 @@ export default function BudgetCalculator() {
                     <div className="cursor-pointer flex-1" onClick={() => loadBudget(budget.id)}>
                       <div className="font-medium">{budget.name}</div>
                       <div className="text-sm text-gray-500">
-                        {budget.crew_count} positions | {formatCurrency(parseFloat(budget.grand_total || '0'))} total
+                        {budget.crew_count} line items | {formatCurrency(parseFloat(budget.grand_total || '0'))} total
                       </div>
                       <div className="text-xs text-gray-400">
                         Updated: {new Date(budget.updated_at).toLocaleDateString()}
@@ -892,7 +1251,6 @@ export default function BudgetCalculator() {
               Select a template to quickly add crew positions with union rates
             </p>
 
-            {/* Category Filter */}
             <div className="mb-4">
               <label className="block text-sm font-medium mb-2">Filter by Department</label>
               <select
@@ -907,7 +1265,6 @@ export default function BudgetCalculator() {
               </select>
             </div>
 
-            {/* Template List */}
             {crewTemplates.length === 0 ? (
               <p className="text-gray-500 text-center py-8">Loading templates...</p>
             ) : (
@@ -947,6 +1304,60 @@ export default function BudgetCalculator() {
                 className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded-md"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Non-Labor Line Modal */}
+      {showAddLineModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">Add Non-Labor Item</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Item Type</label>
+                <select
+                  value={newLineType}
+                  onChange={(e) => setNewLineType(e.target.value as typeof newLineType)}
+                  className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                >
+                  <option value="equipment">Equipment Package</option>
+                  <option value="rental">Rental</option>
+                  <option value="purchase">Purchase / Expendables</option>
+                  <option value="allowance">Allowance</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Account</label>
+                <select
+                  id="accountSelect"
+                  className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                >
+                  {Object.values(ACCOUNT_CATEGORIES).flatMap(cat =>
+                    cat.accounts.map(acc => (
+                      <option key={acc.code} value={acc.code}>{acc.code} - {acc.name}</option>
+                    ))
+                  )}
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                onClick={() => setShowAddLineModal(false)}
+                className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  const select = document.getElementById('accountSelect') as HTMLSelectElement
+                  addNonLaborItem(newLineType, select.value)
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md"
+              >
+                Add Item
               </button>
             </div>
           </div>
