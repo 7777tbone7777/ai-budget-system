@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const PDFDocument = require('pdfkit');
 require('dotenv').config();
 
 const db = require('./db');
@@ -3785,6 +3786,412 @@ app.put('/api/productions/:production_id/agreements', async (req, res) => {
     });
   } catch (error) {
     appLogger.error('Error updating production agreements:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ============================================================================
+// API ROUTES - PDF EXPORT
+// ============================================================================
+
+// Export budget to PDF
+app.get('/api/productions/:production_id/export/pdf', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const { format = 'topsheet' } = req.query; // topsheet, detail, or full
+
+    // Get production details
+    const prodResult = await db.query(
+      'SELECT * FROM productions WHERE id = $1',
+      [production_id]
+    );
+
+    if (prodResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Production not found' });
+    }
+
+    const production = prodResult.rows[0];
+
+    // Get line items grouped by category
+    const lineItemsResult = await db.query(`
+      SELECT *
+      FROM budget_line_items
+      WHERE production_id = $1
+      ORDER BY account_code, position_title
+    `, [production_id]);
+
+    // Create PDF document
+    const doc = new PDFDocument({ margin: 50, size: 'LETTER' });
+
+    // Set response headers
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${production.name.replace(/[^a-z0-9]/gi, '_')}_Budget.pdf"`);
+
+    // Pipe PDF to response
+    doc.pipe(res);
+
+    // Helper function for currency formatting
+    const formatCurrency = (amount) => {
+      const num = parseFloat(amount || 0);
+      return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    };
+
+    // Title
+    doc.fontSize(20).font('Helvetica-Bold').text('PRODUCTION BUDGET', { align: 'center' });
+    doc.moveDown(0.5);
+    doc.fontSize(16).text(production.name, { align: 'center' });
+    doc.moveDown(0.5);
+
+    // Production Info
+    doc.fontSize(10).font('Helvetica');
+    doc.text(`Production Type: ${production.production_type || 'N/A'}`, 50);
+    doc.text(`Location: ${production.shooting_location || 'N/A'}`);
+    doc.text(`Date: ${new Date().toLocaleDateString('en-US')}`);
+    doc.moveDown();
+
+    // Calculate totals by category
+    const categories = {};
+    let grandTotal = 0;
+
+    lineItemsResult.rows.forEach(item => {
+      const catCode = item.account_code?.substring(0, 2) || '00';
+      if (!categories[catCode]) {
+        categories[catCode] = { items: [], total: 0 };
+      }
+      categories[catCode].items.push(item);
+      categories[catCode].total += parseFloat(item.total || 0);
+      grandTotal += parseFloat(item.total || 0);
+    });
+
+    // Category names mapping
+    const categoryNames = {
+      '01': 'STORY & RIGHTS',
+      '02': 'TALENT',
+      '03': 'DIRECTION',
+      '04': 'CAST',
+      '05': 'TRAVEL & LIVING',
+      '06': 'PRODUCTION STAFF',
+      '07': 'ART DEPARTMENT',
+      '08': 'SET CONSTRUCTION',
+      '09': 'SET OPERATIONS',
+      '10': 'SPECIAL EFFECTS',
+      '11': 'SET DRESSING',
+      '12': 'PROPS',
+      '13': 'WARDROBE',
+      '14': 'MAKEUP & HAIR',
+      '15': 'ELECTRICAL',
+      '16': 'CAMERA',
+      '17': 'PRODUCTION SOUND',
+      '18': 'TRANSPORTATION',
+      '19': 'LOCATION',
+      '20': 'PICTURE VEHICLES/ANIMALS',
+      '21': 'FILM & LAB',
+      '22': 'SECOND UNIT',
+      '23': 'TESTS',
+      '24': 'POST PRODUCTION SUPERVISION',
+      '25': 'EDITING',
+      '26': 'MUSIC',
+      '27': 'POST PRODUCTION SOUND',
+      '28': 'POST PRODUCTION FILM & LAB',
+      '29': 'MAIN & END TITLES',
+      '30': 'FRINGE BENEFITS',
+      '31': 'PUBLICITY',
+      '32': 'INSURANCE',
+      '33': 'GENERAL EXPENSES',
+    };
+
+    // Topsheet - Category Summary
+    doc.fontSize(14).font('Helvetica-Bold').text('BUDGET TOPSHEET', { underline: true });
+    doc.moveDown(0.5);
+
+    // Draw table header
+    const tableTop = doc.y;
+    doc.fontSize(9).font('Helvetica-Bold');
+    doc.text('ACCT', 50, tableTop, { width: 40 });
+    doc.text('CATEGORY', 95, tableTop, { width: 250 });
+    doc.text('TOTAL', 400, tableTop, { width: 100, align: 'right' });
+    doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+
+    // Category rows
+    let yPos = tableTop + 25;
+    doc.font('Helvetica').fontSize(9);
+
+    Object.keys(categories).sort().forEach(catCode => {
+      const cat = categories[catCode];
+      const catName = categoryNames[catCode] || `Category ${catCode}`;
+
+      if (yPos > 700) {
+        doc.addPage();
+        yPos = 50;
+      }
+
+      doc.text(catCode, 50, yPos, { width: 40 });
+      doc.text(catName, 95, yPos, { width: 250 });
+      doc.text(formatCurrency(cat.total), 400, yPos, { width: 100, align: 'right' });
+      yPos += 15;
+    });
+
+    // Total line
+    doc.moveTo(50, yPos).lineTo(550, yPos).stroke();
+    yPos += 10;
+    doc.font('Helvetica-Bold').fontSize(11);
+    doc.text('TOTAL', 95, yPos);
+    doc.text(formatCurrency(grandTotal), 400, yPos, { width: 100, align: 'right' });
+
+    // Add detail pages if requested
+    if (format === 'detail' || format === 'full') {
+      doc.addPage();
+      doc.fontSize(14).font('Helvetica-Bold').text('BUDGET DETAIL', { underline: true });
+      doc.moveDown(0.5);
+
+      Object.keys(categories).sort().forEach(catCode => {
+        const cat = categories[catCode];
+        const catName = categoryNames[catCode] || `Category ${catCode}`;
+
+        if (doc.y > 650) {
+          doc.addPage();
+        }
+
+        doc.fontSize(11).font('Helvetica-Bold').text(`${catCode} - ${catName}`);
+        doc.moveDown(0.3);
+
+        // Column headers
+        const headerY = doc.y;
+        doc.fontSize(8).font('Helvetica-Bold');
+        doc.text('Acct', 50, headerY, { width: 50 });
+        doc.text('Description', 105, headerY, { width: 180 });
+        doc.text('Rate', 290, headerY, { width: 60, align: 'right' });
+        doc.text('Qty', 355, headerY, { width: 40, align: 'right' });
+        doc.text('Total', 440, headerY, { width: 70, align: 'right' });
+
+        let detailY = headerY + 12;
+        doc.font('Helvetica').fontSize(8);
+
+        cat.items.forEach(item => {
+          if (detailY > 720) {
+            doc.addPage();
+            detailY = 50;
+          }
+
+          doc.text(item.account_code || '', 50, detailY, { width: 50 });
+          doc.text((item.position_title || item.description || '').substring(0, 35), 105, detailY, { width: 180 });
+          doc.text(formatCurrency(item.rate), 290, detailY, { width: 60, align: 'right' });
+          doc.text(item.quantity?.toString() || '', 355, detailY, { width: 40, align: 'right' });
+          doc.text(formatCurrency(item.total), 440, detailY, { width: 70, align: 'right' });
+          detailY += 11;
+        });
+
+        // Category total
+        doc.font('Helvetica-Bold');
+        doc.text(`${catCode} Total:`, 290, detailY + 5, { width: 100 });
+        doc.text(formatCurrency(cat.total), 440, detailY + 5, { width: 70, align: 'right' });
+        doc.moveDown(1.5);
+      });
+    }
+
+    // Footer on each page
+    const pages = doc.bufferedPageRange();
+    for (let i = 0; i < pages.count; i++) {
+      doc.switchToPage(i);
+      doc.fontSize(8).font('Helvetica');
+      doc.text(
+        `Page ${i + 1} of ${pages.count} | Generated by AI Budget System | ${new Date().toLocaleString()}`,
+        50,
+        750,
+        { width: 500, align: 'center' }
+      );
+    }
+
+    doc.end();
+
+  } catch (error) {
+    appLogger.error('Error generating PDF:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ============================================================================
+// API ROUTES - BUDGET COMPARISON (Original vs Current)
+// ============================================================================
+
+// Lock original totals (set current as baseline)
+app.post('/api/productions/:production_id/lock-original', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+
+    // Check if already locked
+    const prodCheck = await db.query(
+      'SELECT lock_original_totals FROM productions WHERE id = $1',
+      [production_id]
+    );
+
+    if (prodCheck.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Production not found' });
+    }
+
+    if (prodCheck.rows[0].lock_original_totals) {
+      return res.status(400).json({
+        success: false,
+        error: 'Original totals are already locked. Unlock first to re-lock.',
+      });
+    }
+
+    // Copy current totals to original columns
+    const updateResult = await db.query(`
+      UPDATE budget_line_items
+      SET
+        original_subtotal = subtotal,
+        original_total = total
+      WHERE production_id = $1
+      RETURNING id
+    `, [production_id]);
+
+    // Lock the production
+    await db.query(`
+      UPDATE productions
+      SET lock_original_totals = true, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1
+    `, [production_id]);
+
+    res.json({
+      success: true,
+      message: 'Original totals locked successfully',
+      line_items_updated: updateResult.rows.length
+    });
+  } catch (error) {
+    appLogger.error('Error locking original totals:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Unlock original totals
+app.post('/api/productions/:production_id/unlock-original', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+
+    await db.query(`
+      UPDATE productions
+      SET lock_original_totals = false, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1
+    `, [production_id]);
+
+    res.json({
+      success: true,
+      message: 'Original totals unlocked'
+    });
+  } catch (error) {
+    appLogger.error('Error unlocking original totals:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get budget comparison report
+app.get('/api/productions/:production_id/comparison', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const { by_category, by_account } = req.query;
+
+    // Get production info
+    const prodResult = await db.query(
+      'SELECT name, lock_original_totals, budget_target FROM productions WHERE id = $1',
+      [production_id]
+    );
+
+    if (prodResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Production not found' });
+    }
+
+    const production = prodResult.rows[0];
+
+    // Get line items with variance
+    const lineItemsResult = await db.query(`
+      SELECT
+        id,
+        account_code,
+        position_title,
+        description,
+        rate,
+        quantity,
+        units,
+        subtotal,
+        total,
+        original_subtotal,
+        original_total,
+        (COALESCE(total, 0) - COALESCE(original_total, 0)) as variance,
+        CASE
+          WHEN COALESCE(original_total, 0) > 0
+          THEN ((COALESCE(total, 0) - COALESCE(original_total, 0)) / original_total * 100)
+          ELSE 0
+        END as variance_pct
+      FROM budget_line_items
+      WHERE production_id = $1
+      ORDER BY account_code, position_title
+    `, [production_id]);
+
+    // Calculate summary totals
+    let originalTotal = 0;
+    let currentTotal = 0;
+    const categoryTotals = {};
+
+    lineItemsResult.rows.forEach(item => {
+      originalTotal += parseFloat(item.original_total || 0);
+      currentTotal += parseFloat(item.total || 0);
+
+      // Group by category (first 2-3 chars of account code)
+      const category = item.account_code?.substring(0, 3) || 'Other';
+      if (!categoryTotals[category]) {
+        categoryTotals[category] = { original: 0, current: 0, variance: 0 };
+      }
+      categoryTotals[category].original += parseFloat(item.original_total || 0);
+      categoryTotals[category].current += parseFloat(item.total || 0);
+      categoryTotals[category].variance += parseFloat(item.variance || 0);
+    });
+
+    const totalVariance = currentTotal - originalTotal;
+    const variancePct = originalTotal > 0 ? (totalVariance / originalTotal * 100) : 0;
+
+    // Find items with significant variance
+    const significantVariances = lineItemsResult.rows
+      .filter(item => Math.abs(parseFloat(item.variance || 0)) > 100)
+      .sort((a, b) => Math.abs(parseFloat(b.variance)) - Math.abs(parseFloat(a.variance)))
+      .slice(0, 20);
+
+    res.json({
+      success: true,
+      production: {
+        id: production_id,
+        name: production.name,
+        budget_target: production.budget_target,
+        is_locked: production.lock_original_totals
+      },
+      summary: {
+        original_total: originalTotal.toFixed(2),
+        current_total: currentTotal.toFixed(2),
+        variance: totalVariance.toFixed(2),
+        variance_pct: variancePct.toFixed(1),
+        status: totalVariance > 0 ? 'OVER_BUDGET' :
+                totalVariance < 0 ? 'UNDER_BUDGET' : 'ON_BUDGET'
+      },
+      by_category: Object.entries(categoryTotals).map(([code, totals]) => ({
+        category_code: code,
+        original: totals.original.toFixed(2),
+        current: totals.current.toFixed(2),
+        variance: totals.variance.toFixed(2),
+        variance_pct: totals.original > 0 ? ((totals.variance / totals.original) * 100).toFixed(1) : '0.0'
+      })).sort((a, b) => a.category_code.localeCompare(b.category_code)),
+      significant_variances: significantVariances.map(item => ({
+        id: item.id,
+        account_code: item.account_code,
+        position_title: item.position_title,
+        original: parseFloat(item.original_total || 0).toFixed(2),
+        current: parseFloat(item.total || 0).toFixed(2),
+        variance: parseFloat(item.variance || 0).toFixed(2),
+        variance_pct: parseFloat(item.variance_pct || 0).toFixed(1)
+      })),
+      line_item_count: lineItemsResult.rows.length
+    });
+  } catch (error) {
+    appLogger.error('Error getting budget comparison:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
