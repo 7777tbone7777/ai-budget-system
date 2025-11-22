@@ -1666,16 +1666,30 @@ app.post('/api/productions', async (req, res) => {
       episode_length_minutes,
       season_number,
       principal_photography_start,
+      // Agreement fields (new)
+      iatse_agreement_id,
+      sag_aftra_agreement_id,
+      dga_agreement_id,
+      wga_agreement_id,
+      teamsters_agreement_id,
+      applied_sideletters,
+      is_union_signatory,
+      agreement_notes,
     } = req.body;
 
     const result = await db.query(
       `INSERT INTO productions
        (name, production_type, distribution_platform, shooting_location, state,
-        budget_target, episode_count, episode_length_minutes, season_number, principal_photography_start)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        budget_target, episode_count, episode_length_minutes, season_number, principal_photography_start,
+        iatse_agreement_id, sag_aftra_agreement_id, dga_agreement_id, wga_agreement_id, teamsters_agreement_id,
+        applied_sideletters, is_union_signatory, agreement_notes)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
        RETURNING *`,
       [name, production_type, distribution_platform, shooting_location, state,
-       budget_target, episode_count, episode_length_minutes, season_number, principal_photography_start]
+       budget_target, episode_count, episode_length_minutes, season_number, principal_photography_start,
+       iatse_agreement_id || null, sag_aftra_agreement_id || null, dga_agreement_id || null,
+       wga_agreement_id || null, teamsters_agreement_id || null,
+       JSON.stringify(applied_sideletters || []), is_union_signatory !== false, agreement_notes || null]
     );
 
     res.status(201).json({
@@ -2153,6 +2167,9 @@ app.post('/api/productions/:production_id/line-items', async (req, res) => {
 
     const production = prodResult.rows[0];
     let finalRate = rate_override;
+    let baseRate = null;
+    let sideletterAdjustment = 0;
+    let appliedSideletter = null;
 
     // If no rate override, look up rate from rate_cards
     if (!finalRate && union_local && job_classification) {
@@ -2175,7 +2192,35 @@ app.post('/api/productions/:production_id/line-items', async (req, res) => {
       ]);
 
       if (rateResult.rows.length > 0) {
-        finalRate = rateResult.rows[0].base_rate;
+        baseRate = rateResult.rows[0].base_rate;
+        finalRate = baseRate;
+      }
+    }
+
+    // Apply sideletter wage adjustment if production has applied_sideletters
+    // and this is a union position (not rate_override)
+    if (finalRate && !rate_override && production.is_union_signatory && production.applied_sideletters) {
+      let sideletters = production.applied_sideletters;
+      if (typeof sideletters === 'string') {
+        try {
+          sideletters = JSON.parse(sideletters);
+        } catch (e) {
+          sideletters = [];
+        }
+      }
+
+      // Find the most relevant sideletter for this position
+      // Priority: exact production_type match > general sideletter
+      for (const sl of sideletters) {
+        if (sl.wage_adjustment_pct && sl.wage_adjustment_pct !== 0) {
+          // Apply the wage adjustment (negative = discount, e.g., -3% = 97% of rate)
+          const adjustmentPct = parseFloat(sl.wage_adjustment_pct);
+          const adjustmentMultiplier = 1 + (adjustmentPct / 100);
+          sideletterAdjustment = finalRate * (adjustmentPct / 100);
+          finalRate = finalRate * adjustmentMultiplier;
+          appliedSideletter = sl.sideletter_name || sl.sideletter_id;
+          break; // Apply first matching sideletter
+        }
       }
     }
 
@@ -2278,6 +2323,9 @@ app.post('/api/productions/:production_id/line-items', async (req, res) => {
       data: insertResult.rows[0],
       calculations: {
         rate_used: finalRate,
+        base_rate: baseRate,
+        sideletter_adjustment: sideletterAdjustment,
+        applied_sideletter: appliedSideletter,
         subtotal,
         fringes: totalFringes,
         total,
@@ -3382,6 +3430,242 @@ app.get('/api/reference-docs/topics/list', async (req, res) => {
     });
   } catch (error) {
     appLogger.error('Error fetching topics list', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ============================================================================
+// API ROUTES - UNION AGREEMENTS
+// ============================================================================
+
+// Get all available union agreements
+app.get('/api/agreements', async (req, res) => {
+  try {
+    const { union_name, active_only } = req.query;
+
+    let query = `
+      SELECT id, union_name, agreement_type,
+             effective_date_start, effective_date_end,
+             document_url, rules, created_at
+      FROM union_agreements
+      WHERE 1=1
+    `;
+    const params = [];
+
+    if (union_name) {
+      params.push(union_name);
+      query += ` AND union_name = $${params.length}`;
+    }
+
+    if (active_only === 'true') {
+      query += ` AND (effective_date_end IS NULL OR effective_date_end >= CURRENT_DATE)`;
+    }
+
+    query += ' ORDER BY union_name, effective_date_start DESC';
+
+    const result = await db.query(query, params);
+
+    // Group by union for easier frontend consumption
+    const grouped = {};
+    result.rows.forEach(row => {
+      if (!grouped[row.union_name]) {
+        grouped[row.union_name] = [];
+      }
+      grouped[row.union_name].push(row);
+    });
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows,
+      grouped: grouped
+    });
+  } catch (error) {
+    appLogger.error('Error fetching agreements:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get recommended agreements based on production parameters
+app.post('/api/agreements/recommend', async (req, res) => {
+  try {
+    const { production_type, distribution_platform, start_date, shooting_location } = req.body;
+    const effectiveDate = start_date || new Date().toISOString().split('T')[0];
+
+    // Get active agreements for each major guild
+    const result = await db.query(`
+      SELECT DISTINCT ON (union_name)
+        id, union_name, agreement_type,
+        effective_date_start, effective_date_end, rules
+      FROM union_agreements
+      WHERE union_name IN ('IATSE', 'SAG-AFTRA', 'DGA', 'WGA', 'Teamsters Local 399')
+        AND (effective_date_start IS NULL OR effective_date_start <= $1)
+        AND (effective_date_end IS NULL OR effective_date_end >= $1)
+        AND (
+          agreement_type ILIKE '%Basic Agreement%'
+          OR agreement_type ILIKE '%2024%'
+          OR agreement_type ILIKE '%2023%'
+        )
+      ORDER BY union_name, effective_date_start DESC
+    `, [effectiveDate]);
+
+    // Get applicable sideletters
+    const sideletterResult = await db.query(`
+      SELECT id, sideletter_name, production_type, distribution_platform,
+             wage_adjustment_pct, holiday_pay_pct, vacation_pay_pct,
+             overtime_rules, season_number, location_restriction
+      FROM sideletter_rules
+      WHERE (production_type = $1 OR production_type IS NULL)
+        AND (distribution_platform = $2 OR distribution_platform IS NULL)
+      ORDER BY
+        CASE WHEN production_type = $1 THEN 1 ELSE 2 END,
+        CASE WHEN distribution_platform = $2 THEN 1 ELSE 2 END
+    `, [production_type, distribution_platform]);
+
+    const recommendations = {
+      iatse: result.rows.find(r => r.union_name === 'IATSE'),
+      sag_aftra: result.rows.find(r => r.union_name === 'SAG-AFTRA'),
+      dga: result.rows.find(r => r.union_name === 'DGA'),
+      wga: result.rows.find(r => r.union_name === 'WGA'),
+      teamsters: result.rows.find(r => r.union_name === 'Teamsters Local 399'),
+      applicable_sideletters: sideletterResult.rows.slice(0, 5) // Top 5 most relevant
+    };
+
+    res.json({
+      success: true,
+      data: recommendations,
+      message: 'Recommended agreements based on production parameters'
+    });
+  } catch (error) {
+    appLogger.error('Error recommending agreements:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get single agreement by ID
+app.get('/api/agreements/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db.query(`
+      SELECT id, union_name, agreement_type,
+             effective_date_start, effective_date_end,
+             document_url, rules, created_at
+      FROM union_agreements
+      WHERE id = $1
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Agreement not found' });
+    }
+
+    // Also get related sideletters
+    const sideletters = await db.query(`
+      SELECT * FROM sideletter_rules
+      WHERE union_name = $1
+    `, [result.rows[0].union_name]);
+
+    res.json({
+      success: true,
+      data: {
+        ...result.rows[0],
+        sideletters: sideletters.rows
+      }
+    });
+  } catch (error) {
+    appLogger.error('Error fetching agreement:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get production's agreements (what agreements are assigned to a production)
+app.get('/api/productions/:production_id/agreements', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+
+    const result = await db.query(`
+      SELECT p.id, p.name, p.production_type, p.distribution_platform,
+             p.is_union_signatory, p.applied_sideletters, p.agreement_notes,
+             ia.id as iatse_agreement_id, ia.agreement_type as iatse_agreement_type,
+             sa.id as sag_aftra_agreement_id, sa.agreement_type as sag_aftra_agreement_type,
+             da.id as dga_agreement_id, da.agreement_type as dga_agreement_type,
+             wa.id as wga_agreement_id, wa.agreement_type as wga_agreement_type,
+             ta.id as teamsters_agreement_id, ta.agreement_type as teamsters_agreement_type
+      FROM productions p
+      LEFT JOIN union_agreements ia ON p.iatse_agreement_id = ia.id
+      LEFT JOIN union_agreements sa ON p.sag_aftra_agreement_id = sa.id
+      LEFT JOIN union_agreements da ON p.dga_agreement_id = da.id
+      LEFT JOIN union_agreements wa ON p.wga_agreement_id = wa.id
+      LEFT JOIN union_agreements ta ON p.teamsters_agreement_id = ta.id
+      WHERE p.id = $1
+    `, [production_id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Production not found' });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0]
+    });
+  } catch (error) {
+    appLogger.error('Error fetching production agreements:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update production's agreements
+app.put('/api/productions/:production_id/agreements', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const {
+      iatse_agreement_id,
+      sag_aftra_agreement_id,
+      dga_agreement_id,
+      wga_agreement_id,
+      teamsters_agreement_id,
+      applied_sideletters,
+      is_union_signatory,
+      agreement_notes
+    } = req.body;
+
+    const result = await db.query(`
+      UPDATE productions
+      SET
+        iatse_agreement_id = COALESCE($2, iatse_agreement_id),
+        sag_aftra_agreement_id = COALESCE($3, sag_aftra_agreement_id),
+        dga_agreement_id = COALESCE($4, dga_agreement_id),
+        wga_agreement_id = COALESCE($5, wga_agreement_id),
+        teamsters_agreement_id = COALESCE($6, teamsters_agreement_id),
+        applied_sideletters = COALESCE($7, applied_sideletters),
+        is_union_signatory = COALESCE($8, is_union_signatory),
+        agreement_notes = COALESCE($9, agreement_notes),
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1
+      RETURNING *
+    `, [
+      production_id,
+      iatse_agreement_id,
+      sag_aftra_agreement_id,
+      dga_agreement_id,
+      wga_agreement_id,
+      teamsters_agreement_id,
+      JSON.stringify(applied_sideletters || []),
+      is_union_signatory,
+      agreement_notes
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Production not found' });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+      message: 'Production agreements updated successfully'
+    });
+  } catch (error) {
+    appLogger.error('Error updating production agreements:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
