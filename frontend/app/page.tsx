@@ -148,6 +148,14 @@ export default function Home() {
             Compare Locations
           </a>
         </div>
+        <div className="mt-4">
+          <a
+            href="/guide"
+            className="block p-4 bg-white hover:bg-gray-50 text-gray-700 rounded-lg text-center font-medium transition border border-gray-200"
+          >
+            View User Guide
+          </a>
+        </div>
       </div>
 
       {/* Features */}
