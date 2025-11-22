@@ -70,28 +70,42 @@ app.get('/health', async (req, res) => {
 // Get all rate cards (with filters)
 app.get('/api/rate-cards', async (req, res) => {
   try {
-    const { union_local, location, production_type } = req.query;
+    const { union_local, location, production_type, agreement_id } = req.query;
 
-    let query = 'SELECT * FROM current_rate_cards WHERE 1=1';
+    let query = `
+      SELECT rc.*,
+             a.name as agreement_name,
+             a.short_name as agreement_short_name,
+             a.effective_start as agreement_start,
+             a.effective_end as agreement_end
+      FROM rate_cards rc
+      LEFT JOIN agreements a ON rc.agreement_id = a.id
+      WHERE 1=1
+    `;
     const params = [];
     let paramCount = 1;
 
     if (union_local) {
-      query += ` AND union_local = $${paramCount++}`;
+      query += ` AND rc.union_local = $${paramCount++}`;
       params.push(union_local);
     }
 
     if (location) {
-      query += ` AND location = $${paramCount++}`;
+      query += ` AND rc.location = $${paramCount++}`;
       params.push(location);
     }
 
     if (production_type) {
-      query += ` AND production_type = $${paramCount++}`;
+      query += ` AND rc.production_type = $${paramCount++}`;
       params.push(production_type);
     }
 
-    query += ' ORDER BY union_local, job_classification';
+    if (agreement_id) {
+      query += ` AND rc.agreement_id = $${paramCount++}`;
+      params.push(agreement_id);
+    }
+
+    query += ' ORDER BY rc.union_local, rc.job_classification';
 
     const result = await db.query(query, params);
     res.json({
@@ -101,6 +115,29 @@ app.get('/api/rate-cards', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching rate cards:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// Get all agreements
+app.get('/api/agreements', async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT a.*,
+             (SELECT COUNT(*) FROM rate_cards WHERE agreement_id = a.id) as rate_card_count
+      FROM agreements a
+      ORDER BY a.union_name, a.short_name
+    `);
+    res.json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows,
+    });
+  } catch (error) {
+    console.error('Error fetching agreements:', error);
     res.status(500).json({
       success: false,
       error: error.message,
