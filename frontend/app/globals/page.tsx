@@ -341,7 +341,7 @@ export default function GlobalsPage() {
                           </td>
                           <td className="py-3 px-4">
                             <span className="font-semibold">
-                              {global.value.toFixed(global.precision)}
+                              {parseFloat(String(global.value)).toFixed(global.precision)}
                             </span>
                           </td>
                           <td className="py-3 px-4 text-gray-600 dark:text-gray-400">

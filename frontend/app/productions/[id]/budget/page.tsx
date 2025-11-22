@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import MultiPeriodForm from './MultiPeriodForm';
+import CalculationPanel from '../../../../components/CalculationPanel';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-8e04.up.railway.app';
 
@@ -21,6 +22,9 @@ interface LineItem {
   fringes: number;
   total: number;
   notes?: string;
+  parent_id?: string | null;
+  is_parent?: boolean;
+  children?: LineItem[];
 }
 
 interface Production {
@@ -53,6 +57,8 @@ export default function ProductionBudgetPage() {
   const [rateCards, setRateCards] = useState<RateCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
   // Form state
   const [formData, setFormData] = useState({
@@ -132,6 +138,22 @@ export default function ProductionBudgetPage() {
 
     newTotals.grand_total = newTotals.atl + newTotals.btl + newTotals.other;
     setTotals(newTotals);
+  };
+
+  const toggleExpanded = (id: string) => {
+    setExpandedItems(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const handleChildAdded = () => {
+    loadData(); // Refresh data when a child is added from the panel
   };
 
   const handleAddLineItem = async () => {
@@ -229,8 +251,10 @@ export default function ProductionBudgetPage() {
   };
 
   return (
-    <div className="min-h-screen p-8 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Main Content */}
+      <div className={`flex-1 p-8 transition-all duration-300 ${selectedItemId ? 'pr-4' : ''}`}>
+      <div className={`mx-auto ${selectedItemId ? 'max-w-5xl' : 'max-w-7xl'}`}>
         {/* Header */}
         <div className="mb-8">
           <button
@@ -435,9 +459,38 @@ export default function ProductionBudgetPage() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {groupedItems.atl.map((item) => (
-                    <tr key={item.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.account_code}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{item.description}</td>
+                    <tr
+                      key={item.id}
+                      onClick={() => setSelectedItemId(item.id)}
+                      className={`cursor-pointer transition-colors ${
+                        selectedItemId === item.id
+                          ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                          : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <div className="flex items-center gap-2">
+                          {item.is_parent && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); toggleExpanded(item.id); }}
+                              className="text-gray-400 hover:text-gray-600"
+                            >
+                              {expandedItems.has(item.id) ? '&#9660;' : '&#9654;'}
+                            </button>
+                          )}
+                          {item.account_code}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        <div className="flex items-center gap-2">
+                          {item.description}
+                          {item.is_parent && (
+                            <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                              {item.children?.length || 0} sub-items
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.union_local || '-'}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${item.rate?.toLocaleString()}</td>
@@ -446,7 +499,7 @@ export default function ProductionBudgetPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${item.total?.toLocaleString()}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <button
-                          onClick={() => handleDeleteLineItem(item.id)}
+                          onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(item.id); }}
                           className="text-red-600 hover:text-red-800 text-sm"
                         >
                           Delete
@@ -485,9 +538,38 @@ export default function ProductionBudgetPage() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {groupedItems.btl.map((item) => (
-                    <tr key={item.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.account_code}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{item.description}</td>
+                    <tr
+                      key={item.id}
+                      onClick={() => setSelectedItemId(item.id)}
+                      className={`cursor-pointer transition-colors ${
+                        selectedItemId === item.id
+                          ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                          : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <div className="flex items-center gap-2">
+                          {item.is_parent && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); toggleExpanded(item.id); }}
+                              className="text-gray-400 hover:text-gray-600"
+                            >
+                              {expandedItems.has(item.id) ? '&#9660;' : '&#9654;'}
+                            </button>
+                          )}
+                          {item.account_code}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        <div className="flex items-center gap-2">
+                          {item.description}
+                          {item.is_parent && (
+                            <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                              {item.children?.length || 0} sub-items
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.department || '-'}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.union_local || '-'}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
@@ -497,7 +579,7 @@ export default function ProductionBudgetPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${item.total?.toLocaleString()}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <button
-                          onClick={() => handleDeleteLineItem(item.id)}
+                          onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(item.id); }}
                           className="text-red-600 hover:text-red-800 text-sm"
                         >
                           Delete
@@ -532,15 +614,44 @@ export default function ProductionBudgetPage() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {groupedItems.other.map((item) => (
-                    <tr key={item.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.account_code}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{item.description}</td>
+                    <tr
+                      key={item.id}
+                      onClick={() => setSelectedItemId(item.id)}
+                      className={`cursor-pointer transition-colors ${
+                        selectedItemId === item.id
+                          ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                          : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <div className="flex items-center gap-2">
+                          {item.is_parent && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); toggleExpanded(item.id); }}
+                              className="text-gray-400 hover:text-gray-600"
+                            >
+                              {expandedItems.has(item.id) ? '&#9660;' : '&#9654;'}
+                            </button>
+                          )}
+                          {item.account_code}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        <div className="flex items-center gap-2">
+                          {item.description}
+                          {item.is_parent && (
+                            <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                              {item.children?.length || 0} sub-items
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${item.rate?.toLocaleString()}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${item.total?.toLocaleString()}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <button
-                          onClick={() => handleDeleteLineItem(item.id)}
+                          onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(item.id); }}
                           className="text-red-600 hover:text-red-800 text-sm"
                         >
                           Delete
@@ -589,6 +700,18 @@ export default function ProductionBudgetPage() {
           </div>
         )}
       </div>
+      </div>
+
+      {/* Calculation Panel Sidebar */}
+      {selectedItemId && (
+        <div className="w-96 flex-shrink-0 h-screen sticky top-0">
+          <CalculationPanel
+            lineItemId={selectedItemId}
+            onClose={() => setSelectedItemId(null)}
+            onAddChild={handleChildAdded}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 type Section = 'quick-start' | 'productions' | 'budget-editor' | 'ai-generator' | 'compliance' |
-  'comparison' | 'charges' | 'export' | 'rate-cards' | 'tax-incentives' | 'globals' | 'tools' | 'future';
+  'comparison' | 'charges' | 'export' | 'rate-cards' | 'tax-incentives' | 'globals' | 'tools' | 'future' |
+  'crew-builder' | 'what-if' | 'guardian' | 'nested-items' | 'dynamic-views' | 'access-control';
 
 interface FeatureStatus {
   available: boolean;
@@ -25,6 +26,14 @@ const featureStatuses: Record<string, FeatureStatus> = {
   'globals': { available: true, label: 'Available' },
   'crew-templates': { available: true, label: 'Available' },
   'budget-groups': { available: true, label: 'Available' },
+  // AI Enhancements
+  'crew-builder': { available: true, label: 'New' },
+  'what-if': { available: true, label: 'New' },
+  'guardian': { available: true, label: 'New' },
+  // Modern Features
+  'nested-items': { available: true, label: 'New' },
+  'dynamic-views': { available: true, label: 'New' },
+  'access-control': { available: true, label: 'New' },
   // Future features
   'actuals': { available: false, label: 'Coming Soon' },
   'excel-import': { available: false, label: 'Coming Soon' },
@@ -48,6 +57,15 @@ export default function UserGuidePage() {
     { id: 'productions', label: 'Productions', icon: '🎬' },
     { id: 'budget-editor', label: 'Budget Editor', icon: '📊' },
     { id: 'ai-generator', label: 'AI Budget Generator', icon: '🤖' },
+    // AI Enhancements
+    { id: 'crew-builder', label: 'Smart Crew Builder', icon: '👥', isNew: true },
+    { id: 'what-if', label: 'What-If Analyzer', icon: '🔮', isNew: true },
+    { id: 'guardian', label: 'Budget Guardian', icon: '🛡️', isNew: true },
+    // Modern Features
+    { id: 'nested-items', label: 'Nested Line Items', icon: '📋', isNew: true },
+    { id: 'dynamic-views', label: 'Dynamic Views', icon: '👁️', isNew: true },
+    { id: 'access-control', label: 'Access & Sharing', icon: '🔐', isNew: true },
+    // Original sections
     { id: 'compliance', label: 'CBA Compliance', icon: '✓' },
     { id: 'comparison', label: 'Budget Comparison', icon: '📈' },
     { id: 'charges', label: 'Contractual Charges', icon: '💰' },
@@ -1031,6 +1049,622 @@ export default function UserGuidePage() {
                   <a href="/formula-tester" className="text-blue-600 hover:text-blue-700 text-sm">
                     Test Formulas →
                   </a>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Smart Crew Builder - AI Enhancement */}
+          {activeSection === 'crew-builder' && (
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <h2 className="text-2xl font-bold text-gray-900">Smart Crew Builder</h2>
+                  <span className="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800">AI-Powered</span>
+                </div>
+                <p className="text-gray-600">
+                  AI-powered crew recommendations based on your production type, budget tier, and shooting requirements.
+                  Get optimized crew lists in seconds instead of hours.
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-6">
+                <h3 className="font-semibold text-purple-900 mb-3">The Old Way vs. The New Way</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-white/70 rounded p-4">
+                    <h4 className="font-medium text-red-700 mb-2">Movie Magic Budgeting (Old)</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>- Manually add each crew position one by one</li>
+                      <li>- Look up union rates in separate PDFs</li>
+                      <li>- Guess at prep/wrap schedules</li>
+                      <li>- Hope you did not miss a key position</li>
+                      <li>- Takes 2-4 hours per department</li>
+                    </ul>
+                  </div>
+                  <div className="bg-white/70 rounded p-4">
+                    <h4 className="font-medium text-green-700 mb-2">Smart Crew Builder (New)</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>+ AI recommends complete crew list</li>
+                      <li>+ Union rates auto-populated</li>
+                      <li>+ Prep/wrap schedules calculated</li>
+                      <li>+ Never miss critical positions</li>
+                      <li>+ Complete crew in under 5 minutes</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">How to Use</h3>
+                <ol className="list-decimal list-inside text-gray-600 space-y-3">
+                  <li>
+                    <strong>Navigate to Crew Builder</strong>
+                    <p className="ml-6 text-sm">From your production, click "Crew Builder" in the sidebar</p>
+                  </li>
+                  <li>
+                    <strong>Select Production Configuration</strong>
+                    <p className="ml-6 text-sm">Choose from: Feature Film (Low/Mid/High Budget), TV Series, Documentary, or Commercial</p>
+                  </li>
+                  <li>
+                    <strong>Enter Shooting Parameters</strong>
+                    <p className="ml-6 text-sm">Shoot days, prep weeks, wrap days, location (affects union rates)</p>
+                  </li>
+                  <li>
+                    <strong>Review AI Recommendations</strong>
+                    <p className="ml-6 text-sm">See recommended positions with rates, quantities, and total costs</p>
+                  </li>
+                  <li>
+                    <strong>Customize and Apply</strong>
+                    <p className="ml-6 text-sm">Adjust any positions, then apply to your budget with one click</p>
+                  </li>
+                </ol>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Available Production Configurations</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {[
+                    { name: 'Feature - Low Budget', budget: 'Under $5M', crew: '25-40 positions' },
+                    { name: 'Feature - Mid Budget', budget: '$5M-$15M', crew: '50-70 positions' },
+                    { name: 'Feature - High Budget', budget: '$15M+', crew: '80-120 positions' },
+                    { name: 'TV Series - Episodic', budget: 'Per episode', crew: '40-60 positions' },
+                    { name: 'Documentary', budget: 'Variable', crew: '10-20 positions' },
+                    { name: 'Commercial', budget: 'Per day', crew: '15-30 positions' },
+                  ].map((config) => (
+                    <div key={config.name} className="border rounded p-3">
+                      <div className="font-medium">{config.name}</div>
+                      <div className="text-sm text-gray-500">{config.budget} | {config.crew}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Crew Optimization</h3>
+                <p className="text-gray-600 mb-4">
+                  The AI can also optimize your existing crew list by analyzing:
+                </p>
+                <ul className="list-disc list-inside text-gray-600 space-y-1">
+                  <li>Positions that could be combined (cost savings)</li>
+                  <li>Missing critical roles that should be added</li>
+                  <li>Schedule optimizations for prep/wrap periods</li>
+                  <li>Union rate compliance verification</li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {/* What-If Analyzer - AI Enhancement */}
+          {activeSection === 'what-if' && (
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <h2 className="text-2xl font-bold text-gray-900">What-If Analyzer</h2>
+                  <span className="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800">AI-Powered</span>
+                </div>
+                <p className="text-gray-600">
+                  Instantly model budget scenarios without touching your working budget. Compare different
+                  approaches side-by-side with AI-powered impact analysis.
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-6">
+                <h3 className="font-semibold text-purple-900 mb-3">The Old Way vs. The New Way</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-white/70 rounded p-4">
+                    <h4 className="font-medium text-red-700 mb-2">Movie Magic Budgeting (Old)</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>- Create duplicate budget files</li>
+                      <li>- Manually change values in each copy</li>
+                      <li>- Export separate reports to compare</li>
+                      <li>- No way to see ripple effects</li>
+                      <li>- Easy to lose track of versions</li>
+                    </ul>
+                  </div>
+                  <div className="bg-white/70 rounded p-4">
+                    <h4 className="font-medium text-green-700 mb-2">What-If Analyzer (New)</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>+ Create scenarios in seconds</li>
+                      <li>+ AI calculates all ripple effects</li>
+                      <li>+ Side-by-side comparison view</li>
+                      <li>+ See impact on fringes, overhead, etc.</li>
+                      <li>+ Apply winning scenario with one click</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">How to Use</h3>
+                <ol className="list-decimal list-inside text-gray-600 space-y-3">
+                  <li>
+                    <strong>Open What-If Analyzer</strong>
+                    <p className="ml-6 text-sm">From your production, click "What-If" in the sidebar</p>
+                  </li>
+                  <li>
+                    <strong>Create a Scenario</strong>
+                    <p className="ml-6 text-sm">Describe what you want to change: "Add 5 shoot days" or "Reduce camera crew by 20%"</p>
+                  </li>
+                  <li>
+                    <strong>Review AI Analysis</strong>
+                    <p className="ml-6 text-sm">See the total impact including all cascading effects (fringes, OT, etc.)</p>
+                  </li>
+                  <li>
+                    <strong>Compare Scenarios</strong>
+                    <p className="ml-6 text-sm">Create multiple scenarios and compare them side-by-side</p>
+                  </li>
+                  <li>
+                    <strong>Apply or Discard</strong>
+                    <p className="ml-6 text-sm">Apply the best scenario to your budget, or discard and try again</p>
+                  </li>
+                </ol>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Example Scenarios</h3>
+                <div className="space-y-3">
+                  {[
+                    { scenario: 'Add 5 shoot days', impact: '+$450,000 (includes OT, fringes, equipment)' },
+                    { scenario: 'Move from LA to Atlanta', impact: '-$1.2M (labor savings + 30% tax credit)' },
+                    { scenario: 'Cut prep week', impact: '-$180,000 (but flags risk of rushed start)' },
+                    { scenario: 'Upgrade to 4K HDR', impact: '+$125,000 (post + equipment + DIT)' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                      <span className="font-medium">{item.scenario}</span>
+                      <span className={`text-sm ${item.impact.startsWith('+') ? 'text-red-600' : 'text-green-600'}`}>
+                        {item.impact}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Variance Prediction</h3>
+                <p className="text-gray-600 mb-4">
+                  The What-If Analyzer includes historical variance predictions based on production type:
+                </p>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-yellow-50 rounded p-3 text-center">
+                    <div className="text-lg font-bold text-yellow-700">+8-12%</div>
+                    <div className="text-xs text-yellow-800">Typical VFX Overrun</div>
+                  </div>
+                  <div className="bg-orange-50 rounded p-3 text-center">
+                    <div className="text-lg font-bold text-orange-700">+5-10%</div>
+                    <div className="text-xs text-orange-800">Location Cost Variance</div>
+                  </div>
+                  <div className="bg-red-50 rounded p-3 text-center">
+                    <div className="text-lg font-bold text-red-700">+3-8%</div>
+                    <div className="text-xs text-red-800">Schedule Overrun Risk</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Budget Guardian - AI Enhancement */}
+          {activeSection === 'guardian' && (
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <h2 className="text-2xl font-bold text-gray-900">Budget Guardian</h2>
+                  <span className="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800">AI-Powered</span>
+                </div>
+                <p className="text-gray-600">
+                  Comprehensive budget auditing with union compliance checking, tax incentive calculations,
+                  and risk flagging. Your AI watchdog for budget accuracy.
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-6">
+                <h3 className="font-semibold text-purple-900 mb-3">The Old Way vs. The New Way</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-white/70 rounded p-4">
+                    <h4 className="font-medium text-red-700 mb-2">Movie Magic Budgeting (Old)</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>- Manually check rates against union PDFs</li>
+                      <li>- Calculate tax incentives by hand</li>
+                      <li>- No automatic risk detection</li>
+                      <li>- Easy to miss compliance issues</li>
+                      <li>- Audit takes hours or days</li>
+                    </ul>
+                  </div>
+                  <div className="bg-white/70 rounded p-4">
+                    <h4 className="font-medium text-green-700 mb-2">Budget Guardian (New)</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>+ Automatic CBA rate verification</li>
+                      <li>+ Tax incentive calculator built-in</li>
+                      <li>+ AI flags potential risks</li>
+                      <li>+ Compliance score at a glance</li>
+                      <li>+ Full audit in under 30 seconds</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">How to Use</h3>
+                <ol className="list-decimal list-inside text-gray-600 space-y-3">
+                  <li>
+                    <strong>Open Budget Guardian</strong>
+                    <p className="ml-6 text-sm">From your production, click "Guardian" in the sidebar</p>
+                  </li>
+                  <li>
+                    <strong>Run Full Audit</strong>
+                    <p className="ml-6 text-sm">Click "Run Audit" to analyze your entire budget</p>
+                  </li>
+                  <li>
+                    <strong>Review Findings</strong>
+                    <p className="ml-6 text-sm">See compliance score, rate violations, and risk flags</p>
+                  </li>
+                  <li>
+                    <strong>Calculate Tax Incentives</strong>
+                    <p className="ml-6 text-sm">Select your shooting location to see estimated credits</p>
+                  </li>
+                  <li>
+                    <strong>Export Audit Report</strong>
+                    <p className="ml-6 text-sm">Generate PDF report for stakeholders and financiers</p>
+                  </li>
+                </ol>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">What Gets Audited</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="border-l-4 border-blue-500 pl-4">
+                    <h4 className="font-medium text-blue-700">Union Compliance</h4>
+                    <p className="text-sm text-gray-600">
+                      Every rate checked against CBA minimums for IATSE, DGA, SAG-AFTRA, WGA, and Teamsters
+                    </p>
+                  </div>
+                  <div className="border-l-4 border-green-500 pl-4">
+                    <h4 className="font-medium text-green-700">Tax Incentives</h4>
+                    <p className="text-sm text-gray-600">
+                      Automatic calculation of qualified spend and estimated credits by location
+                    </p>
+                  </div>
+                  <div className="border-l-4 border-yellow-500 pl-4">
+                    <h4 className="font-medium text-yellow-700">Risk Factors</h4>
+                    <p className="text-sm text-gray-600">
+                      AI flags items with high variance risk based on historical data
+                    </p>
+                  </div>
+                  <div className="border-l-4 border-purple-500 pl-4">
+                    <h4 className="font-medium text-purple-700">Missing Items</h4>
+                    <p className="text-sm text-gray-600">
+                      Identifies commonly forgotten line items and required positions
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Tax Incentive Programs</h3>
+                <p className="text-gray-600 mb-4">Built-in calculator for major programs:</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {['Georgia (30%)', 'New Mexico (35%)', 'California (25%)', 'New York (35%)',
+                    'Louisiana (40%)', 'UK (45%)', 'Canada (25-45%)', 'Australia (40%)'].map((loc) => (
+                    <div key={loc} className="bg-green-50 text-green-800 rounded p-2 text-sm text-center">
+                      {loc}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Nested Line Items - Modern Feature */}
+          {activeSection === 'nested-items' && (
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <h2 className="text-2xl font-bold text-gray-900">Nested Line Items</h2>
+                  <span className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800">Modern Feature</span>
+                </div>
+                <p className="text-gray-600">
+                  Break down complex line items into visible sub-components. See exactly how totals
+                  are calculated with the interactive Calculation Panel.
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-6">
+                <h3 className="font-semibold text-blue-900 mb-3">The Old Way vs. The New Way</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-white/70 rounded p-4">
+                    <h4 className="font-medium text-red-700 mb-2">MMB "4th Level" (Old)</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>- Hidden detail level, hard to access</li>
+                      <li>- Opens in separate modal/spreadsheet</li>
+                      <li>- Easy to forget details exist</li>
+                      <li>- No visual hierarchy in main view</li>
+                      <li>- Confusing for new users</li>
+                    </ul>
+                  </div>
+                  <div className="bg-white/70 rounded p-4">
+                    <h4 className="font-medium text-green-700 mb-2">Nested Line Items (New)</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>+ Visible tree structure with expand/collapse</li>
+                      <li>+ Click any row to see calculation panel</li>
+                      <li>+ Add sub-items directly inline</li>
+                      <li>+ Clear visual hierarchy</li>
+                      <li>+ Intuitive for all users</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">How to Use</h3>
+                <ol className="list-decimal list-inside text-gray-600 space-y-3">
+                  <li>
+                    <strong>Click Any Line Item</strong>
+                    <p className="ml-6 text-sm">In the budget editor, click any row to select it</p>
+                  </li>
+                  <li>
+                    <strong>View Calculation Panel</strong>
+                    <p className="ml-6 text-sm">The right sidebar shows the calculation breakdown</p>
+                  </li>
+                  <li>
+                    <strong>Add Sub-Items</strong>
+                    <p className="ml-6 text-sm">Click "Add Sub-Item" to break down the line item further</p>
+                  </li>
+                  <li>
+                    <strong>Expand/Collapse</strong>
+                    <p className="ml-6 text-sm">Use the arrow icons to show/hide nested items</p>
+                  </li>
+                </ol>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Example: Breaking Down a Position</h3>
+                <div className="bg-gray-50 rounded p-4 font-mono text-sm">
+                  <div className="text-blue-600">510 - Unit Production Manager ... $108,000</div>
+                  <div className="text-gray-600 ml-4">├─ Prep (4 weeks @ $4,500/wk) ... $18,000</div>
+                  <div className="text-gray-600 ml-4">├─ Shoot (12 weeks @ $5,000/wk) ... $60,000</div>
+                  <div className="text-gray-600 ml-4">├─ Wrap (2 weeks @ $4,500/wk) ... $9,000</div>
+                  <div className="text-gray-600 ml-4">└─ Kit Rental (18 weeks @ $500/wk) ... $9,000</div>
+                  <div className="text-gray-400 ml-4 mt-2">+ Fringes (25%) ... $21,000</div>
+                  <div className="text-green-600 mt-2 font-bold">Total with Fringes: $129,000</div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Calculation Panel Features</h3>
+                <ul className="space-y-2 text-gray-600">
+                  <li>- <strong>Sub-Items List:</strong> See all components that make up the total</li>
+                  <li>- <strong>Quick Calculator:</strong> Day rate to weekly, hourly to flat conversions</li>
+                  <li>- <strong>Formula View:</strong> See exactly how the total is calculated</li>
+                  <li>- <strong>Add Child:</strong> Create new sub-items without leaving the view</li>
+                  <li>- <strong>Notes:</strong> Add context and justification for the line item</li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {/* Dynamic Budget Views - Modern Feature */}
+          {activeSection === 'dynamic-views' && (
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <h2 className="text-2xl font-bold text-gray-900">Dynamic Budget Views</h2>
+                  <span className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800">Modern Feature</span>
+                </div>
+                <p className="text-gray-600">
+                  Instantly filter and view your budget from any angle. No more creating separate
+                  "sub-budgets" - just switch views with one click.
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-6">
+                <h3 className="font-semibold text-blue-900 mb-3">The Old Way vs. The New Way</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-white/70 rounded p-4">
+                    <h4 className="font-medium text-red-700 mb-2">MMB Sub-Budgets (Old)</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>- Create separate file for each view</li>
+                      <li>- Manually maintain sync between files</li>
+                      <li>- Changes do not flow between views</li>
+                      <li>- Version control nightmare</li>
+                      <li>- Limited to pre-defined groupings</li>
+                    </ul>
+                  </div>
+                  <div className="bg-white/70 rounded p-4">
+                    <h4 className="font-medium text-green-700 mb-2">Dynamic Views (New)</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>+ Single source of truth</li>
+                      <li>+ Real-time filtering</li>
+                      <li>+ Any combination of filters</li>
+                      <li>+ Save custom views for reuse</li>
+                      <li>+ Changes reflect everywhere instantly</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">How to Use</h3>
+                <ol className="list-decimal list-inside text-gray-600 space-y-3">
+                  <li>
+                    <strong>Open Views</strong>
+                    <p className="ml-6 text-sm">From your production, click "Views" in the sidebar</p>
+                  </li>
+                  <li>
+                    <strong>Select a Preset View</strong>
+                    <p className="ml-6 text-sm">Choose from ATL Only, BTL Only, Labor Only, Post Production, etc.</p>
+                  </li>
+                  <li>
+                    <strong>Or Create Custom Filters</strong>
+                    <p className="ml-6 text-sm">Filter by department, union status, category range, or search term</p>
+                  </li>
+                  <li>
+                    <strong>Save Your View</strong>
+                    <p className="ml-6 text-sm">Click "Save View" to reuse this filter combination later</p>
+                  </li>
+                </ol>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Preset Views</h3>
+                <div className="grid md:grid-cols-2 gap-3">
+                  {[
+                    { name: 'Above the Line', desc: 'Categories 100-400 (Story, Talent, Direction, Producing)' },
+                    { name: 'Below the Line', desc: 'Categories 500-900 (Crew, Equipment, Post)' },
+                    { name: 'Labor Only', desc: 'All crew and talent costs (excludes equipment/materials)' },
+                    { name: 'Post Production', desc: 'Categories 800+ (Editorial, VFX, Sound, Music)' },
+                    { name: 'Union Positions', desc: 'Only positions flagged as union' },
+                    { name: 'Non-Union', desc: 'Non-union positions and general expenses' },
+                    { name: 'Physical Production', desc: 'Categories 500-700 (on-set crew and equipment)' },
+                    { name: 'All Items', desc: 'Complete budget with no filters' },
+                  ].map((view) => (
+                    <div key={view.name} className="border rounded p-3">
+                      <div className="font-medium">{view.name}</div>
+                      <div className="text-sm text-gray-500">{view.desc}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">View Features</h3>
+                <ul className="space-y-2 text-gray-600">
+                  <li>- <strong>Summary Cards:</strong> See totals for your current view at a glance</li>
+                  <li>- <strong>Department Breakdown:</strong> Visual chart showing costs by department</li>
+                  <li>- <strong>Export View:</strong> Export just the filtered items to PDF</li>
+                  <li>- <strong>Share View:</strong> Share a specific view with stakeholders</li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {/* Access Control - Modern Feature */}
+          {activeSection === 'access-control' && (
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <h2 className="text-2xl font-bold text-gray-900">Access & Sharing</h2>
+                  <span className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800">Modern Feature</span>
+                </div>
+                <p className="text-gray-600">
+                  Role-based access control with secure share links. Grant the right permissions
+                  to the right people without sharing passwords.
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-6">
+                <h3 className="font-semibold text-blue-900 mb-3">The Old Way vs. The New Way</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-white/70 rounded p-4">
+                    <h4 className="font-medium text-red-700 mb-2">MMB Password Protection (Old)</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>- Single password for entire file</li>
+                      <li>- All or nothing access</li>
+                      <li>- Passwords shared via email/text</li>
+                      <li>- No way to revoke individual access</li>
+                      <li>- No audit trail of who viewed what</li>
+                    </ul>
+                  </div>
+                  <div className="bg-white/70 rounded p-4">
+                    <h4 className="font-medium text-green-700 mb-2">Role-Based Access (New)</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>+ Owner, Editor, Viewer, Commenter roles</li>
+                      <li>+ Granular permissions per person</li>
+                      <li>+ Secure token-based share links</li>
+                      <li>+ Revoke access with one click</li>
+                      <li>+ Full activity log of all access</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">How to Use</h3>
+                <ol className="list-decimal list-inside text-gray-600 space-y-3">
+                  <li>
+                    <strong>Open Access & Sharing</strong>
+                    <p className="ml-6 text-sm">From your production, click "Access" in the sidebar</p>
+                  </li>
+                  <li>
+                    <strong>Invite Team Members</strong>
+                    <p className="ml-6 text-sm">Enter email addresses and select their role (Owner, Editor, Viewer, Commenter)</p>
+                  </li>
+                  <li>
+                    <strong>Or Create a Share Link</strong>
+                    <p className="ml-6 text-sm">Generate a link with specific permissions, optional expiration, and use limits</p>
+                  </li>
+                  <li>
+                    <strong>Monitor Access</strong>
+                    <p className="ml-6 text-sm">View the activity log to see who accessed the budget and when</p>
+                  </li>
+                </ol>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Role Permissions</h3>
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="text-left p-3 border">Permission</th>
+                      <th className="text-center p-3 border">Owner</th>
+                      <th className="text-center p-3 border">Editor</th>
+                      <th className="text-center p-3 border">Viewer</th>
+                      <th className="text-center p-3 border">Commenter</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td className="p-3 border">View budget</td><td className="text-center p-3 border text-green-600">Yes</td><td className="text-center p-3 border text-green-600">Yes</td><td className="text-center p-3 border text-green-600">Yes</td><td className="text-center p-3 border text-green-600">Yes</td></tr>
+                    <tr><td className="p-3 border">Add comments</td><td className="text-center p-3 border text-green-600">Yes</td><td className="text-center p-3 border text-green-600">Yes</td><td className="text-center p-3 border text-red-600">No</td><td className="text-center p-3 border text-green-600">Yes</td></tr>
+                    <tr><td className="p-3 border">Edit line items</td><td className="text-center p-3 border text-green-600">Yes</td><td className="text-center p-3 border text-green-600">Yes</td><td className="text-center p-3 border text-red-600">No</td><td className="text-center p-3 border text-red-600">No</td></tr>
+                    <tr><td className="p-3 border">Delete budget</td><td className="text-center p-3 border text-green-600">Yes</td><td className="text-center p-3 border text-red-600">No</td><td className="text-center p-3 border text-red-600">No</td><td className="text-center p-3 border text-red-600">No</td></tr>
+                    <tr><td className="p-3 border">Manage access</td><td className="text-center p-3 border text-green-600">Yes</td><td className="text-center p-3 border text-red-600">No</td><td className="text-center p-3 border text-red-600">No</td><td className="text-center p-3 border text-red-600">No</td></tr>
+                    <tr><td className="p-3 border">Create share links</td><td className="text-center p-3 border text-green-600">Yes</td><td className="text-center p-3 border text-red-600">No</td><td className="text-center p-3 border text-red-600">No</td><td className="text-center p-3 border text-red-600">No</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Share Link Options</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded">
+                    <span className="text-2xl">🔗</span>
+                    <div>
+                      <div className="font-medium">Permission Level</div>
+                      <div className="text-sm text-gray-600">Choose what role the link grants (Viewer, Commenter, etc.)</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded">
+                    <span className="text-2xl">⏰</span>
+                    <div>
+                      <div className="font-medium">Expiration</div>
+                      <div className="text-sm text-gray-600">Set link to expire after 24 hours, 7 days, 30 days, or never</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded">
+                    <span className="text-2xl">🔢</span>
+                    <div>
+                      <div className="font-medium">Use Limit</div>
+                      <div className="text-sm text-gray-600">Limit link to 1, 5, 10, or unlimited uses</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

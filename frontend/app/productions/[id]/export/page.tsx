@@ -10,6 +10,17 @@ interface Production {
   shooting_location: string;
 }
 
+interface ExportOptions {
+  format: 'topsheet' | 'detail' | 'full' | 'comparison' | 'view';
+  includeNotes: boolean;
+  includeFringes: boolean;
+  includeVariance: boolean;
+  viewFilter?: string;
+  headerStyle: 'standard' | 'minimal' | 'detailed';
+  showZeroItems: boolean;
+  groupByDepartment: boolean;
+}
+
 export default function ExportPage() {
   const params = useParams();
   const router = useRouter();
@@ -19,38 +30,67 @@ export default function ExportPage() {
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [exportFormat, setExportFormat] = useState<'topsheet' | 'detail' | 'full'>('topsheet');
+  const [options, setOptions] = useState<ExportOptions>({
+    format: 'topsheet',
+    includeNotes: false,
+    includeFringes: true,
+    includeVariance: false,
+    headerStyle: 'standard',
+    showZeroItems: false,
+    groupByDepartment: true,
+  });
+  const [savedViews, setSavedViews] = useState<Array<{ id: string; name: string }>>([]);
 
   useEffect(() => {
-    const fetchProduction = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/productions/${productionId}`
-        );
-        if (res.ok) {
-          const data = await res.json();
+        const [prodRes, viewsRes] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/productions/${productionId}`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/productions/${productionId}/views/saved`)
+        ]);
+        if (prodRes.ok) {
+          const data = await prodRes.json();
           setProduction(data.data);
         }
+        if (viewsRes.ok) {
+          const viewsData = await viewsRes.json();
+          setSavedViews(viewsData.data || []);
+        }
       } catch (err) {
-        console.error('Error fetching production:', err);
+        console.error('Error fetching data:', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchProduction();
+    fetchData();
   }, [productionId]);
 
   const handleExportPDF = async () => {
     setExporting(true);
     try {
-      const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/productions/${productionId}/export/pdf?format=${exportFormat}`;
-
-      // Open in new tab to trigger download
+      const params = new URLSearchParams({
+        format: options.format,
+        includeNotes: options.includeNotes.toString(),
+        includeFringes: options.includeFringes.toString(),
+        includeVariance: options.includeVariance.toString(),
+        headerStyle: options.headerStyle,
+        showZeroItems: options.showZeroItems.toString(),
+        groupByDepartment: options.groupByDepartment.toString(),
+      });
+      if (options.viewFilter) {
+        params.append('viewFilter', options.viewFilter);
+      }
+      const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/productions/${productionId}/export/pdf?${params.toString()}`;
       window.open(url, '_blank');
     } catch (err) {
       console.error('Export error:', err);
     } finally {
       setExporting(false);
     }
+  };
+
+  const updateOption = <K extends keyof ExportOptions>(key: K, value: ExportOptions[K]) => {
+    setOptions(prev => ({ ...prev, [key]: value }));
   };
 
   if (loading) {
@@ -88,67 +128,126 @@ export default function ExportPage() {
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         {/* Export Format Selection */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">PDF Export Options</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Export Format</h2>
 
-          <div className="space-y-4">
-            {/* Topsheet */}
-            <label className="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-              <input
-                type="radio"
-                name="format"
-                value="topsheet"
-                checked={exportFormat === 'topsheet'}
-                onChange={() => setExportFormat('topsheet')}
-                className="mt-1 mr-4"
-              />
-              <div>
-                <div className="font-medium text-gray-900">Topsheet Only</div>
-                <div className="text-sm text-gray-500">
-                  Summary view with category totals. Ideal for executive review and quick budget overview.
-                </div>
-                <div className="text-xs text-gray-400 mt-1">Typically 1-2 pages</div>
-              </div>
-            </label>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+            {[
+              { id: 'topsheet', label: 'Topsheet', desc: '1-2 pages' },
+              { id: 'detail', label: 'Detail', desc: 'Full breakdown' },
+              { id: 'full', label: 'Complete', desc: 'With notes' },
+              { id: 'comparison', label: 'Variance', desc: 'Orig vs Current' },
+              { id: 'view', label: 'Custom View', desc: 'Filtered data' },
+            ].map((fmt) => (
+              <button
+                key={fmt.id}
+                onClick={() => updateOption('format', fmt.id as ExportOptions['format'])}
+                className={`p-3 rounded-lg border-2 text-center transition-colors ${
+                  options.format === fmt.id
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="font-medium text-sm">{fmt.label}</div>
+                <div className="text-xs text-gray-500">{fmt.desc}</div>
+              </button>
+            ))}
+          </div>
 
-            {/* Detail */}
-            <label className="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-              <input
-                type="radio"
-                name="format"
-                value="detail"
-                checked={exportFormat === 'detail'}
-                onChange={() => setExportFormat('detail')}
-                className="mt-1 mr-4"
-              />
-              <div>
-                <div className="font-medium text-gray-900">Topsheet + Detail</div>
-                <div className="text-sm text-gray-500">
-                  Full budget detail with all line items organized by category.
-                  Includes account codes, descriptions, rates, quantities, and totals.
-                </div>
-                <div className="text-xs text-gray-400 mt-1">Variable length based on budget size</div>
-              </div>
-            </label>
+          {/* View Selection (if custom view) */}
+          {options.format === 'view' && (
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Select Saved View</label>
+              <select
+                value={options.viewFilter || ''}
+                onChange={(e) => updateOption('viewFilter', e.target.value)}
+                className="w-full p-2 border rounded"
+              >
+                <option value="">-- Select a view --</option>
+                <option value="atl">Above the Line</option>
+                <option value="btl">Below the Line</option>
+                <option value="labor">Labor Only</option>
+                <option value="post">Post Production</option>
+                {savedViews.map((view) => (
+                  <option key={view.id} value={view.id}>{view.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
-            {/* Full */}
-            <label className="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-              <input
-                type="radio"
-                name="format"
-                value="full"
-                checked={exportFormat === 'full'}
-                onChange={() => setExportFormat('full')}
-                className="mt-1 mr-4"
-              />
-              <div>
-                <div className="font-medium text-gray-900">Complete Budget Package</div>
-                <div className="text-sm text-gray-500">
-                  Comprehensive export including topsheet, full detail pages, and all budget notes.
-                  Best for archival and complete documentation.
-                </div>
-                <div className="text-xs text-gray-400 mt-1">Full comprehensive report</div>
+          {/* Export Options */}
+          <div className="border-t pt-6 space-y-4">
+            <h3 className="font-medium text-gray-900">Export Options</h3>
+
+            <div className="grid grid-cols-2 gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={options.includeFringes}
+                  onChange={(e) => updateOption('includeFringes', e.target.checked)}
+                  className="rounded"
+                />
+                <span className="text-sm">Include fringe breakdown</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={options.includeVariance}
+                  onChange={(e) => updateOption('includeVariance', e.target.checked)}
+                  className="rounded"
+                />
+                <span className="text-sm">Show variance column</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={options.includeNotes}
+                  onChange={(e) => updateOption('includeNotes', e.target.checked)}
+                  className="rounded"
+                />
+                <span className="text-sm">Include line item notes</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={options.showZeroItems}
+                  onChange={(e) => updateOption('showZeroItems', e.target.checked)}
+                  className="rounded"
+                />
+                <span className="text-sm">Show zero-value items</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={options.groupByDepartment}
+                  onChange={(e) => updateOption('groupByDepartment', e.target.checked)}
+                  className="rounded"
+                />
+                <span className="text-sm">Group by department</span>
+              </label>
+            </div>
+
+            <div className="pt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Header Style</label>
+              <div className="flex gap-3">
+                {[
+                  { id: 'minimal', label: 'Minimal' },
+                  { id: 'standard', label: 'Standard' },
+                  { id: 'detailed', label: 'Detailed' },
+                ].map((style) => (
+                  <button
+                    key={style.id}
+                    onClick={() => updateOption('headerStyle', style.id as ExportOptions['headerStyle'])}
+                    className={`px-4 py-2 rounded border text-sm ${
+                      options.headerStyle === style.id
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    {style.label}
+                  </button>
+                ))}
               </div>
-            </label>
+            </div>
           </div>
 
           {/* Export Button */}

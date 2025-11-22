@@ -122,7 +122,7 @@ export default function Home() {
       {/* Quick Actions */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <a
             href="/productions/new"
             className="block p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-center font-medium transition"
@@ -131,7 +131,7 @@ export default function Home() {
           </a>
           <a
             href="/rate-cards"
-            className="block p-4 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-center font-medium transition"
+            className="block p-4 bg-gray-400 hover:bg-gray-500 text-white rounded-lg text-center font-medium transition"
           >
             Browse Rate Cards
           </a>
@@ -147,19 +147,19 @@ export default function Home() {
           >
             Compare Locations
           </a>
-        </div>
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <a
-            href="/guide"
-            className="block p-4 bg-white hover:bg-gray-50 text-gray-700 rounded-lg text-center font-medium transition border border-gray-200"
-          >
-            View User Guide
-          </a>
           <a
             href="/guild-directory"
-            className="block p-4 bg-white hover:bg-gray-50 text-gray-700 rounded-lg text-center font-medium transition border border-gray-200"
+            className="block p-4 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-center font-medium transition"
           >
-            Guild & Union Directory
+            Guild Directory
+          </a>
+        </div>
+        <div className="mt-4">
+          <a
+            href="/guide"
+            className="block p-4 bg-gray-900 hover:bg-black text-white rounded-lg text-center font-medium transition"
+          >
+            View User Guide
           </a>
         </div>
       </div>

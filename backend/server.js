@@ -10,6 +10,11 @@ const db = require('./db');
 const { parseFormula, extractGlobalNames, calculateLineItemTotal } = require('./formula-parser');
 const { requestLogger, errorLogger, createLogger } = require('./logger');
 const { generateBudget, parseNaturalLanguage } = require('./ai-budget-generator');
+const { recommendCrew, optimizeCrew, parseCrewRequest, PRODUCTION_CONFIGS } = require('./smart-crew-builder');
+const { analyzeScenario, compareScenarios, predictVariance, summarizeScenario, parseScenarioRequest, HISTORICAL_VARIANCE } = require('./what-if-analyzer');
+const { auditBudget, checkRate, calculateTaxIncentives, getTaxIncentivePrograms, summarizeAudit, TAX_INCENTIVES, COMPLIANCE_RULES } = require('./budget-guardian');
+const { VIEW_TEMPLATES, getFilteredView, saveView, getSavedViews, updateView, deleteView, getFilterOptions, ensureViewsTable } = require('./budget-views');
+const { ROLES, ensureAccessTables, grantAccess, revokeAccess, getProductionAccess, checkPermission, getUserRole, createShareLink, validateShareLink, getShareLinks, deactivateShareLink, logAccess, getAccessLog, getUserProductions } = require('./access-control');
 
 // Create context-specific loggers
 const appLogger = createLogger('APP');
@@ -3472,6 +3477,865 @@ app.post('/api/ai/parse', async (req, res) => {
 });
 
 // ============================================================================
+// SMART CREW BUILDER API
+// ============================================================================
+
+// Get available production types and their configurations
+app.get('/api/ai/crew/production-types', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      data: PRODUCTION_CONFIGS
+    });
+  } catch (error) {
+    aiLogger.error('Failed to get production types', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Recommend crew based on production parameters
+app.post('/api/ai/crew/recommend', async (req, res) => {
+  try {
+    const { prompt, productionType, budget, shootDays, location, episodeCount } = req.body;
+
+    aiLogger.info('Crew recommendation request', { productionType, budget, shootDays, location });
+
+    // Parse natural language prompt if provided
+    let params = {};
+    if (prompt) {
+      params = parseCrewRequest(prompt);
+    }
+
+    // Override with explicit parameters
+    if (productionType) params.productionType = productionType;
+    if (budget) params.budget = budget;
+    if (shootDays) params.shootDays = shootDays;
+    if (location) params.location = location;
+    if (episodeCount) params.episodeCount = episodeCount;
+
+    const result = await recommendCrew(db, params);
+
+    res.json(result);
+  } catch (error) {
+    aiLogger.error('Crew recommendation failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Parse crew request (preview mode)
+app.post('/api/ai/crew/parse', async (req, res) => {
+  try {
+    const { prompt } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({
+        success: false,
+        error: 'Prompt is required'
+      });
+    }
+
+    const parsed = parseCrewRequest(prompt);
+
+    res.json({
+      success: true,
+      parsed
+    });
+  } catch (error) {
+    aiLogger.error('Crew parse failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Optimize existing crew for budget constraints
+app.post('/api/ai/crew/optimize', async (req, res) => {
+  try {
+    const { currentCrew, targetBudget, priorities } = req.body;
+
+    if (!currentCrew || !targetBudget) {
+      return res.status(400).json({
+        success: false,
+        error: 'currentCrew and targetBudget are required'
+      });
+    }
+
+    aiLogger.info('Crew optimization request', {
+      positionCount: currentCrew.length,
+      targetBudget
+    });
+
+    const result = await optimizeCrew(db, currentCrew, targetBudget, priorities || []);
+
+    res.json({
+      success: true,
+      ...result
+    });
+  } catch (error) {
+    aiLogger.error('Crew optimization failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Apply crew recommendations to production budget
+app.post('/api/ai/crew/apply/:productionId', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const { departments, applyFringes = true } = req.body;
+
+    if (!departments || !Array.isArray(departments)) {
+      return res.status(400).json({
+        success: false,
+        error: 'departments array is required'
+      });
+    }
+
+    aiLogger.info('Applying crew to production', {
+      productionId,
+      departmentCount: departments.length
+    });
+
+    let itemsCreated = 0;
+
+    for (const dept of departments) {
+      for (const position of dept.positions || []) {
+        // Insert line item for each position
+        await db.query(
+          `INSERT INTO budget_line_items (
+            production_id, account_code, description, quantity, rate,
+            subtotal, fringes, total, notes
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+          [
+            productionId,
+            position.accountCode || '0000',
+            position.position,
+            position.weeks * position.quantity,
+            position.weeklyRate,
+            position.baseCost,
+            applyFringes ? position.fringes : 0,
+            applyFringes ? position.total : position.baseCost,
+            `${position.union} - ${position.quantity} × ${position.weeks} weeks`
+          ]
+        );
+        itemsCreated++;
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Applied ${itemsCreated} crew positions to budget`,
+      itemsCreated
+    });
+  } catch (error) {
+    aiLogger.error('Failed to apply crew to production', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// ============================================================================
+// WHAT-IF ANALYZER API - Predictive Variance and Scenario Modeling
+// ============================================================================
+
+// Analyze a single what-if scenario
+app.post('/api/ai/whatif/analyze', async (req, res) => {
+  try {
+    const { baseline, scenario } = req.body;
+
+    if (!baseline || !scenario) {
+      return res.status(400).json({
+        success: false,
+        error: 'baseline and scenario are required'
+      });
+    }
+
+    aiLogger.info('Analyzing what-if scenario', {
+      scenarioName: scenario.name,
+      baselineBudget: baseline.totalBudget
+    });
+
+    const analysis = analyzeScenario(baseline, scenario, db);
+
+    res.json({
+      success: true,
+      analysis,
+      summary: summarizeScenario(analysis)
+    });
+  } catch (error) {
+    aiLogger.error('What-if analysis failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Compare multiple scenarios
+app.post('/api/ai/whatif/compare', async (req, res) => {
+  try {
+    const { baseline, scenarios } = req.body;
+
+    if (!baseline || !scenarios || !Array.isArray(scenarios)) {
+      return res.status(400).json({
+        success: false,
+        error: 'baseline and scenarios array are required'
+      });
+    }
+
+    aiLogger.info('Comparing what-if scenarios', {
+      count: scenarios.length,
+      baselineBudget: baseline.totalBudget
+    });
+
+    const comparison = compareScenarios(baseline, scenarios, db);
+
+    res.json({
+      success: true,
+      comparison
+    });
+  } catch (error) {
+    aiLogger.error('Scenario comparison failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Predict variance for a production
+app.post('/api/ai/whatif/predict-variance', async (req, res) => {
+  try {
+    const { baseline } = req.body;
+
+    if (!baseline) {
+      return res.status(400).json({
+        success: false,
+        error: 'baseline is required'
+      });
+    }
+
+    aiLogger.info('Predicting variance', {
+      productionType: baseline.productionType,
+      totalBudget: baseline.totalBudget
+    });
+
+    const prediction = predictVariance(baseline, db);
+
+    res.json({
+      success: true,
+      prediction
+    });
+  } catch (error) {
+    aiLogger.error('Variance prediction failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Parse natural language scenario request
+app.post('/api/ai/whatif/parse', async (req, res) => {
+  try {
+    const { request } = req.body;
+
+    if (!request) {
+      return res.status(400).json({
+        success: false,
+        error: 'request text is required'
+      });
+    }
+
+    aiLogger.info('Parsing scenario request', { request });
+
+    const scenario = parseScenarioRequest(request);
+
+    res.json({
+      success: true,
+      scenario
+    });
+  } catch (error) {
+    aiLogger.error('Scenario parsing failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Get historical variance data by production type
+app.get('/api/ai/whatif/historical-variance', (req, res) => {
+  try {
+    res.json({
+      success: true,
+      data: HISTORICAL_VARIANCE
+    });
+  } catch (error) {
+    aiLogger.error('Failed to get historical variance', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Analyze what-if for a specific production
+app.post('/api/ai/whatif/production/:productionId', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const { scenario } = req.body;
+
+    // Get current production data as baseline
+    const productionResult = await db.query(
+      'SELECT * FROM productions WHERE id = $1',
+      [productionId]
+    );
+
+    if (productionResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Production not found'
+      });
+    }
+
+    const production = productionResult.rows[0];
+
+    // Get current budget totals
+    const budgetResult = await db.query(
+      `SELECT COALESCE(SUM(total), 0) as total_budget
+       FROM budget_line_items WHERE production_id = $1`,
+      [productionId]
+    );
+
+    // Build baseline from production data
+    const baseline = {
+      totalBudget: parseFloat(budgetResult.rows[0].total_budget) || production.budget || 10000000,
+      productionType: production.production_type || 'theatrical',
+      shootDays: production.shoot_days || 30,
+      locations: production.location_count || 5,
+      crewSize: production.crew_size || 50,
+      principalCast: production.principal_cast || 5,
+      contingency: production.contingency || 0.10
+    };
+
+    aiLogger.info('Analyzing what-if for production', {
+      productionId,
+      baseline
+    });
+
+    const analysis = analyzeScenario(baseline, scenario, db);
+
+    res.json({
+      success: true,
+      production: {
+        id: production.id,
+        name: production.name,
+        type: production.production_type
+      },
+      baseline,
+      analysis,
+      summary: summarizeScenario(analysis)
+    });
+  } catch (error) {
+    aiLogger.error('Production what-if analysis failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// ============================================================================
+// NESTED LINE ITEMS API - Modern replacement for hidden 4th Level
+// ============================================================================
+
+// Get line items with their children (tree structure)
+app.get('/api/productions/:productionId/line-items/tree', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+
+    // Get all line items for this production
+    const result = await db.query(`
+      SELECT * FROM budget_line_items
+      WHERE production_id = $1
+      ORDER BY account_code, sort_order, created_at
+    `, [productionId]);
+
+    // Build tree structure
+    const items = result.rows;
+    const itemMap = new Map();
+    const rootItems = [];
+
+    // First pass: create map
+    items.forEach(item => {
+      itemMap.set(item.id, { ...item, children: [] });
+    });
+
+    // Second pass: build tree
+    items.forEach(item => {
+      const node = itemMap.get(item.id);
+      if (item.parent_id && itemMap.has(item.parent_id)) {
+        itemMap.get(item.parent_id).children.push(node);
+      } else {
+        rootItems.push(node);
+      }
+    });
+
+    res.json({
+      success: true,
+      items: rootItems,
+      totalCount: items.length
+    });
+  } catch (error) {
+    apiLogger.error('Failed to get line items tree', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Add a child line item to a parent
+app.post('/api/line-items/:parentId/children', async (req, res) => {
+  try {
+    const { parentId } = req.params;
+    const { description, quantity, rate, notes } = req.body;
+
+    // Get parent item
+    const parentResult = await db.query(
+      'SELECT * FROM budget_line_items WHERE id = $1',
+      [parentId]
+    );
+
+    if (parentResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Parent item not found' });
+    }
+
+    const parent = parentResult.rows[0];
+    const subtotal = (quantity || 0) * (rate || 0);
+
+    // Create child item
+    const result = await db.query(`
+      INSERT INTO budget_line_items (
+        production_id, parent_id, account_code, description,
+        quantity, rate, subtotal, total, notes, sort_order
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $7, $8,
+        (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM budget_line_items WHERE parent_id = $2)
+      )
+      RETURNING *
+    `, [
+      parent.production_id,
+      parentId,
+      parent.account_code,
+      description,
+      quantity || 0,
+      rate || 0,
+      subtotal,
+      notes || ''
+    ]);
+
+    // Mark parent as having children
+    await db.query(
+      'UPDATE budget_line_items SET is_parent = true WHERE id = $1',
+      [parentId]
+    );
+
+    // Recalculate parent total from children
+    await recalculateParentTotal(parentId);
+
+    res.json({
+      success: true,
+      item: result.rows[0]
+    });
+  } catch (error) {
+    apiLogger.error('Failed to add child line item', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get children of a line item
+app.get('/api/line-items/:parentId/children', async (req, res) => {
+  try {
+    const { parentId } = req.params;
+
+    const result = await db.query(`
+      SELECT * FROM budget_line_items
+      WHERE parent_id = $1
+      ORDER BY sort_order, created_at
+    `, [parentId]);
+
+    res.json({
+      success: true,
+      children: result.rows
+    });
+  } catch (error) {
+    apiLogger.error('Failed to get children', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update calculation breakdown for a line item
+app.put('/api/line-items/:id/calculation', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { calculation_breakdown } = req.body;
+
+    const result = await db.query(`
+      UPDATE budget_line_items
+      SET calculation_breakdown = $1
+      WHERE id = $2
+      RETURNING *
+    `, [JSON.stringify(calculation_breakdown), id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Line item not found' });
+    }
+
+    res.json({
+      success: true,
+      item: result.rows[0]
+    });
+  } catch (error) {
+    apiLogger.error('Failed to update calculation', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get calculation breakdown for a line item
+app.get('/api/line-items/:id/calculation', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db.query(`
+      SELECT id, description, quantity, rate, subtotal, fringes, total,
+             calculation_breakdown, is_parent
+      FROM budget_line_items WHERE id = $1
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Line item not found' });
+    }
+
+    const item = result.rows[0];
+
+    // If has children, also get children summary
+    let childrenSummary = null;
+    if (item.is_parent) {
+      const childResult = await db.query(`
+        SELECT description, quantity, rate, subtotal, total
+        FROM budget_line_items WHERE parent_id = $1
+        ORDER BY sort_order
+      `, [id]);
+      childrenSummary = childResult.rows;
+    }
+
+    res.json({
+      success: true,
+      item,
+      childrenSummary,
+      breakdown: item.calculation_breakdown || generateDefaultBreakdown(item)
+    });
+  } catch (error) {
+    apiLogger.error('Failed to get calculation', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Recalculate parent total from children
+app.post('/api/line-items/:parentId/recalculate', async (req, res) => {
+  try {
+    const { parentId } = req.params;
+    const newTotal = await recalculateParentTotal(parentId);
+
+    res.json({
+      success: true,
+      newTotal
+    });
+  } catch (error) {
+    apiLogger.error('Failed to recalculate', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Helper function to recalculate parent total
+async function recalculateParentTotal(parentId) {
+  const childrenResult = await db.query(
+    'SELECT SUM(total) as total FROM budget_line_items WHERE parent_id = $1',
+    [parentId]
+  );
+
+  const childrenTotal = parseFloat(childrenResult.rows[0].total) || 0;
+
+  await db.query(
+    'UPDATE budget_line_items SET subtotal = $1, total = $1 WHERE id = $2',
+    [childrenTotal, parentId]
+  );
+
+  return childrenTotal;
+}
+
+// Helper function to generate default breakdown
+function generateDefaultBreakdown(item) {
+  return {
+    type: 'simple',
+    steps: [
+      { label: 'Quantity', value: item.quantity, operation: 'base' },
+      { label: 'Rate', value: item.rate, operation: 'multiply' },
+      { label: 'Subtotal', value: item.subtotal, operation: 'result' }
+    ],
+    fringes: item.fringes ? {
+      rate: item.fringes / item.subtotal,
+      amount: item.fringes
+    } : null,
+    total: item.total
+  };
+}
+
+// ============================================================================
+// BUDGET GUARDIAN API - Compliance Auditing and Tax Incentives
+// ============================================================================
+
+// Audit a production budget for compliance
+app.post('/api/ai/guardian/audit/:productionId', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+
+    // Get production
+    const productionResult = await db.query(
+      'SELECT * FROM productions WHERE id = $1',
+      [productionId]
+    );
+
+    if (productionResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Production not found'
+      });
+    }
+
+    const production = productionResult.rows[0];
+
+    // Get all line items
+    const lineItemsResult = await db.query(
+      'SELECT * FROM budget_line_items WHERE production_id = $1',
+      [productionId]
+    );
+
+    aiLogger.info('Running budget audit', {
+      productionId,
+      lineItems: lineItemsResult.rows.length
+    });
+
+    const audit = await auditBudget(production, lineItemsResult.rows, db);
+
+    res.json({
+      success: true,
+      audit,
+      summary: summarizeAudit(audit)
+    });
+  } catch (error) {
+    aiLogger.error('Budget audit failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Check a single rate for compliance
+app.post('/api/ai/guardian/check-rate', async (req, res) => {
+  try {
+    const { position, rate, productionType, location } = req.body;
+
+    if (!position || rate === undefined) {
+      return res.status(400).json({
+        success: false,
+        error: 'position and rate are required'
+      });
+    }
+
+    aiLogger.info('Checking rate compliance', { position, rate, productionType, location });
+
+    const result = await checkRate(
+      position,
+      rate,
+      productionType || 'theatrical',
+      location || 'Los Angeles',
+      db
+    );
+
+    res.json({
+      success: true,
+      ...result
+    });
+  } catch (error) {
+    aiLogger.error('Rate check failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Calculate tax incentives for a budget
+app.post('/api/ai/guardian/tax-incentives', async (req, res) => {
+  try {
+    const { budget, lineItems } = req.body;
+
+    if (!budget || !lineItems) {
+      return res.status(400).json({
+        success: false,
+        error: 'budget and lineItems are required'
+      });
+    }
+
+    aiLogger.info('Calculating tax incentives', {
+      location: budget.primary_location,
+      itemCount: lineItems.length
+    });
+
+    const incentives = calculateTaxIncentives(budget, lineItems);
+
+    res.json({
+      success: true,
+      incentives
+    });
+  } catch (error) {
+    aiLogger.error('Tax incentive calculation failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Get available tax incentive programs
+app.get('/api/ai/guardian/tax-programs', (req, res) => {
+  try {
+    const programs = getTaxIncentivePrograms();
+    res.json({
+      success: true,
+      programs
+    });
+  } catch (error) {
+    aiLogger.error('Failed to get tax programs', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Get compliance rules by production type
+app.get('/api/ai/guardian/compliance-rules', (req, res) => {
+  try {
+    const { productionType } = req.query;
+
+    if (productionType && COMPLIANCE_RULES[productionType]) {
+      res.json({
+        success: true,
+        productionType,
+        rules: COMPLIANCE_RULES[productionType]
+      });
+    } else {
+      res.json({
+        success: true,
+        allRules: COMPLIANCE_RULES
+      });
+    }
+  } catch (error) {
+    aiLogger.error('Failed to get compliance rules', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Quick audit for a production (lightweight version)
+app.get('/api/ai/guardian/quick-audit/:productionId', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+
+    // Get production
+    const productionResult = await db.query(
+      'SELECT * FROM productions WHERE id = $1',
+      [productionId]
+    );
+
+    if (productionResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Production not found'
+      });
+    }
+
+    const production = productionResult.rows[0];
+
+    // Get line item summary
+    const summaryResult = await db.query(`
+      SELECT
+        COUNT(*) as total_items,
+        SUM(total) as total_budget,
+        SUM(fringes) as total_fringes,
+        COUNT(CASE WHEN fringes = 0 OR fringes IS NULL THEN 1 END) as items_without_fringes
+      FROM budget_line_items WHERE production_id = $1
+    `, [productionId]);
+
+    const summary = summaryResult.rows[0];
+    const rules = COMPLIANCE_RULES[production.production_type] || COMPLIANCE_RULES.theatrical;
+
+    // Quick compliance checks
+    const issues = [];
+
+    // Check fringe coverage
+    const fringeRatio = summary.items_without_fringes / summary.total_items;
+    if (fringeRatio > 0.3) {
+      issues.push({
+        type: 'warning',
+        category: 'fringes',
+        message: `${Math.round(fringeRatio * 100)}% of items missing fringe calculations`
+      });
+    }
+
+    // Check if tax incentive eligible
+    const incentives = calculateTaxIncentives(production, []);
+    const eligible = incentives.some(i => i.eligible);
+
+    res.json({
+      success: true,
+      production: {
+        id: production.id,
+        name: production.name,
+        type: production.production_type,
+        location: production.primary_location
+      },
+      summary: {
+        totalItems: parseInt(summary.total_items),
+        totalBudget: parseFloat(summary.total_budget) || 0,
+        totalFringes: parseFloat(summary.total_fringes) || 0,
+        itemsWithoutFringes: parseInt(summary.items_without_fringes)
+      },
+      issues,
+      taxIncentiveEligible: eligible,
+      complianceRules: rules
+    });
+  } catch (error) {
+    aiLogger.error('Quick audit failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// ============================================================================
 // REFERENCE DOCS API (Movie Magic Manual, etc.)
 // ============================================================================
 
@@ -4546,6 +5410,252 @@ app.use((err, req, res, next) => {
     success: false,
     error: err.message || 'Internal server error',
   });
+});
+
+// ============================================================================
+// API ROUTES - DYNAMIC BUDGET VIEWS
+// ============================================================================
+
+// Initialize views table on startup
+ensureViewsTable(db.pool).catch(err => console.error('Failed to create views table:', err));
+
+// Get filter options for a production (departments, unions, account codes, etc.)
+app.get('/api/productions/:productionId/views/filter-options', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const options = await getFilterOptions(db.pool, productionId);
+    res.json({ success: true, data: options });
+  } catch (err) {
+    console.error('Error getting filter options:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Get view templates (presets)
+app.get('/api/views/templates', (req, res) => {
+  res.json({ success: true, data: VIEW_TEMPLATES });
+});
+
+// Apply filters and get filtered view data
+app.post('/api/productions/:productionId/views/filter', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const filters = req.body.filters || {};
+    const result = await getFilteredView(db.pool, productionId, filters);
+    res.json({ success: true, data: result });
+  } catch (err) {
+    console.error('Error applying filters:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Get all saved views for a production
+app.get('/api/productions/:productionId/views', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const views = await getSavedViews(db.pool, productionId);
+    res.json({ success: true, data: views });
+  } catch (err) {
+    console.error('Error getting saved views:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Save a new view
+app.post('/api/productions/:productionId/views', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const { name, description, filters, is_default } = req.body;
+    const view = await saveView(db.pool, productionId, { name, description, filters, is_default });
+    res.json({ success: true, data: view });
+  } catch (err) {
+    console.error('Error saving view:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Update a view
+app.put('/api/views/:viewId', async (req, res) => {
+  try {
+    const { viewId } = req.params;
+    const { name, description, filters, is_default } = req.body;
+    const view = await updateView(db.pool, viewId, { name, description, filters, is_default });
+    res.json({ success: true, data: view });
+  } catch (err) {
+    console.error('Error updating view:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Delete a view
+app.delete('/api/views/:viewId', async (req, res) => {
+  try {
+    const { viewId } = req.params;
+    const deleted = await deleteView(db.pool, viewId);
+    res.json({ success: true, deleted });
+  } catch (err) {
+    console.error('Error deleting view:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ============================================================================
+// API ROUTES - ACCESS CONTROL & SHARE LINKS
+// ============================================================================
+
+// Initialize access tables on startup
+ensureAccessTables(db.pool).catch(err => console.error('Failed to create access tables:', err));
+
+// Get available roles
+app.get('/api/roles', (req, res) => {
+  res.json({ success: true, data: ROLES });
+});
+
+// Get all users with access to a production
+app.get('/api/productions/:productionId/access', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const access = await getProductionAccess(db.pool, productionId);
+    res.json({ success: true, data: access });
+  } catch (err) {
+    console.error('Error getting production access:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Grant access to a user
+app.post('/api/productions/:productionId/access', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const { email, role, grantedBy } = req.body;
+    const access = await grantAccess(db.pool, productionId, email, role, grantedBy);
+    await logAccess(db.pool, productionId, 'access_granted', {
+      userEmail: grantedBy,
+      metadata: { targetEmail: email, role }
+    });
+    res.json({ success: true, data: access });
+  } catch (err) {
+    console.error('Error granting access:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Revoke access from a user
+app.delete('/api/productions/:productionId/access/:email', async (req, res) => {
+  try {
+    const { productionId, email } = req.params;
+    const { revokedBy } = req.query;
+    const revoked = await revokeAccess(db.pool, productionId, email);
+    if (revoked) {
+      await logAccess(db.pool, productionId, 'access_revoked', {
+        userEmail: revokedBy,
+        metadata: { targetEmail: email }
+      });
+    }
+    res.json({ success: true, revoked });
+  } catch (err) {
+    console.error('Error revoking access:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Check user's permission for a production
+app.get('/api/productions/:productionId/access/check', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const { email, permission } = req.query;
+    const hasPermission = await checkPermission(db.pool, productionId, email, permission);
+    const role = await getUserRole(db.pool, productionId, email);
+    res.json({ success: true, data: { hasPermission, role } });
+  } catch (err) {
+    console.error('Error checking permission:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Get all share links for a production
+app.get('/api/productions/:productionId/share-links', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const links = await getShareLinks(db.pool, productionId);
+    res.json({ success: true, data: links });
+  } catch (err) {
+    console.error('Error getting share links:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Create a share link
+app.post('/api/productions/:productionId/share-links', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const { role, name, createdBy, expiresIn, maxUses } = req.body;
+    const link = await createShareLink(db.pool, productionId, { role, name, createdBy, expiresIn, maxUses });
+    await logAccess(db.pool, productionId, 'share_link_created', {
+      userEmail: createdBy,
+      metadata: { linkId: link.id, role, name }
+    });
+    res.json({ success: true, data: link });
+  } catch (err) {
+    console.error('Error creating share link:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Validate a share link (public endpoint)
+app.get('/api/share/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    const result = await validateShareLink(db.pool, token);
+    if (result.valid) {
+      await logAccess(db.pool, result.productionId, 'share_link_used', {
+        shareToken: token,
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+    }
+    res.json({ success: true, data: result });
+  } catch (err) {
+    console.error('Error validating share link:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Deactivate a share link
+app.delete('/api/share-links/:linkId', async (req, res) => {
+  try {
+    const { linkId } = req.params;
+    const deactivated = await deactivateShareLink(db.pool, linkId);
+    res.json({ success: true, deactivated });
+  } catch (err) {
+    console.error('Error deactivating share link:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Get access log for a production
+app.get('/api/productions/:productionId/access-log', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const { limit } = req.query;
+    const log = await getAccessLog(db.pool, productionId, limit ? parseInt(limit) : 50);
+    res.json({ success: true, data: log });
+  } catch (err) {
+    console.error('Error getting access log:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Get all productions a user has access to
+app.get('/api/users/:email/productions', async (req, res) => {
+  try {
+    const { email } = req.params;
+    const productions = await getUserProductions(db.pool, email);
+    res.json({ success: true, data: productions });
+  } catch (err) {
+    console.error('Error getting user productions:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 // ============================================================================

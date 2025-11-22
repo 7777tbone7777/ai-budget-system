@@ -408,10 +408,13 @@ export default function RateCards() {
                     Union Local
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Position
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Agreement
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Position
+                    Production Type
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Rate
@@ -433,6 +436,9 @@ export default function RateCards() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                       {card.union_local}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      {card.job_classification}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {card.agreement_short_name ? (
                         <span className="px-2 py-1 bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 rounded text-xs font-medium">
@@ -442,8 +448,14 @@ export default function RateCards() {
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {card.job_classification}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      {card.production_type ? (
+                        <span className="px-2 py-1 bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 rounded text-xs font-medium">
+                          {card.production_type.replace(/_/g, ' ')}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600 dark:text-green-400">
                       {formatCurrency(card.base_rate)}
