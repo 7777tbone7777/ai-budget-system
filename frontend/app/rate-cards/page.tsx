@@ -202,7 +202,7 @@ export default function RateCards() {
 
   // Get unique agreement names for filter
   const agreementOptions = useMemo(() => {
-    return [...new Set(allRates.map(r => r.agreement_short_name).filter(Boolean))]
+    return [...new Set(allRates.map(r => r.agreement_short_name).filter((a): a is string => a !== null && a !== undefined))]
   }, [allRates])
 
   const formatCurrency = (amount: string) => {
