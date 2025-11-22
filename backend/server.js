@@ -1004,6 +1004,125 @@ app.delete('/api/globals/:id', async (req, res) => {
   }
 });
 
+// Initialize default globals for a production
+app.post('/api/productions/:production_id/globals/initialize', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const { production_type } = req.body;
+
+    // Default globals based on production type (following Movie Magic Budgeting workflow)
+    const defaultGlobals = {
+      // Production Group - Common to all
+      common: [
+        { name: 'PREP_DAYS', value: 14, description: 'Number of prep days', global_group: 'Production' },
+        { name: 'SHOOT_DAYS', value: 20, description: 'Number of shooting days', global_group: 'Production' },
+        { name: 'WRAP_DAYS', value: 5, description: 'Number of wrap days', global_group: 'Production' },
+        { name: 'POST_WEEKS', value: 8, description: 'Weeks of post-production', global_group: 'Production' },
+        { name: 'TRAVEL_DAYS', value: 2, description: 'Travel/load days per location', global_group: 'Production' },
+        { name: 'HOLIDAY_DAYS', value: 0, description: 'Holiday days during production', global_group: 'Production' },
+      ],
+      // Rates Group
+      rates: [
+        { name: 'OVERTIME_MULT_1_5', value: 1.5, description: 'Overtime multiplier (1.5x)', global_group: 'Rates' },
+        { name: 'OVERTIME_MULT_2', value: 2.0, description: 'Double time multiplier', global_group: 'Rates' },
+        { name: 'GOLDEN_TIME_MULT', value: 2.5, description: 'Golden time multiplier', global_group: 'Rates' },
+        { name: 'KIT_RENTAL_WEEKLY', value: 100, description: 'Standard kit rental per week', global_group: 'Rates' },
+        { name: 'CAR_ALLOWANCE_DAILY', value: 35, description: 'Car allowance per day', global_group: 'Rates' },
+        { name: 'CELL_ALLOWANCE_WEEKLY', value: 50, description: 'Cell phone allowance per week', global_group: 'Rates' },
+      ],
+      // Fringes Group
+      fringes: [
+        { name: 'PAYROLL_TAX_PCT', value: 15, description: 'Payroll taxes percentage', global_group: 'Fringes' },
+        { name: 'HEALTH_WELFARE_PCT', value: 8.5, description: 'Health & Welfare percentage', global_group: 'Fringes' },
+        { name: 'PENSION_PCT', value: 8.0, description: 'Pension contribution percentage', global_group: 'Fringes' },
+        { name: 'WORKERS_COMP_PCT', value: 5.5, description: 'Workers comp percentage', global_group: 'Fringes' },
+      ],
+      // TV Series specific
+      tv_series: [
+        { name: 'NUM_EPISODES', value: 10, description: 'Number of episodes in order', global_group: 'Production' },
+        { name: 'SHOOT_DAYS_PER_EP', value: 8, description: 'Shooting days per episode', global_group: 'Production' },
+        { name: 'EP_PATTERN', value: 1, description: 'Episodes shot per block', global_group: 'Production' },
+      ],
+      // Feature Film specific
+      feature: [
+        { name: 'PRINCIPAL_DAYS', value: 35, description: 'Principal photography days', global_group: 'Production' },
+        { name: 'SECOND_UNIT_DAYS', value: 10, description: 'Second unit days', global_group: 'Production' },
+        { name: 'VFX_SHOTS', value: 200, description: 'Number of VFX shots', global_group: 'Production' },
+      ],
+    };
+
+    // Select which globals to create based on production type
+    let globalsToCreate = [...defaultGlobals.common, ...defaultGlobals.rates, ...defaultGlobals.fringes];
+
+    if (production_type === 'tv_series' || production_type === 'episodic') {
+      globalsToCreate = [...globalsToCreate, ...defaultGlobals.tv_series];
+    } else if (production_type === 'feature' || production_type === 'theatrical') {
+      globalsToCreate = [...globalsToCreate, ...defaultGlobals.feature];
+    }
+
+    let created = 0;
+    let skipped = 0;
+
+    for (const global of globalsToCreate) {
+      // Check if global already exists
+      const existing = await db.query(
+        'SELECT id FROM globals WHERE production_id = $1 AND name = $2',
+        [production_id, global.name]
+      );
+
+      if (existing.rows.length === 0) {
+        await db.query(
+          `INSERT INTO globals (production_id, name, value, precision, description, global_group)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+          [production_id, global.name, global.value, 2, global.description, global.global_group]
+        );
+        created++;
+      } else {
+        skipped++;
+      }
+    }
+
+    // Also initialize default budget groups
+    const defaultGroups = [
+      { name: 'Prep', description: 'Pre-production period', color: '#3B82F6', sort_order: 1 },
+      { name: 'Shoot', description: 'Principal photography', color: '#10B981', sort_order: 2 },
+      { name: 'Wrap', description: 'Wrap and strike period', color: '#F59E0B', sort_order: 3 },
+      { name: 'Post-Production', description: 'Post-production period', color: '#8B5CF6', sort_order: 4 },
+      { name: 'Idle', description: 'Idle/hiatus periods', color: '#6B7280', sort_order: 5, include_in_total: false },
+    ];
+
+    let groupsCreated = 0;
+    for (const group of defaultGroups) {
+      const existing = await db.query(
+        'SELECT id FROM budget_groups WHERE production_id = $1 AND name = $2',
+        [production_id, group.name]
+      );
+
+      if (existing.rows.length === 0) {
+        await db.query(
+          `INSERT INTO budget_groups (production_id, name, description, color, sort_order, include_in_total)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+          [production_id, group.name, group.description, group.color, group.sort_order, group.include_in_total !== false]
+        );
+        groupsCreated++;
+      }
+    }
+
+    res.json({
+      success: true,
+      message: 'Default globals and groups initialized',
+      globals: { created, skipped },
+      groups: { created: groupsCreated },
+    });
+  } catch (error) {
+    console.error('Error initializing globals:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
 // Resolve global value by name
 app.get('/api/productions/:production_id/globals/:name/value', async (req, res) => {
   try {
@@ -3666,6 +3785,284 @@ app.put('/api/productions/:production_id/agreements', async (req, res) => {
     });
   } catch (error) {
     appLogger.error('Error updating production agreements:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ============================================================================
+// API ROUTES - CBA COMPLIANCE CHECKER
+// ============================================================================
+
+// Check CBA compliance for a production's budget line items
+// Compares rates against union minimum rates from rate_cards
+app.get('/api/productions/:production_id/compliance-check', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const { include_warnings } = req.query;
+
+    // Get production details including agreements
+    const prodResult = await db.query(`
+      SELECT p.*,
+             ia.agreement_type as iatse_agreement,
+             sa.agreement_type as sag_aftra_agreement,
+             da.agreement_type as dga_agreement
+      FROM productions p
+      LEFT JOIN union_agreements ia ON p.iatse_agreement_id = ia.id
+      LEFT JOIN union_agreements sa ON p.sag_aftra_agreement_id = sa.id
+      LEFT JOIN union_agreements da ON p.dga_agreement_id = da.id
+      WHERE p.id = $1
+    `, [production_id]);
+
+    if (prodResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Production not found' });
+    }
+
+    const production = prodResult.rows[0];
+
+    // Get all line items for this production with position information
+    const lineItemsResult = await db.query(`
+      SELECT bli.*
+      FROM budget_line_items bli
+      WHERE bli.production_id = $1
+        AND bli.rate IS NOT NULL
+        AND bli.rate > 0
+      ORDER BY bli.account_code, bli.position_title
+    `, [production_id]);
+
+    const violations = [];
+    const warnings = [];
+    let compliantCount = 0;
+
+    // For each line item, check against rate_cards
+    for (const item of lineItemsResult.rows) {
+      // Find matching rate card based on position title
+      // Try exact match first, then fuzzy match
+      const rateCardResult = await db.query(`
+        SELECT rc.*, rc.base_rate as minimum_rate
+        FROM rate_cards rc
+        WHERE (
+          rc.job_classification ILIKE $1
+          OR rc.job_classification ILIKE $2
+          OR $1 ILIKE '%' || rc.job_classification || '%'
+        )
+        AND rc.effective_date <= COALESCE($3, CURRENT_DATE)
+        ORDER BY
+          CASE WHEN rc.job_classification ILIKE $1 THEN 1
+               WHEN rc.job_classification ILIKE $2 THEN 2
+               ELSE 3 END,
+          rc.effective_date DESC
+        LIMIT 1
+      `, [item.position_title, '%' + item.position_title + '%', production.principal_photography_start]);
+
+      if (rateCardResult.rows.length > 0) {
+        const rateCard = rateCardResult.rows[0];
+        const minimumRate = parseFloat(rateCard.minimum_rate);
+        const itemRate = parseFloat(item.rate);
+
+        // Calculate rate type adjustment (hourly vs daily vs weekly)
+        let adjustedMinimum = minimumRate;
+        const rateType = rateCard.rate_type?.toLowerCase() || 'hourly';
+
+        // Normalize to hourly for comparison if needed
+        if (rateType === 'daily' && item.unit?.toLowerCase() === 'day') {
+          // Both are daily, compare directly
+        } else if (rateType === 'weekly' && item.unit?.toLowerCase() === 'week') {
+          // Both are weekly, compare directly
+        } else if (rateType === 'hourly' && item.unit?.toLowerCase() === 'hour') {
+          // Both are hourly, compare directly
+        }
+        // For mixed comparisons, keep it simple for now
+
+        if (itemRate < adjustedMinimum) {
+          violations.push({
+            line_item_id: item.id,
+            account_code: item.account_code,
+            position_title: item.position_title,
+            current_rate: itemRate,
+            minimum_rate: adjustedMinimum,
+            rate_card_classification: rateCard.job_classification,
+            union_local: rateCard.union_local,
+            unit: item.unit || 'unspecified',
+            shortfall: (adjustedMinimum - itemRate).toFixed(2),
+            shortfall_pct: (((adjustedMinimum - itemRate) / adjustedMinimum) * 100).toFixed(1),
+            severity: itemRate < (adjustedMinimum * 0.9) ? 'critical' : 'warning'
+          });
+        } else {
+          compliantCount++;
+
+          // Add near-minimum warnings if requested
+          if (include_warnings === 'true' && itemRate < (adjustedMinimum * 1.05)) {
+            warnings.push({
+              line_item_id: item.id,
+              account_code: item.account_code,
+              position_title: item.position_title,
+              current_rate: itemRate,
+              minimum_rate: adjustedMinimum,
+              message: 'Rate is within 5% of minimum'
+            });
+          }
+        }
+      }
+    }
+
+    // Calculate compliance score
+    const totalChecked = violations.length + compliantCount;
+    const complianceScore = totalChecked > 0
+      ? ((compliantCount / totalChecked) * 100).toFixed(1)
+      : 100;
+
+    // Calculate total shortfall
+    const totalShortfall = violations.reduce((sum, v) => sum + parseFloat(v.shortfall), 0);
+
+    res.json({
+      success: true,
+      production_id,
+      production_name: production.name,
+      is_union_signatory: production.is_union_signatory,
+      agreements: {
+        iatse: production.iatse_agreement,
+        sag_aftra: production.sag_aftra_agreement,
+        dga: production.dga_agreement
+      },
+      summary: {
+        total_line_items_checked: totalChecked,
+        compliant_count: compliantCount,
+        violation_count: violations.length,
+        warning_count: warnings.length,
+        compliance_score: parseFloat(complianceScore),
+        total_shortfall: totalShortfall.toFixed(2),
+        status: violations.length === 0 ? 'COMPLIANT' :
+                violations.some(v => v.severity === 'critical') ? 'CRITICAL' : 'VIOLATIONS'
+      },
+      violations,
+      warnings: include_warnings === 'true' ? warnings : undefined
+    });
+  } catch (error) {
+    appLogger.error('Error checking CBA compliance:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get available rate cards for a specific position
+app.get('/api/rate-cards/search', async (req, res) => {
+  try {
+    const { position, union_local, production_type, effective_date } = req.query;
+
+    if (!position) {
+      return res.status(400).json({
+        success: false,
+        error: 'Position search term is required'
+      });
+    }
+
+    const result = await db.query(`
+      SELECT *
+      FROM rate_cards
+      WHERE job_classification ILIKE $1
+        AND ($2::varchar IS NULL OR union_local = $2)
+        AND ($3::varchar IS NULL OR production_type = $3 OR production_type IS NULL)
+        AND ($4::date IS NULL OR effective_date <= $4)
+      ORDER BY
+        union_local,
+        CASE WHEN job_classification ILIKE $5 THEN 1 ELSE 2 END,
+        effective_date DESC
+      LIMIT 50
+    `, ['%' + position + '%', union_local || null, production_type || null, effective_date || null, position]);
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows
+    });
+  } catch (error) {
+    appLogger.error('Error searching rate cards:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Suggest compliant rate for a position
+app.get('/api/rate-cards/suggest', async (req, res) => {
+  try {
+    const { position, union_local, production_type, effective_date } = req.query;
+
+    if (!position) {
+      return res.status(400).json({
+        success: false,
+        error: 'Position is required'
+      });
+    }
+
+    // Find best matching rate card
+    const result = await db.query(`
+      SELECT rc.*,
+             rc.base_rate as suggested_rate,
+             'Based on ' || rc.job_classification || ' (' || rc.union_local || ')' as suggestion_reason
+      FROM rate_cards rc
+      WHERE (
+        rc.job_classification ILIKE $1
+        OR rc.job_classification ILIKE $2
+      )
+      AND ($3::varchar IS NULL OR rc.union_local ILIKE '%' || $3 || '%')
+      AND ($4::date IS NULL OR rc.effective_date <= $4)
+      ORDER BY
+        CASE
+          WHEN rc.job_classification ILIKE $1 THEN 1
+          WHEN rc.job_classification ILIKE $2 THEN 2
+          ELSE 3
+        END,
+        rc.effective_date DESC
+      LIMIT 5
+    `, [position, '%' + position + '%', union_local || null, effective_date || null]);
+
+    if (result.rows.length === 0) {
+      return res.json({
+        success: true,
+        found: false,
+        message: 'No matching rate card found for this position',
+        suggestions: []
+      });
+    }
+
+    res.json({
+      success: true,
+      found: true,
+      best_match: result.rows[0],
+      alternatives: result.rows.slice(1)
+    });
+  } catch (error) {
+    appLogger.error('Error suggesting rate:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get compliance summary for all productions
+app.get('/api/compliance/summary', async (req, res) => {
+  try {
+    // Get basic stats
+    const statsResult = await db.query(`
+      SELECT
+        COUNT(DISTINCT p.id) as total_productions,
+        COUNT(DISTINCT CASE WHEN p.is_union_signatory THEN p.id END) as union_productions,
+        (SELECT COUNT(*) FROM rate_cards) as total_rate_cards,
+        (SELECT COUNT(DISTINCT union_local) FROM rate_cards) as unions_covered
+      FROM productions p
+    `);
+
+    // Get rate card breakdown by union
+    const unionBreakdown = await db.query(`
+      SELECT union_local, COUNT(*) as rate_count
+      FROM rate_cards
+      GROUP BY union_local
+      ORDER BY rate_count DESC
+    `);
+
+    res.json({
+      success: true,
+      stats: statsResult.rows[0],
+      rate_cards_by_union: unionBreakdown.rows
+    });
+  } catch (error) {
+    appLogger.error('Error getting compliance summary:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
