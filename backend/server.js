@@ -76,7 +76,6 @@ app.get('/health', async (req, res) => {
 const budgetRouter = require('./api/budgets');
 app.locals.pool = db; // Make db pool available to router
 app.use('/api/budgets', budgetRouter);
-app.use('/api/fringe-rules', budgetRouter); // Fringe rules endpoints
 
 appLogger.info('Budget hierarchy API routes registered', {
   routes: [
@@ -88,9 +87,7 @@ appLogger.info('Budget hierarchy API routes registered', {
     'POST /api/budgets/:budget_id/accounts',
     'GET /api/budgets/:budget_id/line-items',
     'POST /api/budgets/:budget_id/line-items',
-    'GET /api/budgets/:budget_id/hierarchy',
-    'GET /api/fringe-rules',
-    'GET /api/fringe-rules/lookup'
+    'GET /api/budgets/:budget_id/hierarchy'
   ]
 });
 
@@ -724,6 +721,75 @@ app.get('/api/crew-positions', async (req, res) => {
       success: false,
       error: error.message,
     });
+  }
+});
+
+// ============================================================================
+// API ROUTES - FRINGE CALCULATION RULES (NEW HIERARCHY)
+// ============================================================================
+
+// Get all fringe calculation rules
+app.get('/api/fringe-rules', async (req, res) => {
+  try {
+    const { union_local, state, position_classification } = req.query;
+
+    let query = 'SELECT * FROM fringe_calculation_rules WHERE 1=1';
+    const params = [];
+
+    if (union_local) {
+      params.push(union_local);
+      query += ` AND union_local = $${params.length}`;
+    }
+
+    if (state) {
+      params.push(state);
+      query += ` AND state = $${params.length}`;
+    }
+
+    if (position_classification) {
+      params.push(position_classification);
+      query += ` AND position_classification = $${params.length}`;
+    }
+
+    query += ' ORDER BY effective_date_start DESC';
+
+    const result = await db.query(query, params);
+
+    res.json({
+      success: true,
+      fringe_rules: result.rows
+    });
+  } catch (err) {
+    console.error('Error fetching fringe rules:', err);
+    res.status(500).json({ error: 'Failed to fetch fringe rules', details: err.message });
+  }
+});
+
+// Smart lookup to find applicable fringe rule
+app.get('/api/fringe-rules/lookup', async (req, res) => {
+  try {
+    const { union_local, state, position_classification, effective_date } = req.query;
+
+    if (!position_classification) {
+      return res.status(400).json({ error: 'position_classification is required' });
+    }
+
+    const result = await db.query(
+      `SELECT * FROM get_fringe_rule($1, $2, $3, $4)`,
+      [union_local || null, state || null, position_classification, effective_date || new Date()]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No applicable fringe rule found' });
+    }
+
+    res.json({
+      success: true,
+      fringe_rule: result.rows[0]
+    });
+  } catch (err) {
+    console.error('Error looking up fringe rule:', err);
+    res.status(500).json({ error: 'Failed to lookup fringe rule', details: err.message });
   }
 });
 
