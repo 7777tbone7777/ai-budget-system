@@ -8,6 +8,15 @@ import CalculationPanel from '../../../../components/CalculationPanel';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-8e04.up.railway.app';
 
+// Currency formatting helper
+const formatCurrency = (value: number | undefined | null): string => {
+  if (value === undefined || value === null) return '0.00';
+  return Number(value).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+};
+
 interface LineItem {
   id: string;
   account_code: string;
@@ -27,6 +36,14 @@ interface LineItem {
   children?: LineItem[];
 }
 
+interface Sideletter {
+  id: string;
+  sideletter_name: string;
+  wage_adjustment_pct?: string;
+  holiday_pay_pct?: string;
+  vacation_pay_pct?: string;
+}
+
 interface Production {
   id: string;
   name: string;
@@ -35,6 +52,8 @@ interface Production {
   shooting_location?: string;
   state?: string;
   budget_target?: number;
+  applied_sideletters?: Sideletter[];
+  principal_photography_start?: string;
 }
 
 interface RateCard {
@@ -72,6 +91,7 @@ export default function ProductionBudgetPage() {
 
   // Multi-period tracking state
   const [usePeriods, setUsePeriods] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [periods, setPeriods] = useState({
     prep: { days: 0, hours_per_day: 0, rate: 0 },
     shoot: { days: 0, hours_per_day: 0, rate: 0 },
@@ -216,6 +236,31 @@ export default function ProductionBudgetPage() {
     }
   };
 
+  const handleAutoGenerateBudget = async () => {
+    if (lineItems.length > 0) {
+      if (!confirm('This will replace all existing line items. Are you sure you want to auto-generate a new budget?')) {
+        return;
+      }
+    }
+
+    try {
+      setGenerating(true);
+      const response = await axios.post(`${API_URL}/api/productions/${productionId}/auto-generate-budget`);
+
+      if (response.data.success) {
+        await loadData();
+        alert(`Budget auto-generated!\n\n${response.data.itemsCreated} line items created\nEstimated Total: $${formatCurrency(response.data.estimatedTotal)}\n\nMeal Penalty: ${response.data.mealPenalty ? `$${response.data.mealPenalty.rate}/violation after ${response.data.mealPenalty.deadline}` : 'N/A'}`);
+      } else {
+        alert('Failed to generate budget: ' + response.data.error);
+      }
+    } catch (error: any) {
+      console.error('Error auto-generating budget:', error);
+      alert('Failed to auto-generate budget: ' + (error.response?.data?.error || error.message));
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   // Get unique unions from rate cards
   const uniqueUnions = Array.from(new Set(rateCards.map(rc => rc.union_local))).sort();
 
@@ -270,41 +315,79 @@ export default function ProductionBudgetPage() {
             <span>Type: {production.production_type}</span>
             {production.distribution_platform && <span>• Platform: {production.distribution_platform}</span>}
             {production.shooting_location && <span>• Location: {production.shooting_location}</span>}
-            {production.budget_target && <span>• Target: ${production.budget_target.toLocaleString()}</span>}
+            {production.budget_target && <span>• Target: ${formatCurrency(production.budget_target)}</span>}
+            {production.principal_photography_start && (
+              <span>• Start: {new Date(production.principal_photography_start).toLocaleDateString()}</span>
+            )}
           </div>
+          {/* Applied Sideletters */}
+          {production.applied_sideletters && production.applied_sideletters.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="text-sm text-gray-500">Sideletters:</span>
+              {production.applied_sideletters.map((sl) => (
+                <span
+                  key={sl.id}
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
+                  title={`Wage Adj: ${sl.wage_adjustment_pct || '0'}%, Holiday: ${sl.holiday_pay_pct || '100'}%, Vacation: ${sl.vacation_pay_pct || '100'}%`}
+                >
+                  {sl.sideletter_name}
+                  {sl.wage_adjustment_pct && sl.wage_adjustment_pct !== '0.00' && (
+                    <span className="ml-1 text-purple-600">({sl.wage_adjustment_pct}%)</span>
+                  )}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Budget Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-blue-50 rounded-lg p-6">
             <div className="text-sm text-blue-600 font-medium">Above the Line</div>
-            <div className="text-3xl font-bold text-blue-900">${totals.atl.toLocaleString()}</div>
+            <div className="text-3xl font-bold text-blue-900">${formatCurrency(totals.atl)}</div>
             <div className="text-sm text-blue-700 mt-1">{groupedItems.atl.length} items</div>
           </div>
           <div className="bg-green-50 rounded-lg p-6">
             <div className="text-sm text-green-600 font-medium">Below the Line</div>
-            <div className="text-3xl font-bold text-green-900">${totals.btl.toLocaleString()}</div>
+            <div className="text-3xl font-bold text-green-900">${formatCurrency(totals.btl)}</div>
             <div className="text-sm text-green-700 mt-1">{groupedItems.btl.length} items</div>
           </div>
           <div className="bg-purple-50 rounded-lg p-6">
             <div className="text-sm text-purple-600 font-medium">Other</div>
-            <div className="text-3xl font-bold text-purple-900">${totals.other.toLocaleString()}</div>
+            <div className="text-3xl font-bold text-purple-900">${formatCurrency(totals.other)}</div>
             <div className="text-sm text-purple-700 mt-1">{groupedItems.other.length} items</div>
           </div>
           <div className="bg-orange-50 rounded-lg p-6">
             <div className="text-sm text-orange-600 font-medium">Grand Total</div>
-            <div className="text-3xl font-bold text-orange-900">${totals.grand_total.toLocaleString()}</div>
+            <div className="text-3xl font-bold text-orange-900">${formatCurrency(totals.grand_total)}</div>
             <div className="text-sm text-orange-700 mt-1">{lineItems.length} total items</div>
           </div>
         </div>
 
-        {/* Add Line Item Button */}
-        <div className="mb-6">
+        {/* Action Buttons */}
+        <div className="mb-6 flex gap-4">
           <button
             onClick={() => setShowAddForm(!showAddForm)}
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
           >
             {showAddForm ? 'Cancel' : '+ Add Line Item'}
+          </button>
+          <button
+            onClick={handleAutoGenerateBudget}
+            disabled={generating}
+            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium disabled:bg-green-400 flex items-center gap-2"
+          >
+            {generating ? (
+              <>
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Generating...
+              </>
+            ) : (
+              'Auto-Generate Budget'
+            )}
           </button>
         </div>
 
@@ -454,6 +537,7 @@ export default function ProductionBudgetPage() {
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Fringes</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">% of Budget</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                   </tr>
                 </thead>
@@ -493,10 +577,15 @@ export default function ProductionBudgetPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.union_local || '-'}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${item.rate?.toLocaleString()}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${item.subtotal?.toLocaleString()}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">${item.fringes?.toLocaleString()}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${item.total?.toLocaleString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.rate)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.subtotal)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">${formatCurrency(item.fringes)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${formatCurrency(item.total)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
+                        {production?.budget_target
+                          ? ((item.total / parseFloat(production.budget_target.toString())) * 100).toFixed(2)
+                          : '0.00'}%
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <button
                           onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(item.id); }}
@@ -511,7 +600,7 @@ export default function ProductionBudgetPage() {
               </table>
             </div>
             <div className="mt-4 text-right text-xl font-bold text-gray-900">
-              ATL Subtotal: ${totals.atl.toLocaleString()}
+              ATL Subtotal: ${formatCurrency(totals.atl)}
             </div>
           </div>
         )}
@@ -533,6 +622,7 @@ export default function ProductionBudgetPage() {
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Fringes</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">% of Budget</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                   </tr>
                 </thead>
@@ -573,10 +663,15 @@ export default function ProductionBudgetPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.department || '-'}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.union_local || '-'}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${item.rate?.toLocaleString()}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${item.subtotal?.toLocaleString()}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">${item.fringes?.toLocaleString()}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${item.total?.toLocaleString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.rate)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.subtotal)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">${formatCurrency(item.fringes)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${formatCurrency(item.total)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
+                        {production?.budget_target
+                          ? ((item.total / parseFloat(production.budget_target.toString())) * 100).toFixed(2)
+                          : '0.00'}%
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <button
                           onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(item.id); }}
@@ -591,7 +686,7 @@ export default function ProductionBudgetPage() {
               </table>
             </div>
             <div className="mt-4 text-right text-xl font-bold text-gray-900">
-              BTL Subtotal: ${totals.btl.toLocaleString()}
+              BTL Subtotal: ${formatCurrency(totals.btl)}
             </div>
           </div>
         )}
@@ -609,6 +704,7 @@ export default function ProductionBudgetPage() {
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantity</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Rate</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">% of Budget</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                   </tr>
                 </thead>
@@ -647,8 +743,13 @@ export default function ProductionBudgetPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${item.rate?.toLocaleString()}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${item.total?.toLocaleString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.rate)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${formatCurrency(item.total)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
+                        {production?.budget_target
+                          ? ((item.total / parseFloat(production.budget_target.toString())) * 100).toFixed(2)
+                          : '0.00'}%
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <button
                           onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(item.id); }}
@@ -682,19 +783,19 @@ export default function ProductionBudgetPage() {
             <div className="flex justify-between items-center">
               <div>
                 <div className="text-lg font-medium opacity-90">Production Budget Total</div>
-                <div className="text-5xl font-bold mt-2">${totals.grand_total.toLocaleString()}</div>
+                <div className="text-5xl font-bold mt-2">${formatCurrency(totals.grand_total)}</div>
                 {production.budget_target && (
                   <div className="text-sm mt-2 opacity-90">
-                    Target: ${production.budget_target.toLocaleString()}
+                    Target: ${formatCurrency(production.budget_target)}
                     {' '}
                     ({((totals.grand_total / production.budget_target) * 100).toFixed(1)}% of target)
                   </div>
                 )}
               </div>
               <div className="text-right">
-                <div className="text-sm opacity-90">ATL: ${totals.atl.toLocaleString()}</div>
-                <div className="text-sm opacity-90">BTL: ${totals.btl.toLocaleString()}</div>
-                <div className="text-sm opacity-90">Other: ${totals.other.toLocaleString()}</div>
+                <div className="text-sm opacity-90">ATL: ${formatCurrency(totals.atl)}</div>
+                <div className="text-sm opacity-90">BTL: ${formatCurrency(totals.btl)}</div>
+                <div className="text-sm opacity-90">Other: ${formatCurrency(totals.other)}</div>
               </div>
             </div>
           </div>

@@ -30,6 +30,9 @@ export default function RootLayout({
                 <a href="/rate-cards" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
                   Rate Cards
                 </a>
+                <a href="/agreements" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                  Agreements
+                </a>
                 <a href="/productions" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
                   Productions
                 </a>

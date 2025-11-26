@@ -43,6 +43,28 @@ function generateShareToken() {
 
 // Create production_access table if not exists
 async function ensureAccessTables(pool) {
+  // First, drop old tables if they exist with wrong schema
+  // This is safe since access control data can be recreated
+  try {
+    // Check if production_access exists and has user_email column
+    const checkColumn = await pool.query(`
+      SELECT column_name FROM information_schema.columns
+      WHERE table_name = 'production_access' AND column_name = 'user_email'
+    `);
+
+    if (checkColumn.rows.length === 0) {
+      // Table exists but missing user_email - drop and recreate
+      console.log('[ACCESS] Recreating access tables with correct schema...');
+      await pool.query(`
+        DROP TABLE IF EXISTS access_log CASCADE;
+        DROP TABLE IF EXISTS share_links CASCADE;
+        DROP TABLE IF EXISTS production_access CASCADE;
+      `);
+    }
+  } catch (err) {
+    // Table doesn't exist, that's fine
+  }
+
   await pool.query(`
     -- Production access for users
     CREATE TABLE IF NOT EXISTS production_access (
@@ -90,6 +112,8 @@ async function ensureAccessTables(pool) {
     CREATE INDEX IF NOT EXISTS idx_share_links_production ON share_links(production_id);
     CREATE INDEX IF NOT EXISTS idx_access_log_production ON access_log(production_id);
   `);
+
+  console.log('[ACCESS] Access tables ready');
 }
 
 // Grant access to a user

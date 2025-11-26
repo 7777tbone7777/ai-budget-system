@@ -15,6 +15,7 @@ const { analyzeScenario, compareScenarios, predictVariance, summarizeScenario, p
 const { auditBudget, checkRate, calculateTaxIncentives, getTaxIncentivePrograms, summarizeAudit, TAX_INCENTIVES, COMPLIANCE_RULES } = require('./budget-guardian');
 const { VIEW_TEMPLATES, getFilteredView, saveView, getSavedViews, updateView, deleteView, getFilterOptions, ensureViewsTable } = require('./budget-views');
 const { ROLES, ensureAccessTables, grantAccess, revokeAccess, getProductionAccess, checkPermission, getUserRole, createShareLink, validateShareLink, getShareLinks, deactivateShareLink, logAccess, getAccessLog, getUserProductions } = require('./access-control');
+const { calculateProductionFringes, applyCalculatedFringes, estimatePositionFringes, getFringeRates, DEFAULT_FRINGE_RATES } = require('./schedule-fringe-calculator');
 
 // Create context-specific loggers
 const appLogger = createLogger('APP');
@@ -64,6 +65,123 @@ app.get('/health', async (req, res) => {
       timestamp: new Date().toISOString(),
       database: 'disconnected',
       error: error.message,
+    });
+  }
+});
+
+// ============================================================================
+// BUDGET HIERARCHY API ROUTES
+// ============================================================================
+// Register the budget hierarchy router
+const budgetRouter = require('./api/budgets');
+app.locals.pool = db; // Make db pool available to router
+app.use('/api/budgets', budgetRouter);
+app.use('/api/fringe-rules', budgetRouter); // Fringe rules endpoints
+
+appLogger.info('Budget hierarchy API routes registered', {
+  routes: [
+    'POST /api/budgets',
+    'GET /api/budgets/:budget_id',
+    'GET /api/budgets/:budget_id/topsheet',
+    'POST /api/budgets/:budget_id/topsheet',
+    'GET /api/budgets/:budget_id/accounts',
+    'POST /api/budgets/:budget_id/accounts',
+    'GET /api/budgets/:budget_id/line-items',
+    'POST /api/budgets/:budget_id/line-items',
+    'GET /api/budgets/:budget_id/hierarchy',
+    'GET /api/fringe-rules',
+    'GET /api/fringe-rules/lookup'
+  ]
+});
+
+// ============================================================================
+// DATABASE MIGRATIONS
+// ============================================================================
+
+// Add atl_or_btl column to budget_line_items if it doesn't exist
+app.post('/api/migrate/add-atl-btl-column', async (req, res) => {
+  try {
+    // Check if column exists
+    const checkColumn = await db.query(`
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_name = 'budget_line_items'
+      AND column_name = 'atl_or_btl'
+    `);
+
+    if (checkColumn.rows.length === 0) {
+      // Column doesn't exist, add it
+      await db.query(`
+        ALTER TABLE budget_line_items
+        ADD COLUMN atl_or_btl VARCHAR(10)
+      `);
+
+      res.json({
+        success: true,
+        message: 'Column atl_or_btl added successfully'
+      });
+    } else {
+      res.json({
+        success: true,
+        message: 'Column atl_or_btl already exists'
+      });
+    }
+  } catch (error) {
+    console.error('Migration failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Update existing line items to set atl_or_btl based on account code
+app.post('/api/migrate/categorize-existing-items', async (req, res) => {
+  try {
+    // Update ATL items (account codes starting with 1)
+    await db.query(`
+      UPDATE budget_line_items
+      SET atl_or_btl = 'ATL'
+      WHERE account_code ~ '^1[0-9]+'
+      AND (atl_or_btl IS NULL OR atl_or_btl = '')
+    `);
+
+    // Update BTL items (account codes starting with 2 or 3)
+    await db.query(`
+      UPDATE budget_line_items
+      SET atl_or_btl = 'BTL'
+      WHERE account_code ~ '^[23][0-9]+'
+      AND (atl_or_btl IS NULL OR atl_or_btl = '')
+    `);
+
+    // Update Other items (account codes starting with 4, 5, 6, 7, 8, 9)
+    await db.query(`
+      UPDATE budget_line_items
+      SET atl_or_btl = 'Other'
+      WHERE account_code ~ '^[456789][0-9]+'
+      AND (atl_or_btl IS NULL OR atl_or_btl = '')
+    `);
+
+    // Get count of updated items
+    const result = await db.query(`
+      SELECT
+        atl_or_btl,
+        COUNT(*) as count
+      FROM budget_line_items
+      WHERE atl_or_btl IS NOT NULL
+      GROUP BY atl_or_btl
+    `);
+
+    res.json({
+      success: true,
+      message: 'Existing items categorized successfully',
+      categories: result.rows
+    });
+  } catch (error) {
+    console.error('Categorization migration failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
     });
   }
 });
@@ -724,6 +842,210 @@ app.post('/api/fringes/calculate', async (req, res) => {
     res.status(500).json({
       success: false,
       error: error.message,
+    });
+  }
+});
+
+// ============================================================================
+// AI SCHEDULE-AWARE FRINGE CALCULATOR
+// ============================================================================
+
+// Calculate fringes for entire production with schedule awareness
+app.post('/api/ai/fringes/calculate/:productionId', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const { schedule } = req.body;
+
+    aiLogger.info('Schedule-aware fringe calculation requested', { productionId });
+
+    // Validate schedule structure
+    if (!schedule) {
+      return res.status(400).json({
+        success: false,
+        error: 'Schedule is required. Provide prep, shoot, wrap, post durations.'
+      });
+    }
+
+    // Default schedule if incomplete
+    const fullSchedule = {
+      prep: { duration: schedule.prep?.duration || 0 },
+      shoot: { duration: schedule.shoot?.duration || 0 },
+      wrap: { duration: schedule.wrap?.duration || 0 },
+      post: { duration: schedule.post?.duration || 0 }
+    };
+
+    const result = await calculateProductionFringes(db, productionId, fullSchedule);
+
+    res.json(result);
+  } catch (error) {
+    aiLogger.error('Schedule-aware fringe calculation failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Apply calculated fringes to production line items
+app.post('/api/ai/fringes/apply/:productionId', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const { positions, schedule } = req.body;
+
+    aiLogger.info('Applying calculated fringes', { productionId, positionCount: positions?.length });
+
+    // If positions not provided, recalculate first
+    let positionResults = positions;
+    if (!positionResults) {
+      if (!schedule) {
+        return res.status(400).json({
+          success: false,
+          error: 'Either positions or schedule is required'
+        });
+      }
+      const calcResult = await calculateProductionFringes(db, productionId, schedule);
+      positionResults = calcResult.positions;
+    }
+
+    const result = await applyCalculatedFringes(db, productionId, positionResults);
+
+    // Recalculate production totals
+    await db.query(`
+      UPDATE productions p
+      SET total_budget = (
+        SELECT COALESCE(SUM(total), 0)
+        FROM budget_line_items
+        WHERE production_id = p.id
+      ),
+      updated_at = NOW()
+      WHERE id = $1
+    `, [productionId]);
+
+    res.json({
+      success: true,
+      ...result,
+      message: `Applied fringes to ${result.updated} line items`
+    });
+  } catch (error) {
+    aiLogger.error('Apply fringes failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Quick estimate for a single position (real-time preview)
+app.post('/api/ai/fringes/estimate', async (req, res) => {
+  try {
+    const { unionLocal, rate, rateType, schedule } = req.body;
+
+    if (!rate || !schedule) {
+      return res.status(400).json({
+        success: false,
+        error: 'rate and schedule are required'
+      });
+    }
+
+    const result = await estimatePositionFringes(
+      db,
+      unionLocal || 'Non-Union',
+      parseFloat(rate),
+      rateType || 'weekly',
+      schedule
+    );
+
+    res.json({
+      success: true,
+      ...result
+    });
+  } catch (error) {
+    aiLogger.error('Fringe estimate failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Get default fringe rates by union type
+app.get('/api/ai/fringes/rates', async (req, res) => {
+  try {
+    const { unionLocal, state } = req.query;
+
+    if (unionLocal) {
+      const rates = await getFringeRates(db, unionLocal, state || 'CA');
+      res.json({
+        success: true,
+        unionLocal,
+        rates
+      });
+    } else {
+      // Return all default rates
+      res.json({
+        success: true,
+        rates: DEFAULT_FRINGE_RATES
+      });
+    }
+  } catch (error) {
+    aiLogger.error('Get fringe rates failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Audit existing fringes against calculated values
+app.post('/api/ai/fringes/audit/:productionId', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const { schedule } = req.body;
+
+    if (!schedule) {
+      return res.status(400).json({
+        success: false,
+        error: 'Schedule is required for audit'
+      });
+    }
+
+    aiLogger.info('Fringe audit requested', { productionId });
+
+    const result = await calculateProductionFringes(db, productionId, schedule);
+
+    // Format as audit report
+    const audit = {
+      success: true,
+      productionId,
+      productionName: result.productionName,
+      summary: {
+        totalPositions: result.summary.totalPositions,
+        positionsWithDiscrepancies: result.summary.positionsWithDiscrepancies,
+        calculatedFringes: result.summary.totalCalculatedFringes,
+        enteredFringes: result.summary.totalEnteredFringes,
+        difference: result.summary.totalDifference,
+        averageEffectiveRate: result.summary.averageEffectiveRate + '%'
+      },
+      discrepancies: result.discrepancies.map(d => ({
+        position: d.position,
+        union: d.union,
+        entered: d.enteredFringes,
+        calculated: d.totals.totalFringes,
+        difference: d.difference,
+        effectiveRate: d.totals.effectiveRate + '%'
+      })),
+      byUnion: result.summary.byUnion,
+      recommendation: result.summary.positionsWithDiscrepancies > 0
+        ? `${result.summary.positionsWithDiscrepancies} position(s) have fringe discrepancies totaling $${Math.abs(result.summary.totalDifference).toFixed(2)}. Consider applying calculated fringes.`
+        : 'All fringe calculations match entered values within tolerance.'
+    };
+
+    res.json(audit);
+  } catch (error) {
+    aiLogger.error('Fringe audit failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
     });
   }
 });
@@ -1918,6 +2240,97 @@ app.get('/api/productions/:id', async (req, res) => {
   }
 });
 
+// Update production by ID
+app.put('/api/productions/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      name,
+      production_type,
+      distribution_platform,
+      shooting_location,
+      state,
+      budget_target,
+      episode_count,
+      episode_length_minutes,
+      season_number,
+      principal_photography_start,
+      iatse_agreement_id,
+      sag_aftra_agreement_id,
+      dga_agreement_id,
+      wga_agreement_id,
+      teamsters_agreement_id,
+      applied_sideletters,
+      is_union_signatory,
+      agreement_notes,
+    } = req.body;
+
+    // Check if production exists
+    const checkResult = await db.query(
+      'SELECT * FROM productions WHERE id = $1',
+      [id]
+    );
+
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Production not found',
+      });
+    }
+
+    // Build dynamic update query based on provided fields
+    const updates = [];
+    const values = [];
+    let paramCount = 1;
+
+    if (name !== undefined) { updates.push(`name = $${paramCount++}`); values.push(name); }
+    if (production_type !== undefined) { updates.push(`production_type = $${paramCount++}`); values.push(production_type); }
+    if (distribution_platform !== undefined) { updates.push(`distribution_platform = $${paramCount++}`); values.push(distribution_platform); }
+    if (shooting_location !== undefined) { updates.push(`shooting_location = $${paramCount++}`); values.push(shooting_location); }
+    if (state !== undefined) { updates.push(`state = $${paramCount++}`); values.push(state); }
+    if (budget_target !== undefined) { updates.push(`budget_target = $${paramCount++}`); values.push(budget_target); }
+    if (episode_count !== undefined) { updates.push(`episode_count = $${paramCount++}`); values.push(episode_count); }
+    if (episode_length_minutes !== undefined) { updates.push(`episode_length_minutes = $${paramCount++}`); values.push(episode_length_minutes); }
+    if (season_number !== undefined) { updates.push(`season_number = $${paramCount++}`); values.push(season_number); }
+    if (principal_photography_start !== undefined) { updates.push(`principal_photography_start = $${paramCount++}`); values.push(principal_photography_start); }
+    if (iatse_agreement_id !== undefined) { updates.push(`iatse_agreement_id = $${paramCount++}`); values.push(iatse_agreement_id); }
+    if (sag_aftra_agreement_id !== undefined) { updates.push(`sag_aftra_agreement_id = $${paramCount++}`); values.push(sag_aftra_agreement_id); }
+    if (dga_agreement_id !== undefined) { updates.push(`dga_agreement_id = $${paramCount++}`); values.push(dga_agreement_id); }
+    if (wga_agreement_id !== undefined) { updates.push(`wga_agreement_id = $${paramCount++}`); values.push(wga_agreement_id); }
+    if (teamsters_agreement_id !== undefined) { updates.push(`teamsters_agreement_id = $${paramCount++}`); values.push(teamsters_agreement_id); }
+    if (applied_sideletters !== undefined) { updates.push(`applied_sideletters = $${paramCount++}`); values.push(JSON.stringify(applied_sideletters)); }
+    if (is_union_signatory !== undefined) { updates.push(`is_union_signatory = $${paramCount++}`); values.push(is_union_signatory); }
+    if (agreement_notes !== undefined) { updates.push(`agreement_notes = $${paramCount++}`); values.push(agreement_notes); }
+
+    if (updates.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'No fields to update',
+      });
+    }
+
+    // Add updated_at
+    updates.push(`updated_at = CURRENT_TIMESTAMP`);
+    values.push(id);
+
+    const result = await db.query(
+      `UPDATE productions SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING *`,
+      values
+    );
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error updating production:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
 // Delete production by ID
 app.delete('/api/productions/:id', async (req, res) => {
   try {
@@ -2269,8 +2682,7 @@ app.get('/api/productions/:production_id/line-items', async (req, res) => {
         bli.*,
         cp.position_title,
         cp.union_local,
-        cp.department,
-        cp.atl_or_btl
+        cp.department
       FROM budget_line_items bli
       LEFT JOIN crew_positions cp ON bli.position_id = cp.id
       WHERE bli.production_id = $1
@@ -3639,6 +4051,982 @@ app.post('/api/ai/crew/apply/:productionId', async (req, res) => {
       success: false,
       error: error.message
     });
+  }
+});
+
+// Auto-generate budget for a production using AI crew builder + agreement rules
+app.post('/api/productions/:productionId/auto-generate-budget', async (req, res) => {
+  const { productionId } = req.params;
+  const { includeAll = true } = req.body; // Whether to include all positions or just essentials
+
+  try {
+    aiLogger.info('Auto-generating budget for production', { productionId });
+
+    // 1. Fetch production details
+    const prodResult = await db.query(
+      'SELECT * FROM productions WHERE id = $1',
+      [productionId]
+    );
+
+    if (prodResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Production not found' });
+    }
+
+    const production = prodResult.rows[0];
+    const startDate = production.principal_photography_start;
+    const productionType = production.production_type || 'single_camera';
+    const budget = parseFloat(production.budget_target) || 10000000;
+    const location = production.shooting_location || 'Los Angeles';
+    const episodeCount = production.episode_count || 1;
+    const shootDays = episodeCount * 8; // Estimate 8 days per episode
+
+    aiLogger.debug('Production details', { productionType, budget, location, shootDays, startDate });
+
+    // 2. Get crew recommendations using existing smart crew builder
+    const crewRecommendations = await recommendCrew(db, {
+      productionType,
+      budget,
+      shootDays,
+      location,
+      episodeCount
+    });
+
+    // 3. Get period rules for overtime calculations
+    const periodRulesResult = await db.query(
+      `SELECT * FROM period_rules
+       WHERE union_local = 'IATSE'
+       AND effective_date <= $1
+       ORDER BY effective_date DESC`,
+      [startDate || new Date()]
+    );
+    const periodRules = periodRulesResult.rows;
+
+    // 4. Get meal penalty rates
+    const mealPenaltyResult = await db.query(
+      `SELECT * FROM meal_penalties
+       WHERE union_local = 'IATSE'
+       AND effective_date <= $1
+       ORDER BY effective_date DESC
+       LIMIT 1`,
+      [startDate || new Date()]
+    );
+    const mealPenalty = mealPenaltyResult.rows[0];
+
+    // 5. Get typical crew from production_type_crews if available
+    const crewTemplateResult = await db.query(
+      `SELECT ptc.*, rc.base_rate, rc.rate_type
+       FROM production_type_crews ptc
+       LEFT JOIN rate_cards rc ON
+         rc.job_classification ILIKE '%' || ptc.position_title || '%'
+         AND rc.union_local ILIKE '%' || ptc.union_local || '%'
+         AND rc.effective_date <= $2
+       WHERE ptc.production_type = $1
+       ORDER BY ptc.sort_order, rc.effective_date DESC`,
+      [productionType, startDate || new Date()]
+    );
+
+    // 6. Delete existing budget line items (to regenerate)
+    await db.query(
+      'DELETE FROM budget_line_items WHERE production_id = $1',
+      [productionId]
+    );
+
+    let itemsCreated = 0;
+    let totalBudget = 0;
+
+    // 7. Create line items from either crew template or AI recommendations
+    if (crewTemplateResult.rows.length > 0) {
+      // Use our new production_type_crews table
+      const seenPositions = new Set();
+      const accountCodeCounter = {}; // Track used account codes per category
+
+      for (const crew of crewTemplateResult.rows) {
+        // Skip duplicates (from multiple rate matches)
+        const posKey = `${crew.department}-${crew.position_title}`;
+        if (seenPositions.has(posKey)) continue;
+        seenPositions.add(posKey);
+
+        // Get the best rate for this position
+        const rateResult = await db.query(
+          `SELECT base_rate, rate_type FROM rate_cards
+           WHERE job_classification ILIKE $1
+           AND (location ILIKE $2 OR location = 'National' OR location IS NULL)
+           AND effective_date <= $3
+           ORDER BY
+             CASE WHEN location ILIKE $2 THEN 0 ELSE 1 END,
+             effective_date DESC
+           LIMIT 1`,
+          [`%${crew.position_title}%`, `%${location}%`, startDate || new Date()]
+        );
+
+        const rate = rateResult.rows[0]?.base_rate || 2000;
+        const rateType = rateResult.rows[0]?.rate_type || 'weekly';
+
+        // Calculate days from template
+        const prepDays = crew.typical_prep_days || 0;
+        const shootDaysForPos = crew.typical_shoot_days || shootDays;
+        const wrapDays = crew.typical_wrap_days || 0;
+        const totalDays = prepDays + shootDaysForPos + wrapDays;
+
+        // Convert to weeks for weekly rates
+        const quantity = rateType === 'weekly' ? Math.ceil(totalDays / 5) : totalDays;
+        const subtotal = rate * quantity;
+        const fringes = subtotal * 0.32; // 32% fringe estimate
+        const total = subtotal + fringes;
+
+        // Generate unique account code for crew positions
+        // Extract category from department (e.g., "Production" -> "20", "Camera" -> "33")
+        const deptLower = crew.department?.toLowerCase() || '';
+        let categoryCode = '20'; // Default to production
+
+        if (deptLower.includes('camera')) categoryCode = '33';
+        else if (deptLower.includes('sound')) categoryCode = '37';
+        else if (deptLower.includes('grip')) categoryCode = '25';
+        else if (deptLower.includes('electric') || deptLower.includes('lighting')) categoryCode = '32';
+        else if (deptLower.includes('art')) categoryCode = '22';
+        else if (deptLower.includes('location')) categoryCode = '36';
+        else if (deptLower.includes('transport')) categoryCode = '35';
+        else if (deptLower.includes('wardrobe') || deptLower.includes('costume')) categoryCode = '29';
+        else if (deptLower.includes('property') || deptLower.includes('prop')) categoryCode = '28';
+        else if (deptLower.includes('makeup') || deptLower.includes('hair')) categoryCode = '31';
+        else if (deptLower.includes('post')) categoryCode = '43';
+
+        // Generate sequential account code within category
+        if (!accountCodeCounter[categoryCode]) {
+          accountCodeCounter[categoryCode] = 1;
+        }
+        const accountCode = `${categoryCode}${String(accountCodeCounter[categoryCode]).padStart(2, '0')}`;
+        accountCodeCounter[categoryCode]++;
+
+        await db.query(
+          `INSERT INTO budget_line_items (
+            production_id, account_code, description, quantity, rate,
+            subtotal, fringes, total, notes, atl_or_btl
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+          [
+            productionId,
+            accountCode,
+            `${crew.position_title} (${crew.department})`,
+            quantity,
+            rate,
+            subtotal,
+            fringes,
+            total,
+            `${crew.union_local} - Prep: ${prepDays}d, Shoot: ${shootDaysForPos}d, Wrap: ${wrapDays}d`,
+            'BTL'
+          ]
+        );
+
+        itemsCreated++;
+        totalBudget += total;
+      }
+    } else if (crewRecommendations.departments) {
+      // Fall back to AI crew recommendations
+      const accountCodeCounter = {}; // Track used account codes
+
+      for (const dept of crewRecommendations.departments) {
+        for (const position of dept.positions || []) {
+          // Generate unique account code if not provided
+          let accountCode = position.accountCode;
+          if (!accountCode || accountCode === '0000') {
+            const categoryCode = dept.categoryCode || '20';
+            if (!accountCodeCounter[categoryCode]) {
+              accountCodeCounter[categoryCode] = 1;
+            }
+            accountCode = `${categoryCode}${String(accountCodeCounter[categoryCode]).padStart(2, '0')}`;
+            accountCodeCounter[categoryCode]++;
+          }
+
+          await db.query(
+            `INSERT INTO budget_line_items (
+              production_id, account_code, description, quantity, rate,
+              subtotal, fringes, total, notes, atl_or_btl
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+            [
+              productionId,
+              accountCode,
+              position.position,
+              position.weeks * (position.quantity || 1),
+              position.weeklyRate || 0,
+              position.baseCost || 0,
+              position.fringes || 0,
+              position.total || 0,
+              `${position.union || 'Union'} - ${position.quantity || 1} × ${position.weeks || 1} weeks`,
+              'BTL'
+            ]
+          );
+          itemsCreated++;
+          totalBudget += position.total || 0;
+        }
+      }
+    }
+
+    // 8. Add meal penalty allowance line item
+    if (mealPenalty) {
+      const mealPenaltyAllowance = shootDays * 2 * parseFloat(mealPenalty.first_penalty_rate); // Estimate 2 per day
+      await db.query(
+        `INSERT INTO budget_line_items (
+          production_id, account_code, description, quantity, rate,
+          subtotal, fringes, total, notes, atl_or_btl
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          productionId,
+          '3685', // Misc Expenses under Location department
+          'Meal Penalty Allowance',
+          shootDays,
+          mealPenalty.first_penalty_rate * 2,
+          mealPenaltyAllowance,
+          0,
+          mealPenaltyAllowance,
+          `Estimated 2 penalties/day × $${mealPenalty.first_penalty_rate}/violation`,
+          'BTL'
+        ]
+      );
+      itemsCreated++;
+      totalBudget += mealPenaltyAllowance;
+    }
+
+    // 9. Add Above the Line (ATL) costs - typically 35-45% of budget
+    const atlBudget = budget * 0.40; // 40% for ATL
+
+    // Query chart_of_accounts for unique ATL account codes
+    const atlAccountsResult = await db.query(`
+      SELECT account_code, account_name FROM chart_of_accounts
+      WHERE account_type = 'ATL'
+      AND account_code IN ('1101', '1201', '1301', '1400', '1504', '1600')
+      ORDER BY account_code
+    `);
+
+    const atlCategories = [
+      { code: atlAccountsResult.rows.find(a => a.account_code === '1101')?.account_code || '1101',
+        desc: 'Story & Rights', pct: 0.05, fringePct: 0 }, // Non-labor
+      { code: atlAccountsResult.rows.find(a => a.account_code === '1201')?.account_code || '1201',
+        desc: 'Producers', pct: 0.08, fringePct: 0.25 }, // 25% fringes
+      { code: atlAccountsResult.rows.find(a => a.account_code === '1301')?.account_code || '1301',
+        desc: 'Directors', pct: 0.10, fringePct: 0.31 }, // DGA 31% fringes
+      { code: atlAccountsResult.rows.find(a => a.account_code === '1400')?.account_code || '1400',
+        desc: 'Cast', pct: 0.70, fringePct: 0.25 }, // SAG-AFTRA 25% fringes (increased from 0.65 to account for fringes)
+      { code: atlAccountsResult.rows.find(a => a.account_code === '1504')?.account_code || '1504',
+        desc: 'Travel & Living - ATL', pct: 0.07, fringePct: 0 } // Non-labor
+    ];
+
+    for (const cat of atlCategories) {
+      const subtotal = atlBudget * cat.pct;
+      const fringes = subtotal * cat.fringePct;
+      const total = subtotal + fringes;
+
+      await db.query(
+        `INSERT INTO budget_line_items (
+          production_id, account_code, description, quantity, rate,
+          subtotal, fringes, total, notes, atl_or_btl
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          productionId,
+          cat.code,
+          cat.desc,
+          1,
+          subtotal,
+          subtotal,
+          fringes,
+          total,
+          cat.fringePct > 0
+            ? `Estimated ${(cat.pct * 100).toFixed(0)}% of ATL budget ($${atlBudget.toLocaleString()}) + ${(cat.fringePct * 100).toFixed(0)}% fringes`
+            : `Estimated ${(cat.pct * 100).toFixed(0)}% of ATL budget ($${atlBudget.toLocaleString()})`,
+          'ATL'
+        ]
+      );
+      itemsCreated++;
+      totalBudget += total;
+    }
+
+    // 10. Add Production Costs (equipment, locations, sets, etc.)
+    const prodCostsBudget = budget * 0.25; // 25% for production costs
+
+    // Query chart_of_accounts for unique BTL account codes
+    const btlAccountsResult = await db.query(`
+      SELECT account_code, account_name FROM chart_of_accounts
+      WHERE account_type = 'BTL'
+      AND account_code IN ('2101', '2216', '2316', '2716', '2816', '2908', '3116', '3318', '2518', '3216', '3518')
+      ORDER BY account_code
+    `);
+
+    const prodCosts = [
+      { code: btlAccountsResult.rows.find(a => a.account_code === '2101')?.account_code || '2101',
+        desc: 'Extra Talent - Stand-Ins', amount: prodCostsBudget * 0.08 },
+      { code: btlAccountsResult.rows.find(a => a.account_code === '2216')?.account_code || '2216',
+        desc: 'Set Design - Purchases', amount: prodCostsBudget * 0.20 },
+      { code: btlAccountsResult.rows.find(a => a.account_code === '2316')?.account_code || '2316',
+        desc: 'Set Construction - Purchases', amount: prodCostsBudget * 0.25 },
+      { code: btlAccountsResult.rows.find(a => a.account_code === '2716')?.account_code || '2716',
+        desc: 'Set Dressing - Purchases', amount: prodCostsBudget * 0.10 },
+      { code: btlAccountsResult.rows.find(a => a.account_code === '2816')?.account_code || '2816',
+        desc: 'Prop Purchases', amount: prodCostsBudget * 0.08 },
+      { code: btlAccountsResult.rows.find(a => a.account_code === '2908')?.account_code || '2908',
+        desc: 'Wardrobe - Alterations & Repairs', amount: prodCostsBudget * 0.09 },
+      { code: btlAccountsResult.rows.find(a => a.account_code === '3116')?.account_code || '3116',
+        desc: 'Makeup & Hair Supplies', amount: prodCostsBudget * 0.05 },
+      { code: btlAccountsResult.rows.find(a => a.account_code === '3318')?.account_code || '3318',
+        desc: 'Camera Equipment Rentals', amount: prodCostsBudget * 0.05 },
+      { code: btlAccountsResult.rows.find(a => a.account_code === '2518')?.account_code || '2518',
+        desc: 'Grip Equipment Rentals', amount: prodCostsBudget * 0.03 },
+      { code: btlAccountsResult.rows.find(a => a.account_code === '3216')?.account_code || '3216',
+        desc: 'Lighting Purchases', amount: prodCostsBudget * 0.04 },
+      { code: btlAccountsResult.rows.find(a => a.account_code === '3518')?.account_code || '3518',
+        desc: 'Transportation - Vehicle Rentals', amount: prodCostsBudget * 0.03 }
+    ];
+
+    for (const cost of prodCosts) {
+      await db.query(
+        `INSERT INTO budget_line_items (
+          production_id, account_code, description, quantity, rate,
+          subtotal, fringes, total, notes, atl_or_btl
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          productionId,
+          cost.code,
+          cost.desc,
+          1,
+          cost.amount,
+          cost.amount,
+          0,
+          cost.amount,
+          'Estimated production cost allocation',
+          'BTL'
+        ]
+      );
+      itemsCreated++;
+      totalBudget += cost.amount;
+    }
+
+    // 11. Add Post-Production costs - typically 20% of budget
+    const postBudget = budget * 0.20;
+
+    // Query chart_of_accounts for unique POST account codes
+    const postAccountsResult = await db.query(`
+      SELECT account_code, account_name FROM chart_of_accounts
+      WHERE account_type = 'POST'
+      AND account_code IN ('4100', '4432', '4602', '4605', '4646', '4206')
+      ORDER BY account_code
+    `);
+
+    const postCosts = [
+      { code: postAccountsResult.rows.find(a => a.account_code === '4100')?.account_code || '4100',
+        desc: 'Editing & Post Tests', amount: postBudget * 0.15 },
+      { code: postAccountsResult.rows.find(a => a.account_code === '4432')?.account_code || '4432',
+        desc: 'Visual Effects', amount: postBudget * 0.35 },
+      { code: postAccountsResult.rows.find(a => a.account_code === '4602')?.account_code || '4602',
+        desc: 'Composer', amount: postBudget * 0.15 },
+      { code: postAccountsResult.rows.find(a => a.account_code === '4605')?.account_code || '4605',
+        desc: 'Licensed Music & Supervision', amount: postBudget * 0.15 },
+      { code: postAccountsResult.rows.find(a => a.account_code === '4646')?.account_code || '4646',
+        desc: 'Music License Buyout', amount: postBudget * 0.10 },
+      { code: postAccountsResult.rows.find(a => a.account_code === '4206')?.account_code || '4206',
+        desc: 'Stage Rental & Facilities', amount: postBudget * 0.10 }
+    ];
+
+    for (const cost of postCosts) {
+      await db.query(
+        `INSERT INTO budget_line_items (
+          production_id, account_code, description, quantity, rate,
+          subtotal, fringes, total, notes, atl_or_btl
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          productionId,
+          cost.code,
+          cost.desc,
+          1,
+          cost.amount,
+          cost.amount,
+          0,
+          cost.amount,
+          'Estimated post-production cost',
+          'Other'
+        ]
+      );
+      itemsCreated++;
+      totalBudget += cost.amount;
+    }
+
+    // 12. Add Other Costs (insurance, contingency)
+    const otherBudget = budget * 0.12; // 12% for insurance & contingency
+
+    // Query chart_of_accounts for unique OTHER account codes
+    const otherAccountsResult = await db.query(`
+      SELECT account_code, account_name FROM chart_of_accounts
+      WHERE account_type = 'OTHER'
+      AND account_code IN ('6701', '6864', '6885')
+      ORDER BY account_code
+    `);
+
+    const otherCosts = [
+      { code: otherAccountsResult.rows.find(a => a.account_code === '6701')?.account_code || '6701',
+        desc: 'Production Insurance', amount: otherBudget * 0.25 },
+      { code: otherAccountsResult.rows.find(a => a.account_code === '6864')?.account_code || '6864',
+        desc: 'Accounting & Administrative', amount: otherBudget * 0.25 },
+      { code: otherAccountsResult.rows.find(a => a.account_code === '6885')?.account_code || '6885',
+        desc: 'Contingency & Misc Expenses', amount: otherBudget * 0.50 }
+    ];
+
+    for (const cost of otherCosts) {
+      await db.query(
+        `INSERT INTO budget_line_items (
+          production_id, account_code, description, quantity, rate,
+          subtotal, fringes, total, notes, atl_or_btl
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          productionId,
+          cost.code,
+          cost.desc,
+          1,
+          cost.amount,
+          cost.amount,
+          0,
+          cost.amount,
+          'Estimated other cost',
+          'Other'
+        ]
+      );
+      itemsCreated++;
+      totalBudget += cost.amount;
+    }
+
+    res.json({
+      success: true,
+      message: `Auto-generated budget with ${itemsCreated} line items`,
+      itemsCreated,
+      estimatedTotal: totalBudget,
+      periodRules: periodRules.map(r => ({
+        period: r.period_type,
+        standardHours: r.standard_hours_per_day,
+        overtimeAfter: r.overtime_start_hour,
+        doubleTimeAfter: r.double_time_start_hour
+      })),
+      mealPenalty: mealPenalty ? {
+        deadline: `${mealPenalty.first_meal_deadline_hours} hours`,
+        rate: mealPenalty.first_penalty_rate
+      } : null,
+      productionDetails: {
+        type: productionType,
+        location,
+        budget,
+        shootDays,
+        startDate
+      }
+    });
+
+  } catch (error) {
+    aiLogger.error('Auto-generate budget failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Get IATSE Videotape 2024-27 wage rates
+app.get('/api/ai/crew/union-rates/iatse-videotape', async (req, res) => {
+  try {
+    // IATSE Videotape Agreement 2024-27 wage rates (extracted from official PDF)
+    const iatseVideotapeRates = {
+      union: 'IATSE',
+      agreement: 'Videotape Electronics Supplemental Basic Agreement',
+      effectivePeriod: '2024-2027',
+      currentPeriod: '2024-25',
+      minimumCall: { daily: '8 hours', weekly: '8 hours, 5 consecutive days' },
+      dramatic: {
+        description: 'Dramatic Programs - Article 15(a) - 3rd+ seasons',
+        daily: {
+          technical_supervisor: 631, technical_director: 631, editor: 618,
+          audio_mixer: 618, director_of_photography: 618, video_cameraperson: 552,
+          digital_imaging_technician: 692, video_controller_shader: 552,
+          camera_utility: 523, digital_utility: 364, videotape_operator: 418,
+          stagecraft_chief: 479, stagecraft_other: 398, script_supervisor: 407,
+          makeup_artist: 492, hair_stylist: 430, costumer: 399,
+          set_decorator: 524, scenic_artist: 479
+        },
+        weekly: {
+          technical_supervisor: 2863, technical_director: 2863, editor: 2817,
+          audio_mixer: 2817, director_of_photography: 2817, video_cameraperson: 2558,
+          digital_imaging_technician: 3170, video_controller_shader: 2558,
+          camera_utility: 2353, videotape_operator: 1950, stagecraft_chief: 2214,
+          stagecraft_other: 1810, script_supervisor: 1880, makeup_artist: 2217,
+          hair_stylist: 1947, costumer: 1831, art_director: 3972,
+          set_decorator: 2414, scenic_artist: 2081
+        }
+      },
+      nonDramatic: {
+        description: 'Non-Dramatic Programs - Article 15(b)(1) - Awards, parades, reality',
+        daily: {
+          technical_supervisor: 570, technical_director: 570, editor: 560,
+          audio_mixer: 560, director_of_photography: 560, video_cameraperson: 498,
+          digital_imaging_technician: 625, video_controller_shader: 498,
+          camera_utility: 475, digital_utility: 327, videotape_operator: 376,
+          stagecraft_chief: 434, stagecraft_other: 358, script_supervisor: 366,
+          makeup_artist: 441, hair_stylist: 387, costumer: 358,
+          set_decorator: 477, scenic_artist: 434
+        },
+        weekly: {
+          technical_supervisor: 2582, technical_director: 2582, editor: 2542,
+          audio_mixer: 2542, director_of_photography: 2542, video_cameraperson: 2305,
+          digital_imaging_technician: 2856, video_controller_shader: 2305,
+          camera_utility: 2123, videotape_operator: 1763, stagecraft_chief: 1994,
+          stagecraft_other: 1631, script_supervisor: 1700, makeup_artist: 1998,
+          hair_stylist: 1763, costumer: 1655, art_director: 3579,
+          set_decorator: 2181, scenic_artist: 1879
+        }
+      },
+      reality: {
+        description: 'Non-Dramatic Programs - Article 15(b)(2) - Reality shows',
+        daily: {
+          technical_supervisor: 587, technical_director: 587, editor: 577,
+          audio_mixer: 577, director_of_photography: 577, video_cameraperson: 513,
+          digital_imaging_technician: 644, video_controller_shader: 513,
+          camera_utility: 489, digital_utility: 337, videotape_operator: 387,
+          stagecraft_chief: 447, stagecraft_other: 369, script_supervisor: 377,
+          makeup_artist: 454, hair_stylist: 399, costumer: 369,
+          set_decorator: 491, scenic_artist: 447
+        },
+        weekly: {
+          technical_supervisor: 2659, technical_director: 2659, editor: 2618,
+          audio_mixer: 2618, director_of_photography: 2618, video_cameraperson: 2374,
+          digital_imaging_technician: 2941, video_controller_shader: 2374,
+          camera_utility: 2187, videotape_operator: 1816, stagecraft_chief: 2054,
+          stagecraft_other: 1680, script_supervisor: 1752, makeup_artist: 2058,
+          hair_stylist: 1816, costumer: 1705, art_director: 3686,
+          set_decorator: 2246, scenic_artist: 1936
+        }
+      },
+      notes: [
+        'Entry level videotape operators eligible for higher rate after 1 year',
+        'Stagecraft crane/dolly/dimmer board operators receive additional $0.65/hour',
+        'Aerial lift work (35+ feet) receives additional $0.65/hour',
+        'Licensed powderman receives $20.00 bonus per shift'
+      ]
+    };
+
+    res.json({
+      success: true,
+      data: iatseVideotapeRates
+    });
+  } catch (error) {
+    aiLogger.error('Failed to get IATSE Videotape rates', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Seed IATSE Videotape 2024-27 rates into the database
+app.post('/api/ai/crew/union-rates/iatse-videotape/seed', async (req, res) => {
+  try {
+    aiLogger.info('Seeding IATSE Videotape 2024-27 rates into database');
+
+    // Define the rates to insert
+    const rates = [];
+    const effectiveDate = '2024-09-29';
+    const contractYear = 1;
+    const wageIncreasePct = 4.0;
+
+    // Production types mapping
+    const productionTypes = [
+      { type: 'dramatic', prodType: 'dramatic_videotape', location: 'Los Angeles - Studio' },
+      { type: 'nonDramatic', prodType: 'non_dramatic_videotape', location: 'Los Angeles - Studio' },
+      { type: 'reality', prodType: 'reality_videotape', location: 'Los Angeles - Studio' }
+    ];
+
+    // IATSE Videotape rates (2024-25)
+    const rateData = {
+      dramatic: {
+        daily: {
+          technical_supervisor: 631, technical_director: 631, editor: 618,
+          audio_mixer: 618, director_of_photography: 618, video_cameraperson: 552,
+          digital_imaging_technician: 692, video_controller_shader: 552,
+          camera_utility: 523, digital_utility: 364, videotape_operator: 418,
+          stagecraft_chief: 479, stagecraft_other: 398, script_supervisor: 407,
+          makeup_artist: 492, hair_stylist: 430, costumer: 399,
+          set_decorator: 524, scenic_artist: 479
+        },
+        weekly: {
+          technical_supervisor: 2863, technical_director: 2863, editor: 2817,
+          audio_mixer: 2817, director_of_photography: 2817, video_cameraperson: 2558,
+          digital_imaging_technician: 3170, video_controller_shader: 2558,
+          camera_utility: 2353, videotape_operator: 1950, stagecraft_chief: 2214,
+          stagecraft_other: 1810, script_supervisor: 1880, makeup_artist: 2217,
+          hair_stylist: 1947, costumer: 1831, art_director: 3972,
+          set_decorator: 2414, scenic_artist: 2081
+        }
+      },
+      nonDramatic: {
+        daily: {
+          technical_supervisor: 570, technical_director: 570, editor: 560,
+          audio_mixer: 560, director_of_photography: 560, video_cameraperson: 498,
+          digital_imaging_technician: 625, video_controller_shader: 498,
+          camera_utility: 475, digital_utility: 327, videotape_operator: 376,
+          stagecraft_chief: 434, stagecraft_other: 358, script_supervisor: 366,
+          makeup_artist: 441, hair_stylist: 387, costumer: 358,
+          set_decorator: 477, scenic_artist: 434
+        },
+        weekly: {
+          technical_supervisor: 2582, technical_director: 2582, editor: 2542,
+          audio_mixer: 2542, director_of_photography: 2542, video_cameraperson: 2305,
+          digital_imaging_technician: 2856, video_controller_shader: 2305,
+          camera_utility: 2123, videotape_operator: 1763, stagecraft_chief: 1994,
+          stagecraft_other: 1631, script_supervisor: 1700, makeup_artist: 1998,
+          hair_stylist: 1763, costumer: 1655, art_director: 3579,
+          set_decorator: 2181, scenic_artist: 1879
+        }
+      },
+      reality: {
+        daily: {
+          technical_supervisor: 587, technical_director: 587, editor: 577,
+          audio_mixer: 577, director_of_photography: 577, video_cameraperson: 513,
+          digital_imaging_technician: 644, video_controller_shader: 513,
+          camera_utility: 489, digital_utility: 337, videotape_operator: 387,
+          stagecraft_chief: 447, stagecraft_other: 369, script_supervisor: 377,
+          makeup_artist: 454, hair_stylist: 399, costumer: 369,
+          set_decorator: 491, scenic_artist: 447
+        },
+        weekly: {
+          technical_supervisor: 2659, technical_director: 2659, editor: 2618,
+          audio_mixer: 2618, director_of_photography: 2618, video_cameraperson: 2374,
+          digital_imaging_technician: 2941, video_controller_shader: 2374,
+          camera_utility: 2187, videotape_operator: 1816, stagecraft_chief: 2054,
+          stagecraft_other: 1680, script_supervisor: 1752, makeup_artist: 2058,
+          hair_stylist: 1816, costumer: 1705, art_director: 3686,
+          set_decorator: 2246, scenic_artist: 1936
+        }
+      }
+    };
+
+    // Job classification name mapping (snake_case to Title Case)
+    const classificationNames = {
+      technical_supervisor: 'Technical Supervisor',
+      technical_director: 'Technical Director',
+      editor: 'Editor',
+      audio_mixer: 'Audio Mixer',
+      director_of_photography: 'Director of Photography',
+      video_cameraperson: 'Video Cameraperson',
+      digital_imaging_technician: 'Digital Imaging Technician',
+      video_controller_shader: 'Video Controller/Shader',
+      camera_utility: 'Camera Utility',
+      digital_utility: 'Digital Utility',
+      videotape_operator: 'Videotape Operator',
+      stagecraft_chief: 'Stagecraft Chief',
+      stagecraft_other: 'Stagecraft Other',
+      script_supervisor: 'Script Supervisor',
+      makeup_artist: 'Makeup Artist',
+      hair_stylist: 'Hair Stylist',
+      costumer: 'Costumer',
+      set_decorator: 'Set Decorator',
+      scenic_artist: 'Scenic Artist',
+      art_director: 'Art Director'
+    };
+
+    // Build INSERT statements
+    for (const pt of productionTypes) {
+      const typeData = rateData[pt.type];
+
+      // Daily rates
+      for (const [job, rate] of Object.entries(typeData.daily)) {
+        rates.push({
+          union_local: 'IATSE Videotape',
+          job_classification: classificationNames[job] || job,
+          rate_type: 'daily',
+          base_rate: rate,
+          location: pt.location,
+          production_type: pt.prodType,
+          effective_date: effectiveDate,
+          contract_year: contractYear,
+          wage_increase_pct: wageIncreasePct
+        });
+      }
+
+      // Weekly rates
+      for (const [job, rate] of Object.entries(typeData.weekly)) {
+        rates.push({
+          union_local: 'IATSE Videotape',
+          job_classification: classificationNames[job] || job,
+          rate_type: 'weekly',
+          base_rate: rate,
+          location: pt.location,
+          production_type: pt.prodType,
+          effective_date: effectiveDate,
+          contract_year: contractYear,
+          wage_increase_pct: wageIncreasePct
+        });
+      }
+    }
+
+    // Check if IATSE Videotape rates already exist
+    const existing = await db.query(`
+      SELECT COUNT(*) as count FROM rate_cards WHERE union_local = 'IATSE Videotape'
+    `);
+
+    if (parseInt(existing.rows[0].count) > 0) {
+      // Delete existing rates first to avoid duplicates
+      await db.query(`DELETE FROM rate_cards WHERE union_local = 'IATSE Videotape'`);
+      aiLogger.info('Deleted existing IATSE Videotape rates');
+    }
+
+    // Insert all rates
+    let inserted = 0;
+
+    for (const rate of rates) {
+      await db.query(`
+        INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date, contract_year, wage_increase_pct)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `, [rate.union_local, rate.job_classification, rate.rate_type, rate.base_rate, rate.location, rate.production_type, rate.effective_date, rate.contract_year, rate.wage_increase_pct]);
+      inserted++;
+    }
+
+    aiLogger.info('IATSE Videotape rates seeded', { inserted, total: rates.length });
+
+    res.json({
+      success: true,
+      message: `Seeded ${rates.length} IATSE Videotape rate cards`,
+      details: { inserted, total: rates.length }
+    });
+  } catch (error) {
+    aiLogger.error('Failed to seed IATSE Videotape rates', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Seed Chart of Accounts from budget templates
+app.post('/api/chart-of-accounts/seed', async (req, res) => {
+  try {
+    aiLogger.info('Seeding Chart of Accounts from budget templates');
+
+    // Check if table exists, create if it doesn't
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS chart_of_accounts (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        account_code VARCHAR(10) NOT NULL UNIQUE,
+        category_code VARCHAR(4),
+        category_name VARCHAR(255),
+        account_name VARCHAR(255) NOT NULL,
+        account_type VARCHAR(50),
+        department VARCHAR(100),
+        is_labor BOOLEAN DEFAULT false,
+        is_fringe_account BOOLEAN DEFAULT false,
+        standard_system VARCHAR(50) DEFAULT 'STANDARD',
+        sort_order INT
+      )
+    `);
+
+    // Define all account codes from budget templates
+    const accounts = [
+      { code: '1100', category: '11', categoryName: 'WRITER', name: 'WRITER', type: 'ATL', dept: 'WRITER', isLabor: false },
+      { code: '1101', category: '11', categoryName: 'WRITER', name: 'WRITER', type: 'ATL', dept: 'WRITER', isLabor: true },
+      { code: '1102', category: '11', categoryName: 'WRITER', name: 'SCRIPT CLEARANCE RESEARCH', type: 'ATL', dept: 'WRITER', isLabor: false },
+      { code: '1200', category: '12', categoryName: 'PRODUCERS UNIT', name: 'PRODUCERS UNIT', type: 'ATL', dept: 'PRODUCERS UNIT', isLabor: false },
+      { code: '1201', category: '12', categoryName: 'PRODUCERS UNIT', name: 'EXECUTIVE PRODUCER', type: 'ATL', dept: 'PRODUCERS UNIT', isLabor: true },
+      { code: '1202', category: '12', categoryName: 'PRODUCERS UNIT', name: 'PRODUCER', type: 'ATL', dept: 'PRODUCERS UNIT', isLabor: true },
+      { code: '1207', category: '12', categoryName: 'PRODUCERS UNIT', name: 'PRODUCER\'S ASSISTANT', type: 'ATL', dept: 'PRODUCERS UNIT', isLabor: true },
+      { code: '1285', category: '12', categoryName: 'PRODUCERS UNIT', name: 'MISC EXPENSES', type: 'ATL', dept: 'PRODUCERS UNIT', isLabor: false },
+      { code: '1288', category: '12', categoryName: 'PRODUCERS UNIT', name: 'PRODUCER BONUS', type: 'ATL', dept: 'PRODUCERS UNIT', isLabor: true },
+      { code: '1300', category: '13', categoryName: 'DIRECTOR', name: 'DIRECTOR', type: 'ATL', dept: 'DIRECTOR', isLabor: false },
+      { code: '1301', category: '13', categoryName: 'DIRECTOR', name: 'DIRECTOR', type: 'ATL', dept: 'DIRECTOR', isLabor: true },
+      { code: '1309', category: '13', categoryName: 'DIRECTOR', name: 'PILOT ROYALTY', type: 'ATL', dept: 'DIRECTOR', isLabor: false },
+      { code: '1351', category: '13', categoryName: 'DIRECTOR', name: 'AIRFARES', type: 'ATL', dept: 'DIRECTOR', isLabor: false },
+      { code: '1352', category: '13', categoryName: 'DIRECTOR', name: 'HOTELS', type: 'ATL', dept: 'DIRECTOR', isLabor: false },
+      { code: '1353', category: '13', categoryName: 'DIRECTOR', name: 'MEALS/PER DIEM', type: 'ATL', dept: 'DIRECTOR', isLabor: false },
+      { code: '1355', category: '13', categoryName: 'DIRECTOR', name: 'AUTOS/TAXIS/LIMOS', type: 'ATL', dept: 'DIRECTOR', isLabor: false },
+      { code: '1385', category: '13', categoryName: 'DIRECTOR', name: 'MISCELLANEOUS', type: 'ATL', dept: 'DIRECTOR', isLabor: false },
+      { code: '1400', category: '14', categoryName: 'PRINCIPAL CAST', name: 'PRINCIPAL CAST', type: 'ATL', dept: 'PRINCIPAL CAST', isLabor: false },
+      { code: '1406', category: '14', categoryName: 'PRINCIPAL CAST', name: 'STUNT COORDINATOR', type: 'ATL', dept: 'PRINCIPAL CAST', isLabor: true },
+      { code: '1407', category: '14', categoryName: 'PRINCIPAL CAST', name: 'STUNTS & ADJUSTMENTS', type: 'ATL', dept: 'PRINCIPAL CAST', isLabor: false },
+      { code: '1417', category: '14', categoryName: 'PRINCIPAL CAST', name: 'RENTALS', type: 'ATL', dept: 'PRINCIPAL CAST', isLabor: false },
+      { code: '1500', category: '15', categoryName: 'ATL TRAVEL & LIVING', name: 'ATL TRAVEL & LIVING', type: 'ATL', dept: 'ATL TRAVEL & LIVING', isLabor: false },
+      { code: '1501', category: '15', categoryName: 'ATL TRAVEL & LIVING', name: 'AIRFARES', type: 'ATL', dept: 'ATL TRAVEL & LIVING', isLabor: false },
+      { code: '1502', category: '15', categoryName: 'ATL TRAVEL & LIVING', name: 'HOTELS', type: 'ATL', dept: 'ATL TRAVEL & LIVING', isLabor: false },
+      { code: '1503', category: '15', categoryName: 'ATL TRAVEL & LIVING', name: 'MEALS', type: 'ATL', dept: 'ATL TRAVEL & LIVING', isLabor: false },
+      { code: '1504', category: '15', categoryName: 'ATL TRAVEL & LIVING', name: 'PER DIEM/LIVING', type: 'ATL', dept: 'ATL TRAVEL & LIVING', isLabor: false },
+      { code: '1505', category: '15', categoryName: 'ATL TRAVEL & LIVING', name: 'GROUND TRANSPORTATION', type: 'ATL', dept: 'ATL TRAVEL & LIVING', isLabor: false },
+      { code: '1506', category: '15', categoryName: 'ATL TRAVEL & LIVING', name: 'RENTAL CARS', type: 'ATL', dept: 'ATL TRAVEL & LIVING', isLabor: false },
+      { code: '2000', category: '20', categoryName: 'PRODUCTION STAFF', name: 'PRODUCTION STAFF', type: 'BTL', dept: 'PRODUCTION STAFF', isLabor: false },
+      { code: '2002', category: '20', categoryName: 'PRODUCTION STAFF', name: '1ST ASSISTANT DIRECTOR', type: 'BTL', dept: 'PRODUCTION STAFF', isLabor: true },
+      { code: '2003', category: '20', categoryName: 'PRODUCTION STAFF', name: '2ND ASSISTANT DIRECTOR', type: 'BTL', dept: 'PRODUCTION STAFF', isLabor: true },
+      { code: '2005', category: '20', categoryName: 'PRODUCTION STAFF', name: 'SCRIPT SUPERVISOR', type: 'BTL', dept: 'PRODUCTION STAFF', isLabor: true },
+      { code: '2007', category: '20', categoryName: 'PRODUCTION STAFF', name: 'LOCATION MANAGER', type: 'BTL', dept: 'PRODUCTION STAFF', isLabor: true },
+      { code: '2008', category: '20', categoryName: 'PRODUCTION STAFF', name: 'ASSISTANT LOCATION MANAGER', type: 'BTL', dept: 'PRODUCTION STAFF', isLabor: true },
+      { code: '2009', category: '20', categoryName: 'PRODUCTION STAFF', name: 'PRODUCTION COORDINATOR', type: 'BTL', dept: 'PRODUCTION STAFF', isLabor: true },
+      { code: '2010', category: '20', categoryName: 'PRODUCTION STAFF', name: 'ASST PROD. OFFICE COORDINATOR', type: 'BTL', dept: 'PRODUCTION STAFF', isLabor: true },
+      { code: '2012', category: '20', categoryName: 'PRODUCTION STAFF', name: 'SET STAFF ASSISTANTS', type: 'BTL', dept: 'PRODUCTION STAFF', isLabor: true },
+      { code: '2013', category: '20', categoryName: 'PRODUCTION STAFF', name: 'PRODUCTION ACCOUNTANT', type: 'BTL', dept: 'PRODUCTION STAFF', isLabor: true },
+      { code: '2014', category: '20', categoryName: 'PRODUCTION STAFF', name: 'ASST ACCOUNTANTS', type: 'BTL', dept: 'PRODUCTION STAFF', isLabor: true },
+      { code: '2015', category: '20', categoryName: 'PRODUCTION STAFF', name: 'BOARD PREP', type: 'BTL', dept: 'PRODUCTION STAFF', isLabor: false },
+      { code: '2017', category: '20', categoryName: 'PRODUCTION STAFF', name: 'BOX/COMPUTER RENTALS', type: 'BTL', dept: 'PRODUCTION STAFF', isLabor: false },
+      { code: '2085', category: '20', categoryName: 'PRODUCTION STAFF', name: 'MISCELLANEOUS', type: 'BTL', dept: 'PRODUCTION STAFF', isLabor: false },
+      { code: '2100', category: '21', categoryName: 'EXTRA TALENT', name: 'EXTRA TALENT', type: 'BTL', dept: 'EXTRA TALENT', isLabor: false },
+      { code: '2101', category: '21', categoryName: 'EXTRA TALENT', name: 'STAND-INS', type: 'BTL', dept: 'EXTRA TALENT', isLabor: true },
+      { code: '2102', category: '21', categoryName: 'EXTRA TALENT', name: 'UNION EXTRAS', type: 'BTL', dept: 'EXTRA TALENT', isLabor: true },
+      { code: '2103', category: '21', categoryName: 'EXTRA TALENT', name: 'NON-UNION EXTRAS', type: 'BTL', dept: 'EXTRA TALENT', isLabor: true },
+      { code: '2107', category: '21', categoryName: 'EXTRA TALENT', name: 'WARDROBE FITTINGS', type: 'BTL', dept: 'EXTRA TALENT', isLabor: false },
+      { code: '2110', category: '21', categoryName: 'EXTRA TALENT', name: 'EXTRAS CASTING COORDINATOR', type: 'BTL', dept: 'EXTRA TALENT', isLabor: true },
+      { code: '2155', category: '21', categoryName: 'EXTRA TALENT', name: 'ATMOSPHERE CARS/MILEAGE', type: 'BTL', dept: 'EXTRA TALENT', isLabor: false },
+      { code: '2185', category: '21', categoryName: 'EXTRA TALENT', name: 'MISCELLANEOUS', type: 'BTL', dept: 'EXTRA TALENT', isLabor: false },
+      { code: '2200', category: '22', categoryName: 'SET DESIGN', name: 'SET DESIGN', type: 'BTL', dept: 'SET DESIGN', isLabor: false },
+      { code: '2202', category: '22', categoryName: 'SET DESIGN', name: 'ART DIRECTOR', type: 'BTL', dept: 'SET DESIGN', isLabor: true },
+      { code: '2213', category: '22', categoryName: 'SET DESIGN', name: 'ART DEPT COORDINATOR', type: 'BTL', dept: 'SET DESIGN', isLabor: true },
+      { code: '2216', category: '22', categoryName: 'SET DESIGN', name: 'PURCHASES', type: 'BTL', dept: 'SET DESIGN', isLabor: false },
+      { code: '2280', category: '22', categoryName: 'SET DESIGN', name: 'PRINTING/XEROX/PHOTO DEV', type: 'BTL', dept: 'SET DESIGN', isLabor: false },
+      { code: '2300', category: '23', categoryName: 'SET CONSTRUCTION', name: 'SET CONSTRUCTION', type: 'BTL', dept: 'SET CONSTRUCTION', isLabor: false },
+      { code: '2301', category: '23', categoryName: 'SET CONSTRUCTION', name: 'CONSTRUCTION LABOR', type: 'BTL', dept: 'SET CONSTRUCTION', isLabor: true },
+      { code: '2304', category: '23', categoryName: 'SET CONSTRUCTION', name: 'PAINT FOREMAN', type: 'BTL', dept: 'SET CONSTRUCTION', isLabor: true },
+      { code: '2305', category: '23', categoryName: 'SET CONSTRUCTION', name: 'GREENS', type: 'BTL', dept: 'SET CONSTRUCTION', isLabor: false },
+      { code: '2307', category: '23', categoryName: 'SET CONSTRUCTION', name: 'BACKINGS', type: 'BTL', dept: 'SET CONSTRUCTION', isLabor: false },
+      { code: '2308', category: '23', categoryName: 'SET CONSTRUCTION', name: 'GREENS LABOR', type: 'BTL', dept: 'SET CONSTRUCTION', isLabor: true },
+      { code: '2316', category: '23', categoryName: 'SET CONSTRUCTION', name: 'PURCHASES', type: 'BTL', dept: 'SET CONSTRUCTION', isLabor: false },
+      { code: '2385', category: '23', categoryName: 'SET CONSTRUCTION', name: 'OTHER COSTS', type: 'BTL', dept: 'SET CONSTRUCTION', isLabor: false },
+      { code: '2400', category: '24', categoryName: 'SET STRIKE', name: 'SET STRIKE', type: 'BTL', dept: 'SET STRIKE', isLabor: false },
+      { code: '2497', category: '24', categoryName: 'SET STRIKE', name: 'TRASH & HAZARDOUS WASTE REMOVAL', type: 'BTL', dept: 'SET STRIKE', isLabor: false },
+      { code: '2500', category: '25', categoryName: 'SET OPERATIONS', name: 'SET OPERATIONS', type: 'BTL', dept: 'SET OPERATIONS', isLabor: false },
+      { code: '2504', category: '25', categoryName: 'SET OPERATIONS', name: 'CRANE GRIP', type: 'BTL', dept: 'SET OPERATIONS', isLabor: true },
+      { code: '2505', category: '25', categoryName: 'SET OPERATIONS', name: 'COMPANY GRIPS', type: 'BTL', dept: 'SET OPERATIONS', isLabor: true },
+      { code: '2509', category: '25', categoryName: 'SET OPERATIONS', name: 'RIGGING CREW', type: 'BTL', dept: 'SET OPERATIONS', isLabor: true },
+      { code: '2512', category: '25', categoryName: 'SET OPERATIONS', name: 'CRAFTS SERVICE PURCHASES', type: 'BTL', dept: 'SET OPERATIONS', isLabor: false },
+      { code: '2516', category: '25', categoryName: 'SET OPERATIONS', name: 'PURCHASES', type: 'BTL', dept: 'SET OPERATIONS', isLabor: false },
+      { code: '2518', category: '25', categoryName: 'SET OPERATIONS', name: 'EQUIPMENT RENTALS', type: 'BTL', dept: 'SET OPERATIONS', isLabor: false },
+      { code: '2519', category: '25', categoryName: 'SET OPERATIONS', name: 'CRANES', type: 'BTL', dept: 'SET OPERATIONS', isLabor: false },
+      { code: '2520', category: '25', categoryName: 'SET OPERATIONS', name: 'GRIP PACKAGE', type: 'BTL', dept: 'SET OPERATIONS', isLabor: false },
+      { code: '2600', category: '26', categoryName: 'SPECIAL EFFECTS', name: 'SPECIAL EFFECTS', type: 'BTL', dept: 'SPECIAL EFFECTS', isLabor: false },
+      { code: '2602', category: '26', categoryName: 'SPECIAL EFFECTS', name: 'F/X FOREMAN', type: 'BTL', dept: 'SPECIAL EFFECTS', isLabor: true },
+      { code: '2603', category: '26', categoryName: 'SPECIAL EFFECTS', name: 'COMPANY F/X TECHNICIANS', type: 'BTL', dept: 'SPECIAL EFFECTS', isLabor: true },
+      { code: '2612', category: '26', categoryName: 'SPECIAL EFFECTS', name: 'MANUFACTURING - MATERIALS', type: 'BTL', dept: 'SPECIAL EFFECTS', isLabor: false },
+      { code: '2616', category: '26', categoryName: 'SPECIAL EFFECTS', name: 'MFG PURCHASES & RENTALS', type: 'BTL', dept: 'SPECIAL EFFECTS', isLabor: false },
+      { code: '2617', category: '26', categoryName: 'SPECIAL EFFECTS', name: 'BOX RENTALS', type: 'BTL', dept: 'SPECIAL EFFECTS', isLabor: false },
+      { code: '2618', category: '26', categoryName: 'SPECIAL EFFECTS', name: 'EQUIPMENT RENTALS', type: 'BTL', dept: 'SPECIAL EFFECTS', isLabor: false },
+      { code: '2655', category: '26', categoryName: 'SPECIAL EFFECTS', name: 'CAR ALLOWANCE', type: 'BTL', dept: 'SPECIAL EFFECTS', isLabor: false },
+      { code: '2700', category: '27', categoryName: 'SET DRESSING', name: 'SET DRESSING', type: 'BTL', dept: 'SET DRESSING', isLabor: false },
+      { code: '2703', category: '27', categoryName: 'SET DRESSING', name: 'SWING GANG', type: 'BTL', dept: 'SET DRESSING', isLabor: true },
+      { code: '2716', category: '27', categoryName: 'SET DRESSING', name: 'PURCHASES', type: 'BTL', dept: 'SET DRESSING', isLabor: false },
+      { code: '2717', category: '27', categoryName: 'SET DRESSING', name: 'BOX/COMPUTER RENTALS', type: 'BTL', dept: 'SET DRESSING', isLabor: false },
+      { code: '2718', category: '27', categoryName: 'SET DRESSING', name: 'RENTALS', type: 'BTL', dept: 'SET DRESSING', isLabor: false },
+      { code: '2800', category: '28', categoryName: 'PROPERTY', name: 'PROPERTY', type: 'BTL', dept: 'PROPERTY', isLabor: false },
+      { code: '2801', category: '28', categoryName: 'PROPERTY', name: 'PROPERTY MASTER', type: 'BTL', dept: 'PROPERTY', isLabor: true },
+      { code: '2803', category: '28', categoryName: 'PROPERTY', name: 'ADDITIONAL PROP LABOR', type: 'BTL', dept: 'PROPERTY', isLabor: true },
+      { code: '2816', category: '28', categoryName: 'PROPERTY', name: 'PROP PURCHASES', type: 'BTL', dept: 'PROPERTY', isLabor: false },
+      { code: '2817', category: '28', categoryName: 'PROPERTY', name: 'BOX RENTALS', type: 'BTL', dept: 'PROPERTY', isLabor: false },
+      { code: '2818', category: '28', categoryName: 'PROPERTY', name: 'PROP RENTALS', type: 'BTL', dept: 'PROPERTY', isLabor: false },
+      { code: '2855', category: '28', categoryName: 'PROPERTY', name: 'CAR ALLOWANCES', type: 'BTL', dept: 'PROPERTY', isLabor: false },
+      { code: '2898', category: '28', categoryName: 'PROPERTY', name: 'LOSS & DAMAGE', type: 'BTL', dept: 'PROPERTY', isLabor: false },
+      { code: '2900', category: '29', categoryName: 'WARDROBE', name: 'WARDROBE', type: 'BTL', dept: 'WARDROBE', isLabor: false },
+      { code: '2908', category: '29', categoryName: 'WARDROBE', name: 'ALTERATIONS & REPAIRS', type: 'BTL', dept: 'WARDROBE', isLabor: false },
+      { code: '2909', category: '29', categoryName: 'WARDROBE', name: 'CLEANING & DYEING', type: 'BTL', dept: 'WARDROBE', isLabor: false },
+      { code: '2916', category: '29', categoryName: 'WARDROBE', name: 'PURCHASES', type: 'BTL', dept: 'WARDROBE', isLabor: false },
+      { code: '2917', category: '29', categoryName: 'WARDROBE', name: 'BOX RENTALS', type: 'BTL', dept: 'WARDROBE', isLabor: false },
+      { code: '2918', category: '29', categoryName: 'WARDROBE', name: 'RENTALS', type: 'BTL', dept: 'WARDROBE', isLabor: false },
+      { code: '2955', category: '29', categoryName: 'WARDROBE', name: 'CAR ALLOWANCES', type: 'BTL', dept: 'WARDROBE', isLabor: false },
+      { code: '3000', category: '30', categoryName: 'PICTURE VEHICLES & ANIMALS', name: 'PICTURE VEHICLES & ANIMALS', type: 'BTL', dept: 'PICTURE VEHICLES & ANIMALS', isLabor: false },
+      { code: '3007', category: '30', categoryName: 'PICTURE VEHICLES & ANIMALS', name: 'PICTURE VEHICLE RENTALS', type: 'BTL', dept: 'PICTURE VEHICLES & ANIMALS', isLabor: false },
+      { code: '3011', category: '30', categoryName: 'PICTURE VEHICLES & ANIMALS', name: 'REPAIRS/MODIFICATIONS', type: 'BTL', dept: 'PICTURE VEHICLES & ANIMALS', isLabor: false },
+      { code: '3043', category: '30', categoryName: 'PICTURE VEHICLES & ANIMALS', name: 'WRANGLERS', type: 'BTL', dept: 'PICTURE VEHICLES & ANIMALS', isLabor: true },
+      { code: '3049', category: '30', categoryName: 'PICTURE VEHICLES & ANIMALS', name: 'ANIMAL TRANSPORT', type: 'BTL', dept: 'PICTURE VEHICLES & ANIMALS', isLabor: false },
+      { code: '3100', category: '31', categoryName: 'MAKEUP & HAIR STYLISTS', name: 'MAKEUP & HAIR STYLISTS', type: 'BTL', dept: 'MAKEUP & HAIR STYLISTS', isLabor: false },
+      { code: '3114', category: '31', categoryName: 'MAKEUP & HAIR STYLISTS', name: 'WIG & HAIR PURCHASE', type: 'BTL', dept: 'MAKEUP & HAIR STYLISTS', isLabor: false },
+      { code: '3116', category: '31', categoryName: 'MAKEUP & HAIR STYLISTS', name: 'MAKEUP/HAIR SUPPLIES', type: 'BTL', dept: 'MAKEUP & HAIR STYLISTS', isLabor: false },
+      { code: '3117', category: '31', categoryName: 'MAKEUP & HAIR STYLISTS', name: 'MAKE-UP/HAIR KIT RENTALS', type: 'BTL', dept: 'MAKEUP & HAIR STYLISTS', isLabor: false },
+      { code: '3200', category: '32', categoryName: 'LIGHTING', name: 'LIGHTING', type: 'BTL', dept: 'LIGHTING', isLabor: false },
+      { code: '3204', category: '32', categoryName: 'LIGHTING', name: 'COMPANY LABOR', type: 'BTL', dept: 'LIGHTING', isLabor: true },
+      { code: '3212', category: '32', categoryName: 'LIGHTING', name: 'GENERATOR FUEL', type: 'BTL', dept: 'LIGHTING', isLabor: false },
+      { code: '3216', category: '32', categoryName: 'LIGHTING', name: 'PURCHASES', type: 'BTL', dept: 'LIGHTING', isLabor: false },
+      { code: '3217', category: '32', categoryName: 'LIGHTING', name: 'BOX RENTALS', type: 'BTL', dept: 'LIGHTING', isLabor: false },
+      { code: '3220', category: '32', categoryName: 'LIGHTING', name: 'LIGHTING PACKAGE', type: 'BTL', dept: 'LIGHTING', isLabor: false },
+      { code: '3221', category: '32', categoryName: 'LIGHTING', name: 'CONDORS AND LIFTS', type: 'BTL', dept: 'LIGHTING', isLabor: false },
+      { code: '3300', category: '33', categoryName: 'CAMERA', name: 'CAMERA', type: 'BTL', dept: 'CAMERA', isLabor: false },
+      { code: '3303', category: '33', categoryName: 'CAMERA', name: 'ADDITIONAL CAMERA OPERATOR', type: 'BTL', dept: 'CAMERA', isLabor: true },
+      { code: '3305', category: '33', categoryName: 'CAMERA', name: '1ST ASSISTANT CAMERA', type: 'BTL', dept: 'CAMERA', isLabor: true },
+      { code: '3306', category: '33', categoryName: 'CAMERA', name: '2ND ASSISTANT CAMERA', type: 'BTL', dept: 'CAMERA', isLabor: true },
+      { code: '3316', category: '33', categoryName: 'CAMERA', name: 'PURCHASES', type: 'BTL', dept: 'CAMERA', isLabor: false },
+      { code: '3317', category: '33', categoryName: 'CAMERA', name: 'BOX RENTALS', type: 'BTL', dept: 'CAMERA', isLabor: false },
+      { code: '3318', category: '33', categoryName: 'CAMERA', name: 'EQUIPMENT RENTALS', type: 'BTL', dept: 'CAMERA', isLabor: false },
+      { code: '3319', category: '33', categoryName: 'CAMERA', name: 'STEADICAM RENTAL', type: 'BTL', dept: 'CAMERA', isLabor: false },
+      { code: '3400', category: '34', categoryName: 'PRODUCTION SOUND', name: 'PRODUCTION SOUND', type: 'BTL', dept: 'PRODUCTION SOUND', isLabor: false },
+      { code: '3404', category: '34', categoryName: 'PRODUCTION SOUND', name: 'VIDEO ASSIST OPERATOR', type: 'BTL', dept: 'PRODUCTION SOUND', isLabor: true },
+      { code: '3405', category: '34', categoryName: 'PRODUCTION SOUND', name: '24-FRAME PLAYBACK', type: 'BTL', dept: 'PRODUCTION SOUND', isLabor: false },
+      { code: '3416', category: '34', categoryName: 'PRODUCTION SOUND', name: 'PURCHASES', type: 'BTL', dept: 'PRODUCTION SOUND', isLabor: false },
+      { code: '3418', category: '34', categoryName: 'PRODUCTION SOUND', name: 'EQUIPMENT RENTALS', type: 'BTL', dept: 'PRODUCTION SOUND', isLabor: false },
+      { code: '3420', category: '34', categoryName: 'PRODUCTION SOUND', name: 'SOUND PACKAGE RENTALS', type: 'BTL', dept: 'PRODUCTION SOUND', isLabor: false },
+      { code: '3422', category: '34', categoryName: 'PRODUCTION SOUND', name: 'WALKIE TALKIES', type: 'BTL', dept: 'PRODUCTION SOUND', isLabor: false },
+      { code: '3500', category: '35', categoryName: 'TRANSPORTATION', name: 'TRANSPORTATION', type: 'BTL', dept: 'TRANSPORTATION', isLabor: false },
+      { code: '3501', category: '35', categoryName: 'TRANSPORTATION', name: 'TRANSPORTATION COORDINATOR', type: 'BTL', dept: 'TRANSPORTATION', isLabor: true },
+      { code: '3502', category: '35', categoryName: 'TRANSPORTATION', name: 'CAPTAIN', type: 'BTL', dept: 'TRANSPORTATION', isLabor: true },
+      { code: '3503', category: '35', categoryName: 'TRANSPORTATION', name: 'STUDIO DRIVERS', type: 'BTL', dept: 'TRANSPORTATION', isLabor: true },
+      { code: '3516', category: '35', categoryName: 'TRANSPORTATION', name: 'PURCHASES', type: 'BTL', dept: 'TRANSPORTATION', isLabor: false },
+      { code: '3517', category: '35', categoryName: 'TRANSPORTATION', name: 'BOX/COMPUTER RENTALS', type: 'BTL', dept: 'TRANSPORTATION', isLabor: false },
+      { code: '3518', category: '35', categoryName: 'TRANSPORTATION', name: 'VEHICLE RENTALS', type: 'BTL', dept: 'TRANSPORTATION', isLabor: false },
+      { code: '3544', category: '35', categoryName: 'TRANSPORTATION', name: 'GASOLINE & OIL', type: 'BTL', dept: 'TRANSPORTATION', isLabor: false },
+      { code: '3545', category: '35', categoryName: 'TRANSPORTATION', name: 'MILEAGE', type: 'BTL', dept: 'TRANSPORTATION', isLabor: false },
+      { code: '3546', category: '35', categoryName: 'TRANSPORTATION', name: 'REPAIRS & MAINTENANCE', type: 'BTL', dept: 'TRANSPORTATION', isLabor: false },
+      { code: '3547', category: '35', categoryName: 'TRANSPORTATION', name: 'PARKING/PERMITS/TAXIS', type: 'BTL', dept: 'TRANSPORTATION', isLabor: false },
+      { code: '3585', category: '35', categoryName: 'TRANSPORTATION', name: 'MISCELLANEOUS', type: 'BTL', dept: 'TRANSPORTATION', isLabor: false },
+      { code: '3598', category: '35', categoryName: 'TRANSPORTATION', name: 'LOSS & DAMAGE', type: 'BTL', dept: 'TRANSPORTATION', isLabor: false },
+      { code: '3600', category: '36', categoryName: 'LOCATION', name: 'LOCATION', type: 'BTL', dept: 'LOCATION', isLabor: false },
+      { code: '3602', category: '36', categoryName: 'LOCATION', name: 'HOTELS', type: 'BTL', dept: 'LOCATION', isLabor: false },
+      { code: '3604', category: '36', categoryName: 'LOCATION', name: 'LIVING EXPENSES/PER DIEM', type: 'BTL', dept: 'LOCATION', isLabor: false },
+      { code: '3605', category: '36', categoryName: 'LOCATION', name: 'GROUND TRANSPORTATION', type: 'BTL', dept: 'LOCATION', isLabor: false },
+      { code: '3606', category: '36', categoryName: 'LOCATION', name: 'SCOUTING/SURVEY COSTS', type: 'BTL', dept: 'LOCATION', isLabor: false },
+      { code: '3607', category: '36', categoryName: 'LOCATION', name: 'SITE RENTALS/PERMITS', type: 'BTL', dept: 'LOCATION', isLabor: false },
+      { code: '3609', category: '36', categoryName: 'LOCATION', name: 'COURTESY PAYMENTS', type: 'BTL', dept: 'LOCATION', isLabor: false },
+      { code: '3613', category: '36', categoryName: 'LOCATION', name: 'SHIPPING/POSTAGE', type: 'BTL', dept: 'LOCATION', isLabor: false },
+      { code: '3620', category: '36', categoryName: 'LOCATION', name: 'CATERED MEALS', type: 'BTL', dept: 'LOCATION', isLabor: false },
+      { code: '3621', category: '36', categoryName: 'LOCATION', name: 'CATERER HELPERS', type: 'BTL', dept: 'LOCATION', isLabor: true },
+      { code: '3625', category: '36', categoryName: 'LOCATION', name: 'FIRST AID TECHNICIANS', type: 'BTL', dept: 'LOCATION', isLabor: true },
+      { code: '3627', category: '36', categoryName: 'LOCATION', name: 'FIRST AID KIT RENTAL', type: 'BTL', dept: 'LOCATION', isLabor: false },
+      { code: '3630', category: '36', categoryName: 'LOCATION', name: 'SECURITY SERVICES', type: 'BTL', dept: 'LOCATION', isLabor: false },
+      { code: '3631', category: '36', categoryName: 'LOCATION', name: 'POLICE & FIREMEN', type: 'BTL', dept: 'LOCATION', isLabor: true },
+      { code: '3632', category: '36', categoryName: 'LOCATION', name: 'MISC LOCAL EMPLOYEES', type: 'BTL', dept: 'LOCATION', isLabor: true },
+      { code: '3685', category: '36', categoryName: 'LOCATION', name: 'MISC EXPENSES', type: 'BTL', dept: 'LOCATION', isLabor: false },
+      { code: '3698', category: '36', categoryName: 'LOCATION', name: 'LOSS & DAMAGE', type: 'BTL', dept: 'LOCATION', isLabor: false },
+      { code: '3700', category: '37', categoryName: 'PRODUCTION FILM & LAB', name: 'PRODUCTION FILM & LAB', type: 'BTL', dept: 'PRODUCTION FILM & LAB', isLabor: false },
+      { code: '3764', category: '37', categoryName: 'PRODUCTION FILM & LAB', name: 'STREAMING TRANSMISSION', type: 'BTL', dept: 'PRODUCTION FILM & LAB', isLabor: false },
+      { code: '3772', category: '37', categoryName: 'PRODUCTION FILM & LAB', name: 'ARCHIVAL/CASSETTES', type: 'BTL', dept: 'PRODUCTION FILM & LAB', isLabor: false },
+      { code: '3785', category: '37', categoryName: 'PRODUCTION FILM & LAB', name: 'MISC EXPENSES', type: 'BTL', dept: 'PRODUCTION FILM & LAB', isLabor: false },
+      { code: '4100', category: '41', categoryName: 'TESTS', name: 'TESTS', type: 'POST', dept: 'TESTS', isLabor: false },
+      { code: '4200', category: '42', categoryName: 'STAGE RENTAL', name: 'STAGE RENTAL', type: 'POST', dept: 'STAGE RENTAL', isLabor: false },
+      { code: '4206', category: '42', categoryName: 'STAGE RENTAL', name: 'OTHER STAGES & FACILITIES', type: 'POST', dept: 'STAGE RENTAL', isLabor: false },
+      { code: '4210', category: '42', categoryName: 'STAGE RENTAL', name: 'STORAGE CHARGES', type: 'POST', dept: 'STAGE RENTAL', isLabor: false },
+      { code: '4250', category: '42', categoryName: 'STAGE RENTAL', name: 'TRASH REMOVAL/DRESSING ROOMS', type: 'POST', dept: 'STAGE RENTAL', isLabor: false },
+      { code: '4400', category: '44', categoryName: 'VISUAL EFFECTS', name: 'VISUAL EFFECTS', type: 'POST', dept: 'VISUAL EFFECTS', isLabor: false },
+      { code: '4432', category: '44', categoryName: 'VISUAL EFFECTS', name: 'VFX', type: 'POST', dept: 'VISUAL EFFECTS', isLabor: false },
+      { code: '4600', category: '46', categoryName: 'MUSIC', name: 'MUSIC', type: 'POST', dept: 'MUSIC', isLabor: false },
+      { code: '4602', category: '46', categoryName: 'MUSIC', name: 'COMPOSER', type: 'POST', dept: 'MUSIC', isLabor: true },
+      { code: '4605', category: '46', categoryName: 'MUSIC', name: 'LICENSED MUSIC & SUPERVISION', type: 'POST', dept: 'MUSIC', isLabor: false },
+      { code: '4646', category: '46', categoryName: 'MUSIC', name: 'MUSIC LICENSE BUYOUT', type: 'POST', dept: 'MUSIC', isLabor: false },
+      { code: '6700', category: '67', categoryName: 'INSURANCE', name: 'INSURANCE', type: 'OTHER', dept: 'INSURANCE', isLabor: false },
+      { code: '6701', category: '67', categoryName: 'INSURANCE', name: 'PRODUCTION INSURANCE', type: 'OTHER', dept: 'INSURANCE', isLabor: false },
+      { code: '6702', category: '67', categoryName: 'INSURANCE', name: 'NEG INSURANCE', type: 'OTHER', dept: 'INSURANCE', isLabor: false },
+      { code: '6703', category: '67', categoryName: 'INSURANCE', name: 'ERRORS & OMISSIONS', type: 'OTHER', dept: 'INSURANCE', isLabor: false },
+      { code: '6705', category: '67', categoryName: 'INSURANCE', name: 'OTHER INSURANCE', type: 'OTHER', dept: 'INSURANCE', isLabor: false },
+      { code: '6803', category: '68', categoryName: 'GENERAL & ADMINISTRATIVE', name: 'XEROX', type: 'OTHER', dept: 'GENERAL & ADMINISTRATIVE', isLabor: false },
+      { code: '6829', category: '68', categoryName: 'GENERAL & ADMINISTRATIVE', name: 'LEGAL FEES', type: 'OTHER', dept: 'GENERAL & ADMINISTRATIVE', isLabor: false },
+      { code: '6835', category: '68', categoryName: 'GENERAL & ADMINISTRATIVE', name: 'ELECTRIC GOLF CARTS', type: 'OTHER', dept: 'GENERAL & ADMINISTRATIVE', isLabor: false },
+      { code: '6861', category: '68', categoryName: 'GENERAL & ADMINISTRATIVE', name: 'COMPUTER RENTAL', type: 'OTHER', dept: 'GENERAL & ADMINISTRATIVE', isLabor: false },
+      { code: '6864', category: '68', categoryName: 'GENERAL & ADMINISTRATIVE', name: 'ACCOUNTING', type: 'OTHER', dept: 'GENERAL & ADMINISTRATIVE', isLabor: false },
+      { code: '6885', category: '68', categoryName: 'GENERAL & ADMINISTRATIVE', name: 'MISC EXPENSES', type: 'OTHER', dept: 'GENERAL & ADMINISTRATIVE', isLabor: false }
+    ];
+
+    // Insert all accounts
+    let inserted = 0;
+    for (const acct of accounts) {
+      await db.query(`
+        INSERT INTO chart_of_accounts
+        (account_code, category_code, category_name, account_name, account_type, department, is_labor, is_fringe_account, standard_system, sort_order)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, false, 'STANDARD', $8)
+        ON CONFLICT (account_code) DO NOTHING
+      `, [acct.code, acct.category, acct.categoryName, acct.name, acct.type, acct.dept, acct.isLabor, parseInt(acct.code)]);
+      inserted++;
+    }
+
+    aiLogger.info('Chart of Accounts seeded', { inserted, total: accounts.length });
+
+    res.json({
+      success: true,
+      message: `Seeded ${accounts.length} chart of accounts`,
+      details: { inserted, total: accounts.length }
+    });
+  } catch (error) {
+    aiLogger.error('Failed to seed chart of accounts', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
