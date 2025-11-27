@@ -5964,27 +5964,100 @@ app.get('/api/agreements', async (req, res) => {
 // Get recommended agreements based on production parameters
 app.post('/api/agreements/recommend', async (req, res) => {
   try {
-    const { production_type, distribution_platform, start_date, shooting_location } = req.body;
+    const { production_type, distribution_platform, start_date, shooting_location, budget_target } = req.body;
     const effectiveDate = start_date || new Date().toISOString().split('T')[0];
 
-    // Get active agreements for each major guild
-    const result = await db.query(`
-      SELECT DISTINCT ON (union_name)
-        id, union_name, agreement_type,
+    // Determine if this is a theatrical or TV production
+    const isTheatrical = production_type === 'theatrical';
+    const isTVProduction = ['multi_camera', 'single_camera', 'long_form', 'mini_series'].includes(production_type);
+
+    // Build smart agreement type filters based on production type
+    let iatseFilter = '';
+    let sagAftraFilter = '';
+    let dgaFilter = '';
+
+    if (isTheatrical) {
+      // For theatrical features, prefer theatrical-specific agreements
+      iatseFilter = `AND (agreement_type ILIKE '%Theatrical%' OR agreement_type ILIKE '%Motion Picture%' OR agreement_type ILIKE '%Basic Agreement%')`;
+      sagAftraFilter = `AND (agreement_type ILIKE '%Theatrical%' OR agreement_type ILIKE '%Motion Picture%' OR agreement_type ILIKE '%Basic Agreement%')`;
+      dgaFilter = `AND (agreement_type ILIKE '%Basic Agreement%' OR agreement_type ILIKE '%Theatrical%')`;
+    } else if (isTVProduction) {
+      // For TV, prefer television-specific agreements
+      iatseFilter = `AND (agreement_type ILIKE '%Television%' OR agreement_type ILIKE '%Videotape%' OR agreement_type ILIKE '%Basic Agreement%')`;
+      sagAftraFilter = `AND (agreement_type ILIKE '%Television%' OR agreement_type ILIKE '%Basic Agreement%')`;
+      dgaFilter = `AND (agreement_type ILIKE '%Basic Agreement%' OR agreement_type ILIKE '%Television%')`;
+    } else {
+      // Default to basic agreements
+      iatseFilter = `AND agreement_type ILIKE '%Basic Agreement%'`;
+      sagAftraFilter = `AND agreement_type ILIKE '%Basic Agreement%'`;
+      dgaFilter = `AND agreement_type ILIKE '%Basic Agreement%'`;
+    }
+
+    // Get IATSE agreement
+    const iatseResult = await db.query(`
+      SELECT id, union_name, agreement_type,
         effective_date_start, effective_date_end, rules
       FROM union_agreements
-      WHERE union_name IN ('IATSE', 'SAG-AFTRA', 'DGA', 'WGA', 'Teamsters Local 399')
+      WHERE union_name = 'IATSE'
         AND (effective_date_start IS NULL OR effective_date_start <= $1)
         AND (effective_date_end IS NULL OR effective_date_end >= $1)
-        AND (
-          agreement_type ILIKE '%Basic Agreement%'
-          OR agreement_type ILIKE '%2024%'
-          OR agreement_type ILIKE '%2023%'
-        )
-      ORDER BY union_name, effective_date_start DESC
+        ${iatseFilter}
+      ORDER BY effective_date_start DESC
+      LIMIT 1
     `, [effectiveDate]);
 
-    // Get applicable sideletters
+    // Get SAG-AFTRA agreement
+    const sagAftraResult = await db.query(`
+      SELECT id, union_name, agreement_type,
+        effective_date_start, effective_date_end, rules
+      FROM union_agreements
+      WHERE union_name = 'SAG-AFTRA'
+        AND (effective_date_start IS NULL OR effective_date_start <= $1)
+        AND (effective_date_end IS NULL OR effective_date_end >= $1)
+        ${sagAftraFilter}
+      ORDER BY effective_date_start DESC
+      LIMIT 1
+    `, [effectiveDate]);
+
+    // Get DGA agreement
+    const dgaResult = await db.query(`
+      SELECT id, union_name, agreement_type,
+        effective_date_start, effective_date_end, rules
+      FROM union_agreements
+      WHERE union_name = 'DGA'
+        AND (effective_date_start IS NULL OR effective_date_start <= $1)
+        AND (effective_date_end IS NULL OR effective_date_end >= $1)
+        ${dgaFilter}
+      ORDER BY effective_date_start DESC
+      LIMIT 1
+    `, [effectiveDate]);
+
+    // Get WGA agreement (usually same for all)
+    const wgaResult = await db.query(`
+      SELECT id, union_name, agreement_type,
+        effective_date_start, effective_date_end, rules
+      FROM union_agreements
+      WHERE union_name = 'WGA'
+        AND (effective_date_start IS NULL OR effective_date_start <= $1)
+        AND (effective_date_end IS NULL OR effective_date_end >= $1)
+        AND agreement_type ILIKE '%Basic Agreement%'
+      ORDER BY effective_date_start DESC
+      LIMIT 1
+    `, [effectiveDate]);
+
+    // Get Teamsters agreement (usually same for all)
+    const teamstersResult = await db.query(`
+      SELECT id, union_name, agreement_type,
+        effective_date_start, effective_date_end, rules
+      FROM union_agreements
+      WHERE union_name = 'Teamsters Local 399'
+        AND (effective_date_start IS NULL OR effective_date_start <= $1)
+        AND (effective_date_end IS NULL OR effective_date_end >= $1)
+      ORDER BY effective_date_start DESC
+      LIMIT 1
+    `, [effectiveDate]);
+
+    // Get applicable sideletters based on production type, platform, and budget
     const sideletterResult = await db.query(`
       SELECT id, sideletter_name, production_type, distribution_platform,
              wage_adjustment_pct, holiday_pay_pct, vacation_pay_pct,
@@ -5998,11 +6071,11 @@ app.post('/api/agreements/recommend', async (req, res) => {
     `, [production_type, distribution_platform]);
 
     const recommendations = {
-      iatse: result.rows.find(r => r.union_name === 'IATSE'),
-      sag_aftra: result.rows.find(r => r.union_name === 'SAG-AFTRA'),
-      dga: result.rows.find(r => r.union_name === 'DGA'),
-      wga: result.rows.find(r => r.union_name === 'WGA'),
-      teamsters: result.rows.find(r => r.union_name === 'Teamsters Local 399'),
+      iatse: iatseResult.rows[0] || null,
+      sag_aftra: sagAftraResult.rows[0] || null,
+      dga: dgaResult.rows[0] || null,
+      wga: wgaResult.rows[0] || null,
+      teamsters: teamstersResult.rows[0] || null,
       applicable_sideletters: sideletterResult.rows.slice(0, 5) // Top 5 most relevant
     };
 

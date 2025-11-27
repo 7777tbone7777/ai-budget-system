@@ -175,9 +175,10 @@ export default function NewProduction() {
       const payload = {
         ...formData,
         budget_target: parseFloat(formData.budget_target) || null,
-        episode_count: parseInt(formData.episode_count),
-        episode_length_minutes: parseInt(formData.episode_length_minutes),
-        season_number: parseInt(formData.season_number),
+        // Only include TV-specific fields for non-theatrical productions
+        episode_count: formData.production_type !== 'theatrical' ? parseInt(formData.episode_count) : null,
+        episode_length_minutes: formData.production_type !== 'theatrical' ? parseInt(formData.episode_length_minutes) : null,
+        season_number: formData.production_type !== 'theatrical' ? parseInt(formData.season_number) : null,
         applied_sideletters: recommendations?.applicable_sideletters?.slice(0, 3) || [],
       }
 
@@ -331,58 +332,63 @@ export default function NewProduction() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Season Number
-              </label>
-              <input
-                type="number"
-                name="season_number"
-                value={formData.season_number}
-                onChange={(e) => {
-                  handleChange(e)
-                  determineSideletter()
-                }}
-                min="1"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
-            </div>
+            {/* Only show Season Number for TV productions */}
+            {formData.production_type !== 'theatrical' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Season Number
+                </label>
+                <input
+                  type="number"
+                  name="season_number"
+                  value={formData.season_number}
+                  onChange={(e) => {
+                    handleChange(e)
+                    determineSideletter()
+                  }}
+                  min="1"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Series Details */}
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Series Details</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Episode Count
-              </label>
-              <input
-                type="number"
-                name="episode_count"
-                value={formData.episode_count}
-                onChange={handleChange}
-                min="1"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
-            </div>
+        {/* Series Details - only show for TV productions */}
+        {formData.production_type !== 'theatrical' && (
+          <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h2 className="text-lg font-semibold mb-4">Series Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Episode Count
+                </label>
+                <input
+                  type="number"
+                  name="episode_count"
+                  value={formData.episode_count}
+                  onChange={handleChange}
+                  min="1"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Episode Length (minutes)
-              </label>
-              <input
-                type="number"
-                name="episode_length_minutes"
-                value={formData.episode_length_minutes}
-                onChange={handleChange}
-                min="1"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Episode Length (minutes)
+                </label>
+                <input
+                  type="number"
+                  name="episode_length_minutes"
+                  value={formData.episode_length_minutes}
+                  onChange={handleChange}
+                  min="1"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Union Agreements */}
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
