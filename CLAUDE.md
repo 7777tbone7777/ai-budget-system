@@ -58,6 +58,7 @@ See `DEPLOYMENT_NOTES.md` for detailed troubleshooting.
 - PostgreSQL hosted on Railway
 - Connection: Use `${{Postgres.DATABASE_URL}}` reference in Railway
 - Schema in `/database/schema.sql`
+- **Migrations:** `/database/migrations/*.sql` (applied in numerical order)
 
 ### Schema Migration Gotcha
 `CREATE TABLE IF NOT EXISTS` does NOT update existing tables with wrong schemas.
@@ -65,6 +66,155 @@ If a table exists but is missing columns, you must:
 1. Check if required columns exist
 2. DROP and recreate if schema is wrong
 3. See `access-control.js` `ensureAccessTables()` for example pattern
+
+### Running Migrations on Railway
+When schema changes are made locally, they must be applied to Railway's database:
+
+```bash
+# Get Railway database credentials
+railway variables --service backend | grep DATABASE_URL
+
+# Run migration (example)
+PGPASSWORD=<password> psql -h <host> -U <user> -d <database> -f database/migrations/001_add_4_level_hierarchy.sql
+```
+
+**CRITICAL:** Always test migrations locally first before running on production.
+
+## Budget Hierarchy System (4-Level Structure)
+
+**Status:** API implemented, migration created, **NOT YET DEPLOYED to Railway**
+
+The budget system uses a 4-level hierarchy based on professional film/TV production budgeting standards:
+
+### Architecture
+
+```
+Budget Metadata (Top Level)
+  ├── Topsheet Categories (High-Level)
+  │     ├── Accounts (Mid-Level Groupings)
+  │     │     └── Line Items (Detailed Entries with Auto-Fringes)
+```
+
+### Database Tables
+
+**Created by:** `/database/migrations/001_add_4_level_hierarchy.sql`
+
+1. **`budget_metadata`** - Top-level budget information
+   - Links to production
+   - Tracks version, budget type (original/revised/final)
+   - Stores aggregate totals and calculation timestamps
+   - Fields: `id`, `production_id`, `budget_uuid`, `version_number`, `budget_type`, `total_topsheet_categories`, `total_accounts`, `total_detail_lines`
+
+2. **`budget_topsheet`** - High-level categories (Above/Below the Line)
+   - Represents major budget sections
+   - Amortization support for episodic content
+   - Auto-calculated rollups from accounts
+   - Fields: `id`, `budget_id`, `category_number`, `category_name`, `current_subtotal`, `current_fringe`, `current_total`, `is_amortized`, `amortization_episodes`, `sort_order`
+
+3. **`budget_accounts`** - Mid-level groupings
+   - Groups related line items (e.g., "Camera Department", "Grip Department")
+   - Auto-calculated rollups from line items
+   - Fields: `id`, `topsheet_category_id`, `budget_id`, `account_code`, `account_name`, `current_subtotal`, `current_fringe`, `current_total`, `is_amortized`, `amortization_episodes`, `sort_order`
+
+4. **`budget_line_items`** - Detailed budget entries
+   - Individual positions, equipment, services
+   - **Auto-calculated fringes** using union rates
+   - Formula support for complex calculations
+   - Fields: `id`, `account_id`, `budget_id`, `production_id`, `line_number`, `description`, `quantity`, `unit_type`, `rate`, `rate_type`, `multiplier`, `formula`, `current_subtotal`, `total_fringe_rate`, `current_fringe`, `current_total`, `union_local`, `position_id`, `fringe_breakdown` (JSONB), `is_amortized`, `amortization_episodes`, `per_episode_cost`, `is_corporate_deal`, `sort_order`
+
+5. **`fringe_calculation_rules`** - Fringe benefit rate lookup
+   - Union-specific fringe rates (pension, health, welfare, vacation, etc.)
+   - State-specific rules
+   - Effective date tracking
+   - Fields: `id`, `union_local`, `state`, `position_classification`, `total_fringe_rate`, `fringe_breakdown` (JSONB), `effective_date_start`, `effective_date_end`
+
+### Auto-Calculation Features
+
+**Database Triggers** (created by migration):
+
+1. **`trigger_calculate_line_item_totals`** - Calculates on INSERT/UPDATE of line items:
+   - `current_subtotal = quantity × rate × multiplier`
+   - `current_fringe = current_subtotal × total_fringe_rate`
+   - `current_total = current_subtotal + current_fringe`
+   - `per_episode_cost = current_total / amortization_episodes` (if amortized)
+
+2. **`trigger_rollup_to_accounts`** - Aggregates line items → accounts:
+   - Sums all line item subtotals, fringes, totals for each account
+   - Triggered after line item INSERT/UPDATE/DELETE
+
+3. **`trigger_rollup_to_topsheet`** - Aggregates accounts → topsheet:
+   - Sums all account subtotals, fringes, totals for each category
+   - Triggered after account rollup completes
+
+4. **`trigger_update_metadata_counts`** - Updates budget metadata:
+   - Counts total topsheet categories, accounts, and line items
+   - Updates `last_calculation_date` timestamp
+   - Triggered after any budget structure change
+
+### API Endpoints
+
+**Base path:** `/api/budgets` (registered in `server.js:75-77`, implemented in `/backend/api/budgets.js`)
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/budgets` | POST | Create new budget for production |
+| `/api/budgets/:budget_id` | GET | Get budget metadata with production info |
+| `/api/budgets/:budget_id/topsheet` | GET | Get topsheet summary with grand total |
+| `/api/budgets/:budget_id/topsheet` | POST | Create topsheet category |
+| `/api/budgets/:budget_id/accounts` | GET | Get all accounts (optionally filter by category_id) |
+| `/api/budgets/:budget_id/accounts` | POST | Create account |
+| `/api/budgets/:budget_id/line-items` | GET | Get line items (paginated, optionally filter by account_id) |
+| `/api/budgets/:budget_id/line-items` | POST | Create line item (auto-calculates fringes!) |
+| `/api/budgets/:budget_id/hierarchy` | GET | Get complete budget hierarchy view |
+| `/api/fringe-rules` | GET | Get fringe calculation rules (filter by union, state, position) |
+| `/api/fringe-rules/lookup` | GET | Smart lookup for applicable fringe rule |
+
+### Testing
+
+**Test script:** `/database/migrations/view_test_results.js`
+
+Demonstrates the system by creating a sample multi-camera sitcom budget and displaying:
+- Line item calculations (subtotal, fringe, total, per-episode)
+- Account rollups
+- Topsheet rollups
+- Metadata counts
+
+Run with:
+```bash
+cd /Users/anthonyvazquez/ai-budget-system/database/migrations
+DATABASE_URL=<railway-db-url> node view_test_results.js
+```
+
+### Current Status & Known Issues
+
+**CRITICAL ISSUE (2025-11-27):**
+
+The budget hierarchy system was built and tested locally but **migrations have NOT been run on Railway's PostgreSQL database**. This causes errors when users try to view budgets:
+
+**Error:** `"column bli.account_code does not exist"`
+
+**Root Cause:**
+- Backend code (server.js, /backend/api/budgets.js) references new budget hierarchy tables
+- Frontend (/frontend/app/productions/[id]/budget/page.tsx) calls `/api/productions/${id}/line-items`
+- This endpoint queries `budget_line_items` table which doesn't exist on Railway yet
+- Migration `001_add_4_level_hierarchy.sql` needs to be applied to Railway database
+
+**Fix Required:**
+1. Apply migration `001_add_4_level_hierarchy.sql` to Railway PostgreSQL
+2. Optionally apply `002_seed_fringe_rules.sql` for fringe calculation data
+3. Test with `003_test_sample_budget.sql` or via API
+
+**To Deploy Migration:**
+```bash
+# Get Railway DB credentials
+railway variables --service backend | grep DATABASE_URL
+
+# Parse DATABASE_URL to get connection details
+# postgres://user:password@host:port/database
+
+# Run migration
+PGPASSWORD=<password> psql -h <host> -U <user> -d <database> -f database/migrations/001_add_4_level_hierarchy.sql
+```
 
 ## AI Features (in server.js)
 
@@ -177,12 +327,32 @@ Most union agreements span 3 years with annual rate increases. The app must be s
 
 ## API Endpoints Quick Reference
 
+### Production Endpoints
 | Endpoint | Description |
 |----------|-------------|
 | `GET /api/productions` | List all productions |
 | `POST /api/productions` | Create production |
-| `GET /api/productions/:id/categories` | Get budget categories |
-| `POST /api/productions/:id/categories` | Create category |
+| `GET /api/productions/:id` | Get production details |
+| `GET /api/productions/:id/line-items` | Get line items (OLD - uses old schema) |
+
+### Budget Hierarchy Endpoints (NEW)
+| Endpoint | Description |
+|----------|-------------|
+| `POST /api/budgets` | Create new budget |
+| `GET /api/budgets/:budget_id` | Get budget metadata |
+| `GET /api/budgets/:budget_id/topsheet` | Get topsheet categories |
+| `POST /api/budgets/:budget_id/topsheet` | Create topsheet category |
+| `GET /api/budgets/:budget_id/accounts` | Get accounts |
+| `POST /api/budgets/:budget_id/accounts` | Create account |
+| `GET /api/budgets/:budget_id/line-items` | Get line items (paginated) |
+| `POST /api/budgets/:budget_id/line-items` | Create line item with auto-fringe calc |
+| `GET /api/budgets/:budget_id/hierarchy` | Get complete budget hierarchy |
+| `GET /api/fringe-rules` | Get fringe calculation rules |
+| `GET /api/fringe-rules/lookup` | Smart fringe rule lookup |
+
+### AI & Analysis Endpoints
+| Endpoint | Description |
+|----------|-------------|
 | `GET /api/ai/crew/production-types` | Get production types |
 | `POST /api/ai/crew/recommend` | Get crew recommendations |
 | `GET /api/ai/guardian/tax-programs` | Get tax incentive programs |
@@ -242,5 +412,86 @@ The user has direct access to Railway, Vercel, and other service dashboards.
 2. If they decline, then use CLI commands to fetch logs
 3. Screenshots can be read directly - just ask for the file path
 
+### 9. Budget Hierarchy Migration Gap (2025-11-27)
+Created comprehensive 4-level budget hierarchy system with:
+- 5 new database tables (`budget_metadata`, `budget_topsheet`, `budget_accounts`, `budget_line_items`, `fringe_calculation_rules`)
+- 4 database triggers for auto-calculations and rollups
+- Complete API implementation in `/backend/api/budgets.js`
+- Migration file `001_add_4_level_hierarchy.sql`
+
+**The Problem:** Built and tested everything locally but forgot to run the migration on Railway's PostgreSQL database. When users clicked "View Budget", got error: `"column bli.account_code does not exist"`.
+
+**Root Cause:** Frontend calls old `/api/productions/${id}/line-items` endpoint, which queries `budget_line_items` table that only exists locally.
+
+**Lesson:** **Always deploy database migrations to production immediately after creating them**, or at minimum, add a clear "TODO: Deploy to Railway" comment in the migration file and CLAUDE.md. Don't assume schema changes will "just work" - they must be explicitly deployed.
+
+**Prevention:**
+- Create a migrations checklist in CLAUDE.md
+- Add Railway migration deployment as a standard step in the development workflow
+- Consider creating a `/database/migrations/README.md` with deployment instructions
+
+### 10. Production Form UX & Union Agreement Intelligence (2025-11-27)
+
+**User Feedback:** When selecting "Theatrical Feature" as production type, TV-specific fields like "Series Details", "Season Number", "Episode Count" should disappear.
+
+**User Question:** Are union agreements auto-selected based on production parameters (type, platform, budget, location, start date)?
+
+**Changes Made:**
+
+1. **Frontend - Conditional Rendering** (`/frontend/app/productions/new/page.tsx`):
+   - Added conditional logic to hide TV-specific fields when `production_type === 'theatrical'`
+   - Hidden fields: Series Details section, Season Number, Episode Count, Episode Length
+   - Form submission now only sends TV fields for non-theatrical productions
+   - Improves UX by showing only relevant fields for each production type
+
+2. **Backend - Smart Agreement Recommendations** (`/backend/server.js:5965`):
+   - Enhanced `/api/agreements/recommend` endpoint with production-type-aware logic
+   - For **Theatrical:** Prioritizes Theatrical/Motion Picture agreements (IATSE Theatrical, SAG-AFTRA Theatrical)
+   - For **TV:** Prioritizes Television/Videotape agreements (IATSE Videotape, SAG-AFTRA TV)
+   - Separate queries per union for more precise matching
+   - Considers: production_type, distribution_platform, start_date (for multi-year agreements)
+   - Foundation for budget-aware sideletter recommendations
+
+**Lesson:** Union agreement selection is complex and context-dependent. The entertainment industry uses different agreements for theatrical vs. TV, and even within TV there are variations (network vs. cable vs. streaming). Building intelligent defaults requires understanding:
+- Agreement types vary by union and production type
+- Distribution platform affects sideletter eligibility
+- Budget thresholds determine low-budget vs. full-scale rates
+- Multi-year agreements require date-based selection
+- Many productions negotiate custom sideletters (addressed in migration 004)
+
+**Key Insight:** High Budget SVOD (Netflix, Apple TV+) is a significant consideration when selecting union agreements and sideletters. It determines:
+- Whether low-budget sideletters apply (they typically don't for high-budget SVOD)
+- Which wage scales and fringe rates are used
+- Overtime rules and meal penalty calculations
+
+### 11. Custom Sideletter Support (2025-11-27 - IN PROGRESS)
+
+**Business Reality:** While standard sideletters exist, **custom negotiated sideletters are very common** in the entertainment industry, especially for:
+- Major studios and prolific producers (101 Studios, Blumhouse, etc.)
+- Multi-show deals with specific unions
+- Productions with unique circumstances (remote locations, extended schedules)
+- Budget-constrained shows needing customized wage scales
+
+**Solution:** Migration `004_add_custom_sideletters.sql` created to support production-specific custom agreements.
+
+**Database Schema:**
+- New table: `custom_sideletters` with fields for:
+  - Custom wage adjustments, holiday pay, vacation pay, pension, health & welfare
+  - Flexible JSONB fields for overtime rules, meal penalties, turnaround, location provisions
+  - Approval tracking (negotiated_by, union_approved, approval_date, union_contact)
+  - Documentation (agreement_notes, document_url for signed PDFs)
+  - Audit trail (created_by, created_at, updated_at, is_active)
+- Updated `productions` table with:
+  - `custom_sideletters` JSONB array to track applied custom agreements
+  - `has_custom_agreements` boolean flag for reporting/audit purposes
+
+**Status:** Database migration created, API endpoints pending, UI pending.
+
+**Next Steps:**
+- Complete backend API endpoints for CRUD operations on custom sideletters
+- Build frontend UI for creating/editing custom sideletters
+- Add "Clone from Standard" feature to use standard sideletters as templates
+- Implement custom sideletter application to productions
+
 ---
-*Last updated: 2025-11-23*
+*Last updated: 2025-11-27*

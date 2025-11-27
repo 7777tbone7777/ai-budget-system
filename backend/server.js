@@ -685,6 +685,344 @@ app.post('/api/sideletters/determine', async (req, res) => {
 });
 
 // ============================================================================
+// API ROUTES - CUSTOM SIDELETTERS
+// ============================================================================
+
+// Get all custom sideletters for a production
+app.get('/api/productions/:production_id/custom-sideletters', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+
+    const result = await db.query(`
+      SELECT cs.*,
+             sr.sideletter_name as standard_sideletter_name
+      FROM custom_sideletters cs
+      LEFT JOIN sideletter_rules sr ON cs.based_on_standard_id = sr.id
+      WHERE cs.production_id = $1 AND cs.is_active = true
+      ORDER BY cs.created_at DESC
+    `, [production_id]);
+
+    res.json({
+      success: true,
+      data: result.rows
+    });
+  } catch (error) {
+    appLogger.error('Error fetching custom sideletters:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get single custom sideletter by ID
+app.get('/api/custom-sideletters/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db.query(`
+      SELECT cs.*,
+             sr.sideletter_name as standard_sideletter_name,
+             p.name as production_name
+      FROM custom_sideletters cs
+      LEFT JOIN sideletter_rules sr ON cs.based_on_standard_id = sr.id
+      LEFT JOIN productions p ON cs.production_id = p.id
+      WHERE cs.id = $1
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Custom sideletter not found' });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0]
+    });
+  } catch (error) {
+    appLogger.error('Error fetching custom sideletter:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Create custom sideletter
+app.post('/api/productions/:production_id/custom-sideletters', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const {
+      sideletter_name,
+      based_on_standard_id,
+      union_name,
+      wage_adjustment_pct,
+      holiday_pay_pct,
+      vacation_pay_pct,
+      pension_pct,
+      health_welfare_pct,
+      overtime_rules,
+      meal_penalty_rules,
+      turnaround_rules,
+      location_provisions,
+      negotiated_by,
+      negotiated_date,
+      union_approved,
+      union_approval_date,
+      union_contact,
+      agreement_notes,
+      document_url,
+      created_by
+    } = req.body;
+
+    const result = await db.query(`
+      INSERT INTO custom_sideletters (
+        production_id, sideletter_name, based_on_standard_id, union_name,
+        wage_adjustment_pct, holiday_pay_pct, vacation_pay_pct,
+        pension_pct, health_welfare_pct,
+        overtime_rules, meal_penalty_rules, turnaround_rules, location_provisions,
+        negotiated_by, negotiated_date, union_approved, union_approval_date, union_contact,
+        agreement_notes, document_url, created_by
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+        $14, $15, $16, $17, $18, $19, $20, $21
+      )
+      RETURNING *
+    `, [
+      production_id, sideletter_name, based_on_standard_id, union_name,
+      wage_adjustment_pct, holiday_pay_pct, vacation_pay_pct,
+      pension_pct, health_welfare_pct,
+      overtime_rules ? JSON.stringify(overtime_rules) : null,
+      meal_penalty_rules ? JSON.stringify(meal_penalty_rules) : null,
+      turnaround_rules ? JSON.stringify(turnaround_rules) : null,
+      location_provisions ? JSON.stringify(location_provisions) : null,
+      negotiated_by, negotiated_date, union_approved, union_approval_date, union_contact,
+      agreement_notes, document_url, created_by
+    ]);
+
+    // Update production to mark it has custom agreements
+    await db.query(`
+      UPDATE productions
+      SET has_custom_agreements = true,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1
+    `, [production_id]);
+
+    appLogger.info(`Custom sideletter created: ${result.rows[0].id} for production ${production_id}`);
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+      message: 'Custom sideletter created successfully'
+    });
+  } catch (error) {
+    appLogger.error('Error creating custom sideletter:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Clone standard sideletter to create custom version
+app.post('/api/custom-sideletters/clone/:standard_id', async (req, res) => {
+  try {
+    const { standard_id } = req.params;
+    const { production_id, sideletter_name, created_by } = req.body;
+
+    // Get the standard sideletter
+    const standard = await db.query(`
+      SELECT * FROM sideletter_rules WHERE id = $1
+    `, [standard_id]);
+
+    if (standard.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Standard sideletter not found' });
+    }
+
+    const std = standard.rows[0];
+
+    // Create custom sideletter based on standard
+    const result = await db.query(`
+      INSERT INTO custom_sideletters (
+        production_id, sideletter_name, based_on_standard_id, union_name,
+        wage_adjustment_pct, holiday_pay_pct, vacation_pay_pct,
+        overtime_rules, created_by
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9
+      )
+      RETURNING *
+    `, [
+      production_id,
+      sideletter_name || `${std.sideletter_name} (Custom)`,
+      standard_id,
+      std.union_name || 'IATSE',
+      std.wage_adjustment_pct,
+      std.holiday_pay_pct,
+      std.vacation_pay_pct,
+      std.overtime_rules ? JSON.stringify(std.overtime_rules) : null,
+      created_by
+    ]);
+
+    appLogger.info(`Custom sideletter cloned from standard ${standard_id}: ${result.rows[0].id}`);
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+      message: 'Custom sideletter created from standard template'
+    });
+  } catch (error) {
+    appLogger.error('Error cloning sideletter:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update custom sideletter
+app.put('/api/custom-sideletters/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    // Build dynamic update query
+    const fields = [];
+    const values = [];
+    let paramCount = 1;
+
+    const allowedFields = [
+      'sideletter_name', 'union_name',
+      'wage_adjustment_pct', 'holiday_pay_pct', 'vacation_pay_pct',
+      'pension_pct', 'health_welfare_pct',
+      'overtime_rules', 'meal_penalty_rules', 'turnaround_rules', 'location_provisions',
+      'negotiated_by', 'negotiated_date', 'union_approved', 'union_approval_date', 'union_contact',
+      'agreement_notes', 'document_url'
+    ];
+
+    for (const [key, value] of Object.entries(updates)) {
+      if (allowedFields.includes(key)) {
+        fields.push(`${key} = $${paramCount++}`);
+        // Stringify JSONB fields
+        if (['overtime_rules', 'meal_penalty_rules', 'turnaround_rules', 'location_provisions'].includes(key)) {
+          values.push(value ? JSON.stringify(value) : null);
+        } else {
+          values.push(value);
+        }
+      }
+    }
+
+    if (fields.length === 0) {
+      return res.status(400).json({ success: false, error: 'No valid fields to update' });
+    }
+
+    fields.push(`updated_at = CURRENT_TIMESTAMP`);
+    values.push(id);
+
+    const query = `
+      UPDATE custom_sideletters
+      SET ${fields.join(', ')}
+      WHERE id = $${paramCount}
+      RETURNING *
+    `;
+
+    const result = await db.query(query, values);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Custom sideletter not found' });
+    }
+
+    appLogger.info(`Custom sideletter updated: ${id}`);
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+      message: 'Custom sideletter updated successfully'
+    });
+  } catch (error) {
+    appLogger.error('Error updating custom sideletter:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Soft delete custom sideletter
+app.delete('/api/custom-sideletters/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db.query(`
+      UPDATE custom_sideletters
+      SET is_active = false,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1
+      RETURNING *
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Custom sideletter not found' });
+    }
+
+    appLogger.info(`Custom sideletter soft deleted: ${id}`);
+
+    res.json({
+      success: true,
+      message: 'Custom sideletter deactivated successfully'
+    });
+  } catch (error) {
+    appLogger.error('Error deleting custom sideletter:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Apply custom sideletter to production
+app.post('/api/productions/:production_id/apply-custom-sideletter', async (req, res) => {
+  try {
+    const { production_id } = req.params;
+    const { custom_sideletter_id } = req.body;
+
+    // Verify custom sideletter exists and belongs to this production
+    const checkResult = await db.query(`
+      SELECT * FROM custom_sideletters
+      WHERE id = $1 AND production_id = $2 AND is_active = true
+    `, [custom_sideletter_id, production_id]);
+
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Custom sideletter not found or does not belong to this production'
+      });
+    }
+
+    // Get current custom sideletters array
+    const prod = await db.query(`
+      SELECT custom_sideletters FROM productions WHERE id = $1
+    `, [production_id]);
+
+    const currentSideletters = prod.rows[0].custom_sideletters || [];
+
+    // Add if not already applied
+    if (!currentSideletters.some(sl => sl.id === custom_sideletter_id)) {
+      const updatedSideletters = [
+        ...currentSideletters,
+        {
+          id: custom_sideletter_id,
+          applied_date: new Date().toISOString()
+        }
+      ];
+
+      await db.query(`
+        UPDATE productions
+        SET custom_sideletters = $1,
+            has_custom_agreements = true,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = $2
+      `, [JSON.stringify(updatedSideletters), production_id]);
+
+      appLogger.info(`Custom sideletter ${custom_sideletter_id} applied to production ${production_id}`);
+
+      res.json({
+        success: true,
+        message: 'Custom sideletter applied to production successfully'
+      });
+    } else {
+      res.json({
+        success: true,
+        message: 'Custom sideletter already applied to this production'
+      });
+    }
+  } catch (error) {
+    appLogger.error('Error applying custom sideletter:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ============================================================================
 // API ROUTES - CREW POSITIONS
 // ============================================================================
 
