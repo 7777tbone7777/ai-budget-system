@@ -10,6 +10,16 @@ An intelligent production budgeting platform that generates compliant, optimized
 - 🌎 **Multi-Location Support**: Compare LA, Georgia, New Mexico, NY, and more
 - 💰 **Tax Incentive Calculator**: Automatic tax credit calculations by state
 - 📈 **Smart Optimization**: AI suggests budget cuts to hit your target
+- 🎬 **Smart Crew Builder**: AI-powered crew recommendations based on production type
+- 🔍 **What-If Analyzer**: Compare budget scenarios with variance prediction
+- 🛡️ **Budget Guardian**: Automatic compliance auditing and rate validation
+- 💼 **AI Fringe Calculator**: Automated payroll tax and fringe benefit calculations
+
+## Documentation
+
+- **📘 [AI Features User Guide](./AI_FEATURES_USER_GUIDE.md)** - Complete guide to all AI features (Smart Crew Builder, What-If Analyzer, Budget Guardian, AI Fringe Calculator)
+- **🔧 [Complete Implementation Guide](./docs/budget-system-complete.md)** - Technical implementation details and workflow
+- **⚙️ [CLAUDE.md](./CLAUDE.md)** - Developer documentation and lessons learned
 
 ## Tech Stack
 

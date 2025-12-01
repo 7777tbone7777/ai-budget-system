@@ -12,7 +12,7 @@ const { requestLogger, errorLogger, createLogger } = require('./logger');
 const { generateBudget, parseNaturalLanguage } = require('./ai-budget-generator');
 const { recommendCrew, optimizeCrew, parseCrewRequest, PRODUCTION_CONFIGS } = require('./smart-crew-builder');
 const { analyzeScenario, compareScenarios, predictVariance, summarizeScenario, parseScenarioRequest, HISTORICAL_VARIANCE } = require('./what-if-analyzer');
-const { auditBudget, checkRate, calculateTaxIncentives, getTaxIncentivePrograms, summarizeAudit, TAX_INCENTIVES, COMPLIANCE_RULES } = require('./budget-guardian');
+const { auditBudget, checkRate, calculateTaxIncentives, getTaxIncentivePrograms, summarizeAudit, TAX_INCENTIVES, COMPLIANCE_RULES, analyzeBudgetOptimization, analyzeScenarioWithCompliance, comprehensiveAnalysis } = require('./budget-guardian');
 const { VIEW_TEMPLATES, getFilteredView, saveView, getSavedViews, updateView, deleteView, getFilterOptions, ensureViewsTable } = require('./budget-views');
 const { ROLES, ensureAccessTables, grantAccess, revokeAccess, getProductionAccess, checkPermission, getUserRole, createShareLink, validateShareLink, getShareLinks, deactivateShareLink, logAccess, getAccessLog, getUserProductions } = require('./access-control');
 const { calculateProductionFringes, applyCalculatedFringes, estimatePositionFringes, getFringeRates, DEFAULT_FRINGE_RATES } = require('./schedule-fringe-calculator');
@@ -3090,7 +3090,7 @@ app.get('/api/productions/:production_id/line-items', async (req, res) => {
       FROM budget_line_items bli
       LEFT JOIN crew_positions cp ON bli.position_id = cp.id
       WHERE bli.production_id = $1
-      ORDER BY bli.account_code, bli.created_at
+      ORDER BY bli.sort_order, bli.created_at
     `, [production_id]);
 
     res.json({
@@ -4578,29 +4578,35 @@ app.post('/api/productions/:productionId/auto-generate-budget', async (req, res)
         const fringes = subtotal * 0.32; // 32% fringe estimate
         const total = subtotal + fringes;
 
-        // Generate unique account code for crew positions
-        // Extract category from department (e.g., "Production" -> "20", "Camera" -> "33")
-        const deptLower = crew.department?.toLowerCase() || '';
-        let categoryCode = '20'; // Default to production
+        // Use account code from production_type_crews template (already sequential)
+        // If no account code in template, fall back to generating one
+        let accountCode = crew.account_code;
 
-        if (deptLower.includes('camera')) categoryCode = '33';
-        else if (deptLower.includes('sound')) categoryCode = '37';
-        else if (deptLower.includes('grip')) categoryCode = '25';
-        else if (deptLower.includes('electric') || deptLower.includes('lighting')) categoryCode = '32';
-        else if (deptLower.includes('art')) categoryCode = '22';
-        else if (deptLower.includes('location')) categoryCode = '36';
-        else if (deptLower.includes('transport')) categoryCode = '35';
-        else if (deptLower.includes('wardrobe') || deptLower.includes('costume')) categoryCode = '29';
-        else if (deptLower.includes('property') || deptLower.includes('prop')) categoryCode = '28';
-        else if (deptLower.includes('makeup') || deptLower.includes('hair')) categoryCode = '31';
-        else if (deptLower.includes('post')) categoryCode = '43';
+        if (!accountCode) {
+          // Fallback: Generate unique account code for crew positions
+          const deptLower = crew.department?.toLowerCase() || '';
+          let categoryCode = '20'; // Default to production
 
-        // Generate sequential account code within category
-        if (!accountCodeCounter[categoryCode]) {
-          accountCodeCounter[categoryCode] = 1;
+          if (deptLower.includes('camera')) categoryCode = '33';
+          else if (deptLower.includes('sound')) categoryCode = '34';
+          else if (deptLower.includes('grip')) categoryCode = '25';
+          else if (deptLower.includes('electric') || deptLower.includes('lighting')) categoryCode = '32';
+          else if (deptLower.includes('art')) categoryCode = '22';
+          else if (deptLower.includes('location')) categoryCode = '36';
+          else if (deptLower.includes('transport')) categoryCode = '35';
+          else if (deptLower.includes('wardrobe') || deptLower.includes('costume')) categoryCode = '29';
+          else if (deptLower.includes('property') || deptLower.includes('prop')) categoryCode = '26';
+          else if (deptLower.includes('makeup')) categoryCode = '30';
+          else if (deptLower.includes('hair')) categoryCode = '31';
+          else if (deptLower.includes('post')) categoryCode = '43';
+
+          // Generate sequential account code within category
+          if (!accountCodeCounter[categoryCode]) {
+            accountCodeCounter[categoryCode] = 1;
+          }
+          accountCode = `${categoryCode}${String(accountCodeCounter[categoryCode]).padStart(2, '0')}`;
+          accountCodeCounter[categoryCode]++;
         }
-        const accountCode = `${categoryCode}${String(accountCodeCounter[categoryCode]).padStart(2, '0')}`;
-        accountCodeCounter[categoryCode]++;
 
         await db.query(
           `INSERT INTO budget_line_items (
@@ -5804,9 +5810,11 @@ app.get('/api/line-items/:id/calculation', async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Query with only the legacy columns that actually exist
     const result = await db.query(`
       SELECT id, description, quantity, rate, subtotal, fringes, total,
-             calculation_breakdown, is_parent
+             current_subtotal, current_fringe, current_total,
+             unit_type, rate_type, multiplier, notes
       FROM budget_line_items WHERE id = $1
     `, [id]);
 
@@ -5816,22 +5824,26 @@ app.get('/api/line-items/:id/calculation', async (req, res) => {
 
     const item = result.rows[0];
 
-    // If has children, also get children summary
+    // Check if has children (optional - parent_id column may or may not exist)
     let childrenSummary = null;
-    if (item.is_parent) {
+    try {
       const childResult = await db.query(`
         SELECT description, quantity, rate, subtotal, total
         FROM budget_line_items WHERE parent_id = $1
         ORDER BY sort_order
       `, [id]);
-      childrenSummary = childResult.rows;
+      if (childResult.rows.length > 0) {
+        childrenSummary = childResult.rows;
+      }
+    } catch (err) {
+      // parent_id column may not exist, that's okay
     }
 
     res.json({
       success: true,
       item,
       childrenSummary,
-      breakdown: item.calculation_breakdown || generateDefaultBreakdown(item)
+      breakdown: generateDefaultBreakdown(item)
     });
   } catch (error) {
     apiLogger.error('Failed to get calculation', error);
@@ -6120,6 +6132,168 @@ app.get('/api/ai/guardian/quick-audit/:productionId', async (req, res) => {
     });
   } catch (error) {
     aiLogger.error('Quick audit failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// ============================================================================
+// UNIFIED BUDGET GUARDIAN - Comprehensive Analysis
+// ============================================================================
+
+// Comprehensive budget analysis - combines compliance, optimization, and tax incentives
+app.post('/api/ai/guardian/analyze/:productionId', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+
+    // Get production
+    const productionResult = await db.query(
+      'SELECT * FROM productions WHERE id = $1',
+      [productionId]
+    );
+
+    if (productionResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Production not found'
+      });
+    }
+
+    const production = productionResult.rows[0];
+
+    // Get all line items
+    const lineItemsResult = await db.query(
+      'SELECT * FROM budget_line_items WHERE production_id = $1',
+      [productionId]
+    );
+
+    aiLogger.info('Running comprehensive budget analysis', {
+      productionId,
+      lineItems: lineItemsResult.rows.length,
+      targetBudget: production.budget_target
+    });
+
+    const analysis = await comprehensiveAnalysis(production, lineItemsResult.rows, db);
+
+    res.json({
+      success: true,
+      ...analysis
+    });
+  } catch (error) {
+    aiLogger.error('Comprehensive analysis failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Budget optimization - find cost-cutting opportunities
+app.post('/api/ai/guardian/optimize/:productionId', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+
+    // Get production
+    const productionResult = await db.query(
+      'SELECT * FROM productions WHERE id = $1',
+      [productionId]
+    );
+
+    if (productionResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Production not found'
+      });
+    }
+
+    const production = productionResult.rows[0];
+
+    if (!production.budget_target) {
+      return res.status(400).json({
+        success: false,
+        error: 'Production must have a budget_target set for optimization analysis'
+      });
+    }
+
+    // Get all line items
+    const lineItemsResult = await db.query(
+      'SELECT * FROM budget_line_items WHERE production_id = $1',
+      [productionId]
+    );
+
+    aiLogger.info('Running budget optimization', {
+      productionId,
+      targetBudget: production.budget_target,
+      lineItems: lineItemsResult.rows.length
+    });
+
+    const optimization = await analyzeBudgetOptimization(production, lineItemsResult.rows, db);
+
+    res.json(optimization);
+  } catch (error) {
+    aiLogger.error('Budget optimization failed', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// What-if scenario analysis WITH compliance validation
+app.post('/api/ai/guardian/scenario/:productionId', async (req, res) => {
+  try {
+    const { productionId } = req.params;
+    const { scenario } = req.body;
+
+    if (!scenario || !scenario.name || !scenario.changes) {
+      return res.status(400).json({
+        success: false,
+        error: 'scenario object with name and changes is required'
+      });
+    }
+
+    // Get production
+    const productionResult = await db.query(
+      'SELECT * FROM productions WHERE id = $1',
+      [productionId]
+    );
+
+    if (productionResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Production not found'
+      });
+    }
+
+    const production = productionResult.rows[0];
+
+    // Get all line items
+    const lineItemsResult = await db.query(
+      'SELECT * FROM budget_line_items WHERE production_id = $1',
+      [productionId]
+    );
+
+    aiLogger.info('Analyzing scenario with compliance check', {
+      productionId,
+      scenarioName: scenario.name,
+      changes: Object.keys(scenario.changes)
+    });
+
+    const analysis = await analyzeScenarioWithCompliance(
+      production,
+      lineItemsResult.rows,
+      scenario,
+      db
+    );
+
+    res.json({
+      success: true,
+      analysis
+    });
+  } catch (error) {
+    aiLogger.error('Scenario analysis failed', error);
     res.status(500).json({
       success: false,
       error: error.message

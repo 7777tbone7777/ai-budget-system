@@ -17,9 +17,18 @@ const formatCurrency = (value: number | undefined | null): string => {
   });
 };
 
+// Helper to get values from either old or new column names
+const getLineItemValues = (item: any) => ({
+  subtotal: parseFloat(item.current_subtotal?.toString() || item.subtotal?.toString() || '0'),
+  fringes: parseFloat(item.current_fringe?.toString() || item.fringes?.toString() || '0'),
+  total: parseFloat(item.current_total?.toString() || item.total?.toString() || '0'),
+  accountCode: item.account_code || item.line_number || '-',
+});
+
 interface LineItem {
   id: string;
   account_code: string;
+  line_number?: string;
   description: string;
   position_title?: string;
   union_local?: string;
@@ -27,9 +36,15 @@ interface LineItem {
   atl_or_btl?: string;
   quantity: number;
   rate: number;
-  subtotal: number;
-  fringes: number;
-  total: number;
+  // Support both old and new column names
+  subtotal?: number;
+  fringes?: number;
+  total?: number;
+  current_subtotal?: number;
+  current_fringe?: number;
+  current_total?: number;
+  total_fringe_rate?: number;
+  per_episode_cost?: number;
   notes?: string;
   parent_id?: string | null;
   is_parent?: boolean;
@@ -146,7 +161,8 @@ export default function ProductionBudgetPage() {
     };
 
     items.forEach(item => {
-      const total = parseFloat(item.total?.toString() || '0');
+      // Support both old and new column names
+      const total = parseFloat(item.current_total?.toString() || item.total?.toString() || '0');
       if (item.atl_or_btl === 'ATL') {
         newTotals.atl += total;
       } else if (item.atl_or_btl === 'BTL') {
@@ -552,48 +568,55 @@ export default function ProductionBudgetPage() {
                           : 'hover:bg-gray-50'
                       }`}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <div className="flex items-center gap-2">
-                          {item.is_parent && (
-                            <button
-                              onClick={(e) => { e.stopPropagation(); toggleExpanded(item.id); }}
-                              className="text-gray-400 hover:text-gray-600"
-                            >
-                              {expandedItems.has(item.id) ? '&#9660;' : '&#9654;'}
-                            </button>
-                          )}
-                          {item.account_code}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <div className="flex items-center gap-2">
-                          {item.description}
-                          {item.is_parent && (
-                            <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
-                              {item.children?.length || 0} sub-items
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.union_local || '-'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.rate)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.subtotal)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">${formatCurrency(item.fringes)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${formatCurrency(item.total)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
-                        {production?.budget_target
-                          ? ((item.total / parseFloat(production.budget_target.toString())) * 100).toFixed(2)
-                          : '0.00'}%
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(item.id); }}
-                          className="text-red-600 hover:text-red-800 text-sm"
-                        >
-                          Delete
-                        </button>
-                      </td>
+                      {(() => {
+                        const vals = getLineItemValues(item);
+                        return (
+                          <>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              <div className="flex items-center gap-2">
+                                {item.is_parent && (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); toggleExpanded(item.id); }}
+                                    className="text-gray-400 hover:text-gray-600"
+                                  >
+                                    {expandedItems.has(item.id) ? '▼' : '►'}
+                                  </button>
+                                )}
+                                {vals.accountCode}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-900">
+                              <div className="flex items-center gap-2">
+                                {item.description}
+                                {item.is_parent && (
+                                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                                    {item.children?.length || 0} sub-items
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.union_local || '-'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.rate)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(vals.subtotal)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">${formatCurrency(vals.fringes)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${formatCurrency(vals.total)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
+                              {production?.budget_target
+                                ? ((vals.total / parseFloat(production.budget_target.toString())) * 100).toFixed(2)
+                                : '0.00'}%
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(item.id); }}
+                                className="text-red-600 hover:text-red-800 text-sm"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </>
+                        );
+                      })()}
                     </tr>
                   ))}
                 </tbody>
@@ -637,49 +660,56 @@ export default function ProductionBudgetPage() {
                           : 'hover:bg-gray-50'
                       }`}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <div className="flex items-center gap-2">
-                          {item.is_parent && (
-                            <button
-                              onClick={(e) => { e.stopPropagation(); toggleExpanded(item.id); }}
-                              className="text-gray-400 hover:text-gray-600"
-                            >
-                              {expandedItems.has(item.id) ? '&#9660;' : '&#9654;'}
-                            </button>
-                          )}
-                          {item.account_code}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <div className="flex items-center gap-2">
-                          {item.description}
-                          {item.is_parent && (
-                            <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
-                              {item.children?.length || 0} sub-items
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.department || '-'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.union_local || '-'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.rate)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.subtotal)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">${formatCurrency(item.fringes)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${formatCurrency(item.total)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
-                        {production?.budget_target
-                          ? ((item.total / parseFloat(production.budget_target.toString())) * 100).toFixed(2)
-                          : '0.00'}%
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(item.id); }}
-                          className="text-red-600 hover:text-red-800 text-sm"
-                        >
-                          Delete
-                        </button>
-                      </td>
+                      {(() => {
+                        const vals = getLineItemValues(item);
+                        return (
+                          <>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              <div className="flex items-center gap-2">
+                                {item.is_parent && (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); toggleExpanded(item.id); }}
+                                    className="text-gray-400 hover:text-gray-600"
+                                  >
+                                    {expandedItems.has(item.id) ? '▼' : '►'}
+                                  </button>
+                                )}
+                                {vals.accountCode}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-900">
+                              <div className="flex items-center gap-2">
+                                {item.description}
+                                {item.is_parent && (
+                                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                                    {item.children?.length || 0} sub-items
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.department || '-'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.union_local || '-'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.rate)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(vals.subtotal)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">${formatCurrency(vals.fringes)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${formatCurrency(vals.total)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
+                              {production?.budget_target
+                                ? ((vals.total / parseFloat(production.budget_target.toString())) * 100).toFixed(2)
+                                : '0.00'}%
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(item.id); }}
+                                className="text-red-600 hover:text-red-800 text-sm"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </>
+                        );
+                      })()}
                     </tr>
                   ))}
                 </tbody>
@@ -719,45 +749,52 @@ export default function ProductionBudgetPage() {
                           : 'hover:bg-gray-50'
                       }`}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <div className="flex items-center gap-2">
-                          {item.is_parent && (
-                            <button
-                              onClick={(e) => { e.stopPropagation(); toggleExpanded(item.id); }}
-                              className="text-gray-400 hover:text-gray-600"
-                            >
-                              {expandedItems.has(item.id) ? '&#9660;' : '&#9654;'}
-                            </button>
-                          )}
-                          {item.account_code}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <div className="flex items-center gap-2">
-                          {item.description}
-                          {item.is_parent && (
-                            <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
-                              {item.children?.length || 0} sub-items
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.rate)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${formatCurrency(item.total)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
-                        {production?.budget_target
-                          ? ((item.total / parseFloat(production.budget_target.toString())) * 100).toFixed(2)
-                          : '0.00'}%
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(item.id); }}
-                          className="text-red-600 hover:text-red-800 text-sm"
-                        >
-                          Delete
-                        </button>
-                      </td>
+                      {(() => {
+                        const vals = getLineItemValues(item);
+                        return (
+                          <>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              <div className="flex items-center gap-2">
+                                {item.is_parent && (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); toggleExpanded(item.id); }}
+                                    className="text-gray-400 hover:text-gray-600"
+                                  >
+                                    {expandedItems.has(item.id) ? '▼' : '►'}
+                                  </button>
+                                )}
+                                {vals.accountCode}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-900">
+                              <div className="flex items-center gap-2">
+                                {item.description}
+                                {item.is_parent && (
+                                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                                    {item.children?.length || 0} sub-items
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.rate)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${formatCurrency(vals.total)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
+                              {production?.budget_target
+                                ? ((vals.total / parseFloat(production.budget_target.toString())) * 100).toFixed(2)
+                                : '0.00'}%
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(item.id); }}
+                                className="text-red-600 hover:text-red-800 text-sm"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </>
+                        );
+                      })()}
                     </tr>
                   ))}
                 </tbody>

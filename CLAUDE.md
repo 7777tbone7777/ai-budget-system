@@ -233,11 +233,14 @@ PGPASSWORD=<password> psql -h <host> -U <user> -d <database> -f database/migrati
 
 **GOAL: Comprehensive Rate Database**
 The goal is to have ALL union agreements and rates in the database so users can easily create accurate budgets for ANY type of production. This includes:
-- IATSE (all locals - 44, 80, 600, 667, 700, 706, 728, 873, Videotape, etc.)
-- DGA (Directors Guild)
+- IATSE (all locals - 44, 52, 80, 161, 209, 411, 477, 479, 480, 481, 487, 492, 600, 695, 700, 705, 706, 728, 729, 764, 798, 800, 839, 854, 871, 873, 892, USA829, Videotape)
+- DGA (Directors Guild of America)
 - SAG-AFTRA (Screen Actors Guild)
-- WGA (Writers Guild)
-- DGC (Directors Guild of Canada)
+- WGA (Writers Guild of America)
+- AFM (American Federation of Musicians)
+- Teamsters (Locals 399, 769, 817)
+- Trade Unions (IBEW Local 40, UA Local 78, Local 724, Local 755)
+- Canada: BCCFU, UBCP (Union of BC Performers), DGC, DGC-BC
 
 Rates should be kept current and updated as new agreements are ratified.
 
@@ -261,13 +264,20 @@ Most union agreements span 3 years with annual rate increases. The app must be s
 3. Select the rate with `effective_date` <= production start date
 4. The `contract_year` field (1, 2, or 3) indicates which year of the agreement
 
-**Current Status (as of 2025-11-23):**
-- **1,911 rate cards** in production database (441 with 2025+ effective dates)
-- Covers 34+ union locals including: IATSE (Locals 44, 52, 80, 600, 695, 700, 705, 706, 728, 729, 800, 839, 871, 892, Videotape), DGA, SAG-AFTRA, WGA, DGC, Teamsters 399
-- 2025 rates imported from EP Paymaster 2025-2026 (November Edition)
+**Current Status (as of 2025-12-01):**
+- **2,400+ rate cards** in production database
+- Covers **46 union locals** across US and Canada:
+  - IATSE (Locals 44, 52, 80, 161, 209, 411, 477, 479, 480, 481, 487, 492, 600, 695, 700, 705, 706, 728, 729, 764, 798, 800, 839, 854, 871, 873, 892, USA829, Videotape)
+  - Guilds: DGA, SAG-AFTRA, WGA
+  - Teamsters: Locals 399, 769, 817
+  - Trade Unions: IBEW Local 40, UA Local 78, Local 724, Local 755
+  - Musicians: AFM (American Federation of Musicians)
+  - Canada BC: BCCFU, UBCP (Union of BC Performers), DGC, DGC-BC
+- Multi-year agreements (2024-2028) with effective date tracking
+- Locations: Los Angeles, New York, Atlanta, British Columbia, and more
 - PDF contracts stored in `/database/union_contracts/`
-- Extracted JSON data in `/database/union_contracts/extracted/`
-- SQL seed files in `/database/guild_agreements/` (23 files - most already executed)
+- Extraction scripts in `/database/union_contracts/AMPTP/scripts/`
+- SQL seed files in `/database/guild_agreements/`
 
 ### Rate Card API Tools
 
@@ -464,7 +474,7 @@ Created comprehensive 4-level budget hierarchy system with:
 - Which wage scales and fringe rates are used
 - Overtime rules and meal penalty calculations
 
-### 11. Custom Sideletter Support (2025-11-27 - IN PROGRESS)
+### 11. Custom Sideletter Support (2025-11-27 - COMPLETED BACKEND)
 
 **Business Reality:** While standard sideletters exist, **custom negotiated sideletters are very common** in the entertainment industry, especially for:
 - Major studios and prolific producers (101 Studios, Blumhouse, etc.)
@@ -485,13 +495,48 @@ Created comprehensive 4-level budget hierarchy system with:
   - `custom_sideletters` JSONB array to track applied custom agreements
   - `has_custom_agreements` boolean flag for reporting/audit purposes
 
-**Status:** Database migration created, API endpoints pending, UI pending.
+**Backend API Endpoints (server.js:687-1023):**
+
+1. **GET `/api/productions/:production_id/custom-sideletters`** - List all custom sideletters for a production
+   - Returns active sideletters with standard sideletter references
+   - Ordered by created_at DESC
+
+2. **GET `/api/custom-sideletters/:id`** - Get single custom sideletter by ID
+   - Includes production details via LEFT JOIN
+
+3. **POST `/api/productions/:production_id/custom-sideletters`** - Create new custom sideletter
+   - Accepts all custom fields (wage adjustments, fringes, JSONB rules)
+   - Automatically sets `has_custom_agreements = true` on production
+   - Returns created sideletter with ID
+
+4. **POST `/api/custom-sideletters/clone/:standard_id`** - Clone from standard sideletter
+   - Fetches standard sideletter from `sideletter_rules` table
+   - Creates custom copy with same terms as starting point
+   - Appends "(Custom)" to name for clarity
+   - Requires production_id in request body
+
+5. **PUT `/api/custom-sideletters/:id`** - Update existing custom sideletter
+   - Dynamic SQL building with whitelisted fields
+   - Handles JSONB field stringification
+   - Auto-updates updated_at timestamp
+
+6. **DELETE `/api/custom-sideletters/:id`** - Soft delete (sets is_active = false)
+   - Preserves audit trail
+   - Doesn't affect existing budgets that reference it
+
+7. **POST `/api/productions/:production_id/apply-custom-sideletter`** - Apply sideletter to production
+   - Validates sideletter belongs to production
+   - Adds to `productions.custom_sideletters` JSONB array
+   - Prevents duplicate application
+   - Sets `has_custom_agreements = true`
+
+**Status:** Database migration created ✓, Backend API complete (7 endpoints) ✓, UI pending
 
 **Next Steps:**
-- Complete backend API endpoints for CRUD operations on custom sideletters
 - Build frontend UI for creating/editing custom sideletters
-- Add "Clone from Standard" feature to use standard sideletters as templates
-- Implement custom sideletter application to productions
+- Add UI for "Clone from Standard" workflow
+- Create production settings page to manage applied custom sideletters
+- Add validation to prevent conflicting custom agreements (e.g., two custom IATSE sideletters)
 
 ---
-*Last updated: 2025-11-27*
+*Last updated: 2025-12-01*

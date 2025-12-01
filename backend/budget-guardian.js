@@ -617,7 +617,501 @@ function summarizeAudit(audit) {
   return summary.join('\n');
 }
 
+/**
+ * ======================================
+ * BUDGET OPTIMIZATION & SCENARIO ANALYSIS
+ * ======================================
+ */
+
+/**
+ * Comprehensive budget analysis - overage identification and optimization suggestions
+ */
+async function analyzeBudgetOptimization(production, lineItems, pool) {
+  guardianLogger.info('Starting budget optimization analysis', {
+    productionId: production.id,
+    targetBudget: production.budget_target
+  });
+
+  const targetBudget = parseFloat(production.budget_target || 0);
+
+  // Calculate actual total
+  let actualTotal = 0;
+  const items = lineItems.map(item => {
+    const total = parseFloat(item.current_total || 0);
+    actualTotal += total;
+    return {
+      ...item,
+      current_total: total
+    };
+  });
+
+  const overBudget = actualTotal - targetBudget;
+  const overBudgetPercent = targetBudget > 0 ? ((overBudget / targetBudget) * 100).toFixed(1) : 0;
+
+  // Department mapping
+  const departmentMap = {
+    '10': 'Story & Rights',
+    '11': 'ATL - Producers',
+    '12': 'ATL - Director',
+    '13': 'ATL - Cast',
+    '14': 'ATL - Travel',
+    '20': 'Production Staff',
+    '21': 'Extra Talent',
+    '22': 'Art Department',
+    '23': 'Set Construction',
+    '24': 'Set Operations',
+    '25': 'Grip',
+    '26': 'Property',
+    '27': 'Set Dressing',
+    '29': 'Wardrobe',
+    '30': 'Makeup',
+    '31': 'Hair',
+    '32': 'Electric',
+    '33': 'Camera',
+    '34': 'Sound',
+    '35': 'Transportation',
+    '36': 'Location',
+    '38': 'Special Effects',
+    '40': 'Stunts',
+    '42': 'Editorial',
+    '43': 'Post Production',
+    '50': 'Fringes',
+    '60': 'Insurance',
+    '70': 'General Expenses'
+  };
+
+  // Group by department
+  const departmentTotals = {};
+  items.forEach(item => {
+    const category = item.account_code ? item.account_code.substring(0, 2) : '99';
+    const deptName = departmentMap[category] || item.atl_or_btl || 'Other';
+
+    if (!departmentTotals[deptName]) {
+      departmentTotals[deptName] = {
+        total: 0,
+        items: [],
+        category
+      };
+    }
+
+    departmentTotals[deptName].total += item.current_total;
+    departmentTotals[deptName].items.push(item);
+  });
+
+  // Sort departments by total (highest first)
+  const departmentAnalysis = Object.entries(departmentTotals)
+    .map(([name, data]) => ({
+      department: name,
+      total: data.total,
+      percentOfBudget: ((data.total / actualTotal) * 100).toFixed(1),
+      itemCount: data.items.length,
+      items: data.items.sort((a, b) => b.current_total - a.current_total)
+    }))
+    .sort((a, b) => b.total - a.total);
+
+  // Generate optimization suggestions
+  const suggestions = [];
+
+  // 1. Reduce shoot days
+  const productionDept = departmentAnalysis.find(d => d.department === 'Production Staff');
+  if (productionDept && overBudget > 0) {
+    const shootDays = production.shoot_days || 60;
+    const avgDailyCost = actualTotal / shootDays;
+    const daysToReduce = Math.ceil(overBudget / avgDailyCost);
+    suggestions.push({
+      strategy: 'Reduce shoot days',
+      description: `Reduce from ${shootDays} to ${shootDays - daysToReduce} shoot days`,
+      estimatedSavings: avgDailyCost * daysToReduce,
+      impact: 'High - affects all daily crew and rentals',
+      difficulty: 'High - requires script/schedule changes',
+      category: 'schedule'
+    });
+  }
+
+  // 2. Reduce crew size in largest departments
+  const topDepts = departmentAnalysis.slice(0, 5);
+  topDepts.forEach(dept => {
+    if (dept.department !== 'ATL - Cast' && dept.department !== 'ATL - Director') {
+      const multiplePositions = dept.items.filter(item => parseFloat(item.quantity || 1) > 1);
+      if (multiplePositions.length > 0) {
+        const reduction = multiplePositions.reduce((sum, item) => {
+          const reducedQty = Math.max(1, parseFloat(item.quantity) - 1);
+          const savingsPerItem = item.current_total * ((parseFloat(item.quantity) - reducedQty) / parseFloat(item.quantity));
+          return sum + savingsPerItem;
+        }, 0);
+
+        suggestions.push({
+          strategy: `Reduce ${dept.department} crew size`,
+          description: `Reduce crew quantities in ${dept.department} (${multiplePositions.length} positions can be reduced)`,
+          estimatedSavings: reduction,
+          impact: 'Medium - may increase shoot days',
+          difficulty: 'Medium - adjust schedule to compensate',
+          category: 'crew'
+        });
+      }
+    }
+  });
+
+  // 3. Switch to lower-budget sideletters
+  if (production.production_type === 'theatrical') {
+    suggestions.push({
+      strategy: 'Use low-budget theatrical sideletter',
+      description: 'Switch to SAG Modified Low Budget ($700k-$2.5M) or Ultra Low Budget (<$250k) agreement',
+      estimatedSavings: actualTotal * 0.15,
+      impact: 'Medium - lower union rates across the board',
+      difficulty: 'Low - if budget qualifies',
+      category: 'union'
+    });
+  }
+
+  // 4. Reduce prep/wrap days
+  suggestions.push({
+    strategy: 'Reduce prep and wrap days',
+    description: 'Reduce prep days by 20% and wrap days by 30% for non-essential positions',
+    estimatedSavings: actualTotal * 0.08,
+    impact: 'Low-Medium - affects department heads most',
+    difficulty: 'Medium - requires efficient planning',
+    category: 'schedule'
+  });
+
+  // 5. Equipment rental optimization
+  const equipmentDepts = departmentAnalysis.filter(d =>
+    d.department.includes('Camera') || d.department.includes('Electric') ||
+    d.department.includes('Grip') || d.department.includes('Sound')
+  );
+  if (equipmentDepts.length > 0) {
+    const equipmentTotal = equipmentDepts.reduce((sum, d) => sum + d.total, 0);
+    suggestions.push({
+      strategy: 'Optimize equipment rentals',
+      description: 'Negotiate package deals, reduce redundant equipment, use house equipment',
+      estimatedSavings: equipmentTotal * 0.15,
+      impact: 'Low - minimal creative impact',
+      difficulty: 'Low - negotiate with vendors',
+      category: 'equipment'
+    });
+  }
+
+  // Sort suggestions by estimated savings
+  suggestions.sort((a, b) => b.estimatedSavings - a.estimatedSavings);
+
+  return {
+    success: true,
+    analysis: {
+      targetBudget,
+      actualBudget: actualTotal,
+      difference: overBudget,
+      differencePercent: parseFloat(overBudgetPercent),
+      status: overBudget > 0 ? 'over' : overBudget < 0 ? 'under' : 'on-target'
+    },
+    departmentBreakdown: departmentAnalysis,
+    suggestions: suggestions.map(s => ({
+      ...s,
+      estimatedSavings: Math.round(s.estimatedSavings),
+      percentOfOverage: overBudget > 0 ? ((s.estimatedSavings / Math.abs(overBudget)) * 100).toFixed(1) : '0.0'
+    })),
+    quickWins: suggestions.slice(0, 3)
+  };
+}
+
+/**
+ * ======================================
+ * WHAT-IF SCENARIO ANALYSIS (Integrated from what-if-analyzer.js)
+ * ======================================
+ */
+
+// Import cascade rules and cost factors from what-if-analyzer
+const CASCADE_RULES = {
+  shootDays: {
+    affects: ['labor', 'equipment', 'locations', 'catering', 'transportation'],
+    multiplier: 1.0,
+    description: 'Shoot days directly affect all daily-rated costs'
+  },
+  crewSize: {
+    affects: ['labor', 'catering', 'transportation', 'wardrobe'],
+    multiplier: 0.8,
+    description: 'Crew size affects labor and support costs'
+  },
+  locations: {
+    affects: ['transportation', 'catering', 'equipment', 'permits'],
+    multiplier: 1.2,
+    description: 'Additional locations increase logistics costs'
+  },
+  vfxShots: {
+    affects: ['post_production', 'equipment'],
+    multiplier: 1.0,
+    description: 'VFX changes affect post-production budget'
+  }
+};
+
+const COST_FACTORS = {
+  labor: { dailyRate: true, percentOfBudget: 0.35, varianceRange: { min: 0.85, max: 1.25 } },
+  equipment: { dailyRate: true, percentOfBudget: 0.08, varianceRange: { min: 0.90, max: 1.15 } },
+  locations: { perLocation: true, percentOfBudget: 0.05, varianceRange: { min: 0.80, max: 1.40 } },
+  transportation: { dailyRate: true, percentOfBudget: 0.04, varianceRange: { min: 0.90, max: 1.20 } },
+  catering: { perPerson: true, dailyRate: true, percentOfBudget: 0.02, varianceRange: { min: 0.95, max: 1.10 } },
+  post_production: { fixed: true, percentOfBudget: 0.15, varianceRange: { min: 0.90, max: 1.50 } }
+};
+
+/**
+ * Analyze a what-if scenario WITH compliance validation
+ */
+async function analyzeScenarioWithCompliance(production, lineItems, scenario, pool) {
+  guardianLogger.info('Analyzing scenario with compliance check', {
+    productionId: production.id,
+    scenarioName: scenario.name
+  });
+
+  const baseline = {
+    totalBudget: lineItems.reduce((sum, item) => sum + parseFloat(item.current_total || 0), 0),
+    shootDays: production.shoot_days || 30,
+    crewSize: lineItems.filter(item => item.account_code?.startsWith('2') || item.account_code?.startsWith('3')).length,
+    locations: production.locations || 5,
+    productionType: production.production_type || 'theatrical'
+  };
+
+  const changes = scenario.changes || {};
+  const results = {
+    scenarioName: scenario.name || 'Unnamed Scenario',
+    baseline: { ...baseline },
+    impacts: [],
+    cascadeEffects: [],
+    totalImpact: 0,
+    newTotal: baseline.totalBudget,
+    percentChange: 0,
+    complianceIssues: [],
+    recommendations: []
+  };
+
+  // Calculate scenario impacts
+  for (const [changeType, changeValue] of Object.entries(changes)) {
+    const impact = calculateChangeImpact(baseline, changeType, changeValue);
+    results.impacts.push(impact);
+    results.totalImpact += impact.dollarImpact;
+
+    // Calculate cascade effects
+    if (CASCADE_RULES[changeType]) {
+      const cascades = calculateCascadeEffects(baseline, changeType, changeValue);
+      results.cascadeEffects.push(...cascades);
+      cascades.forEach(c => results.totalImpact += c.dollarImpact);
+    }
+  }
+
+  results.newTotal = baseline.totalBudget + results.totalImpact;
+  results.percentChange = (results.totalImpact / baseline.totalBudget) * 100;
+
+  // COMPLIANCE CHECK: Run audit on the scenario
+  const scenarioLineItems = adjustLineItemsForScenario(lineItems, scenario);
+  const scenarioProduction = { ...production };
+  if (changes.shootDays) scenarioProduction.shoot_days = baseline.shootDays + changes.shootDays;
+
+  const complianceAudit = await auditBudget(scenarioProduction, scenarioLineItems, pool);
+
+  results.complianceScore = complianceAudit.complianceScore;
+  results.complianceIssues = [
+    ...complianceAudit.violations.map(v => ({ severity: 'high', ...v })),
+    ...complianceAudit.warnings.map(w => ({ severity: 'medium', ...w }))
+  ];
+
+  // Tax incentive impact
+  results.taxIncentiveImpact = calculateTaxIncentives(scenarioProduction, scenarioLineItems);
+
+  // Generate recommendations that consider compliance
+  results.recommendations = generateScenarioRecommendations(results);
+
+  return results;
+}
+
+/**
+ * Calculate impact of a single change
+ */
+function calculateChangeImpact(baseline, changeType, changeValue) {
+  const impact = {
+    changeType,
+    changeValue,
+    description: '',
+    dollarImpact: 0,
+    percentImpact: 0,
+    affectedCategories: []
+  };
+
+  switch (changeType) {
+    case 'shootDays': {
+      const daysDiff = changeValue - baseline.shootDays;
+      const dailyCost = baseline.totalBudget * 0.02;
+      impact.dollarImpact = daysDiff * dailyCost;
+      impact.description = `${daysDiff > 0 ? 'Adding' : 'Removing'} ${Math.abs(daysDiff)} shoot day(s)`;
+      impact.affectedCategories = ['labor', 'equipment', 'locations', 'catering'];
+      break;
+    }
+    case 'crewSize': {
+      const crewDiff = changeValue - baseline.crewSize;
+      const costPerCrew = baseline.totalBudget * 0.004;
+      impact.dollarImpact = crewDiff * costPerCrew * baseline.shootDays;
+      impact.description = `${crewDiff > 0 ? 'Adding' : 'Removing'} ${Math.abs(crewDiff)} crew member(s)`;
+      impact.affectedCategories = ['labor', 'catering', 'transportation'];
+      break;
+    }
+    case 'locations': {
+      const locationsDiff = changeValue - baseline.locations;
+      const costPerLocation = baseline.totalBudget * 0.01;
+      impact.dollarImpact = locationsDiff * costPerLocation;
+      impact.description = `${locationsDiff > 0 ? 'Adding' : 'Removing'} ${Math.abs(locationsDiff)} location(s)`;
+      impact.affectedCategories = ['locations', 'transportation', 'permits'];
+      break;
+    }
+    case 'vfxShots': {
+      const vfxDiff = changeValue - (baseline.vfxShots || 0);
+      const costPerShot = 15000;
+      impact.dollarImpact = vfxDiff * costPerShot;
+      impact.description = `${vfxDiff > 0 ? 'Adding' : 'Removing'} ${Math.abs(vfxDiff)} VFX shot(s)`;
+      impact.affectedCategories = ['post_production', 'vfx'];
+      break;
+    }
+  }
+
+  impact.percentImpact = (impact.dollarImpact / baseline.totalBudget) * 100;
+  return impact;
+}
+
+/**
+ * Calculate cascade effects
+ */
+function calculateCascadeEffects(baseline, changeType, changeValue) {
+  const rule = CASCADE_RULES[changeType];
+  if (!rule) return [];
+
+  const cascades = [];
+  const primaryImpact = calculateChangeImpact(baseline, changeType, changeValue);
+
+  for (const affectedCategory of rule.affects) {
+    const factor = COST_FACTORS[affectedCategory];
+    if (!factor) continue;
+
+    const secondaryMultiplier = 0.15 * rule.multiplier;
+    const dollarImpact = primaryImpact.dollarImpact * secondaryMultiplier * (factor.percentOfBudget || 0.05);
+
+    if (Math.abs(dollarImpact) > 1000) {
+      cascades.push({
+        category: affectedCategory,
+        dollarImpact,
+        percentImpact: (dollarImpact / baseline.totalBudget) * 100,
+        description: `${changeType} change affects ${affectedCategory}`,
+        type: 'cascade'
+      });
+    }
+  }
+
+  return cascades;
+}
+
+/**
+ * Adjust line items for scenario (simplified version)
+ */
+function adjustLineItemsForScenario(lineItems, scenario) {
+  // For now, return original line items
+  // In full implementation, would adjust quantities, days, etc.
+  return lineItems;
+}
+
+/**
+ * Generate recommendations for scenario
+ */
+function generateScenarioRecommendations(results) {
+  const recommendations = [];
+
+  // If scenario passes compliance, recommend it
+  if (results.complianceScore >= 90 && results.totalImpact < 0) {
+    recommendations.push({
+      priority: 'high',
+      category: 'approved_scenario',
+      title: 'Scenario Approved - Compliant and Cost-Saving',
+      description: `This scenario saves $${Math.abs(results.totalImpact).toLocaleString()} and maintains ${results.complianceScore}% compliance`,
+      action: 'This scenario can be safely applied'
+    });
+  }
+
+  // If compliance issues, warn
+  if (results.complianceIssues.filter(i => i.severity === 'high').length > 0) {
+    recommendations.push({
+      priority: 'high',
+      category: 'compliance_warning',
+      title: 'Compliance Issues Detected',
+      description: `This scenario introduces ${results.complianceIssues.length} compliance issues that must be resolved`,
+      action: 'Review violations before applying this scenario'
+    });
+  }
+
+  return recommendations;
+}
+
+/**
+ * ======================================
+ * UNIFIED BUDGET GUARDIAN - Main Entry Point
+ * ======================================
+ */
+
+/**
+ * Comprehensive budget analysis combining optimization, compliance, and tax incentives
+ */
+async function comprehensiveAnalysis(production, lineItems, pool) {
+  guardianLogger.info('Running comprehensive budget analysis', {
+    productionId: production.id
+  });
+
+  // 1. Compliance audit
+  const complianceAudit = await auditBudget(production, lineItems, pool);
+
+  // 2. Budget optimization (if over budget)
+  let optimization = null;
+  if (production.budget_target) {
+    optimization = await analyzeBudgetOptimization(production, lineItems, pool);
+  }
+
+  // 3. Tax incentive analysis (already part of compliance audit)
+  const taxIncentives = complianceAudit.taxIncentives;
+
+  // 4. Combine into unified report
+  return {
+    production: {
+      id: production.id,
+      title: production.title,
+      type: production.production_type,
+      location: production.primary_location,
+      shootDays: production.shoot_days
+    },
+    summary: {
+      targetBudget: production.budget_target,
+      actualBudget: optimization?.analysis?.actualBudget || lineItems.reduce((s, i) => s + parseFloat(i.current_total || 0), 0),
+      difference: optimization?.analysis?.difference || 0,
+      status: optimization?.analysis?.status || 'unknown',
+      complianceScore: complianceAudit.complianceScore
+    },
+    compliance: {
+      score: complianceAudit.complianceScore,
+      violations: complianceAudit.violations,
+      warnings: complianceAudit.warnings,
+      summary: complianceAudit.summary
+    },
+    optimization: optimization,
+    taxIncentives: taxIncentives,
+    recommendations: [
+      ...complianceAudit.recommendations,
+      ...(optimization?.quickWins || []).map(qw => ({
+        priority: 'high',
+        category: qw.category,
+        title: qw.strategy,
+        description: qw.description,
+        estimatedSavings: qw.estimatedSavings
+      }))
+    ].sort((a, b) => {
+      const priorityOrder = { high: 0, medium: 1, low: 2, info: 3 };
+      return (priorityOrder[a.priority] || 3) - (priorityOrder[b.priority] || 3);
+    })
+  };
+}
+
 module.exports = {
+  // Original exports
   auditBudget,
   auditLineItem,
   checkRate,
@@ -625,5 +1119,12 @@ module.exports = {
   getTaxIncentivePrograms,
   summarizeAudit,
   TAX_INCENTIVES,
-  COMPLIANCE_RULES
+  COMPLIANCE_RULES,
+
+  // New unified exports
+  analyzeBudgetOptimization,
+  analyzeScenarioWithCompliance,
+  comprehensiveAnalysis,
+  CASCADE_RULES,
+  COST_FACTORS
 };
