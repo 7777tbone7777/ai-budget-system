@@ -1,6 +1,5 @@
 # Ignore frontend for backend deploys
 frontend/
-frontend/node_modules/
 
 # Ignore all node_modules (Railway installs from package.json)
 node_modules/
@@ -14,3 +13,7 @@ docs/
 .git/
 .next/
 .vercel/
+
+# Ignore large files
+*.pdf
+database/union_contracts/
