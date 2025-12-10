@@ -408,12 +408,13 @@ Sessions slow down as context grows. If responses feel slow:
 - Use `/compact` to compress conversation
 - Or start fresh (CLAUDE.md auto-loads context)
 
-### 8. Vercel Authentication Gotcha
+### 8. Vercel Deployment
 Vercel Pro accounts default to requiring authentication (401 errors).
-**When deploying to Vercel, always use `--public` flag:**
+**Deploy from the frontend directory:**
 ```bash
-vercel --prod --yes --public
+cd frontend && vercel --prod --yes --public
 ```
+Note: The Vercel project is linked in `frontend/.vercel/`. Deploy from there, not from root.
 
 ### 7. User Has Dashboard Access
 The user has direct access to Railway, Vercel, and other service dashboards.
