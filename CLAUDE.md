@@ -410,11 +410,11 @@ Sessions slow down as context grows. If responses feel slow:
 
 ### 8. Vercel Deployment
 Vercel Pro accounts default to requiring authentication (401 errors).
-**Deploy from the frontend directory:**
+**IMPORTANT: Deploy from the frontend directory using local files:**
 ```bash
 cd frontend && vercel --prod --yes --public
 ```
-Note: The Vercel project is linked in `frontend/.vercel/`. Deploy from there, not from root.
+Note: The project's GitHub integration builds from root (where there's no Next.js). Always deploy manually from the `frontend/` directory using local files. Do NOT rely on GitHub auto-deploy.
 
 ### 7. User Has Dashboard Access
 The user has direct access to Railway, Vercel, and other service dashboards.
