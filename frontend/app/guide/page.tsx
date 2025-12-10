@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 type Section = 'quick-start' | 'productions' | 'budget-editor' | 'ai-generator' | 'compliance' |
   'comparison' | 'charges' | 'export' | 'rate-cards' | 'tax-incentives' | 'globals' | 'tools' | 'future' |
-  'crew-builder' | 'what-if' | 'guardian' | 'nested-items' | 'dynamic-views' | 'access-control' | 'chart-of-accounts' | 'union-agreements';
+  'crew-builder' | 'what-if' | 'guardian' | 'fringe-calculator' | 'nested-items' | 'dynamic-views' | 'access-control' | 'chart-of-accounts' | 'union-agreements';
 
 interface FeatureStatus {
   available: boolean;
@@ -34,6 +34,7 @@ const featureStatuses: Record<string, FeatureStatus> = {
   'crew-builder': { available: true, label: 'New' },
   'what-if': { available: true, label: 'New' },
   'guardian': { available: true, label: 'New' },
+  'fringe-calculator': { available: true, label: 'New' },
   // Modern Features
   'nested-items': { available: true, label: 'New' },
   'dynamic-views': { available: true, label: 'New' },
@@ -68,6 +69,7 @@ export default function UserGuidePage() {
     { id: 'crew-builder', label: 'Smart Crew Builder', icon: '👥', isNew: true },
     { id: 'what-if', label: 'What-If Analyzer', icon: '🔮', isNew: true },
     { id: 'guardian', label: 'Budget Guardian', icon: '🛡️', isNew: true },
+    { id: 'fringe-calculator', label: 'AI Fringe Calculator', icon: '💵', isNew: true },
     // Modern Features
     { id: 'nested-items', label: 'Nested Line Items', icon: '📋', isNew: true },
     { id: 'dynamic-views', label: 'Dynamic Views', icon: '👁️', isNew: true },
@@ -123,7 +125,7 @@ export default function UserGuidePage() {
               </p>
             </div>
             <div className="text-sm text-gray-500">
-              Version 1.0 | Last updated: November 2024
+              Version 2.0 | Last updated: December 2024
             </div>
           </div>
         </div>
@@ -1707,6 +1709,135 @@ export default function UserGuidePage() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* AI Fringe Calculator - AI Enhancement */}
+          {activeSection === 'fringe-calculator' && (
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <h2 className="text-2xl font-bold text-gray-900">AI Fringe Calculator</h2>
+                  <span className="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800">AI-Powered</span>
+                </div>
+                <p className="text-gray-600">
+                  Automatically calculate payroll taxes and fringe benefits (pension, health & welfare,
+                  vacation, holiday pay) based on union agreements and state requirements.
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-6">
+                <h3 className="font-semibold text-purple-900 mb-3">The Old Way vs. The New Way</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-white/70 rounded p-4">
+                    <h4 className="font-medium text-red-700 mb-2">Manual Calculations (Old)</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>- Look up fringe rates in union PDFs</li>
+                      <li>- Calculate each component separately</li>
+                      <li>- Different rates for different unions</li>
+                      <li>- Easy to miss required contributions</li>
+                      <li>- State tax variations add complexity</li>
+                    </ul>
+                  </div>
+                  <div className="bg-white/70 rounded p-4">
+                    <h4 className="font-medium text-green-700 mb-2">AI Fringe Calculator (New)</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>+ Auto-detects union from position</li>
+                      <li>+ Calculates all components instantly</li>
+                      <li>+ Union-specific rates built-in</li>
+                      <li>+ Never miss a required contribution</li>
+                      <li>+ Multi-state calculations automatic</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">What Gets Calculated</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="border-l-4 border-blue-500 pl-4">
+                    <h4 className="font-medium text-blue-700">Union Fringes</h4>
+                    <p className="text-sm text-gray-600">
+                      Pension, Health & Welfare, Vacation Pay, Holiday Pay per union agreement
+                    </p>
+                  </div>
+                  <div className="border-l-4 border-green-500 pl-4">
+                    <h4 className="font-medium text-green-700">Payroll Taxes</h4>
+                    <p className="text-sm text-gray-600">
+                      FICA, Medicare, FUTA, SUTA, Workers Comp by state
+                    </p>
+                  </div>
+                  <div className="border-l-4 border-yellow-500 pl-4">
+                    <h4 className="font-medium text-yellow-700">Residuals</h4>
+                    <p className="text-sm text-gray-600">
+                      SAG-AFTRA and WGA residual estimates based on distribution
+                    </p>
+                  </div>
+                  <div className="border-l-4 border-purple-500 pl-4">
+                    <h4 className="font-medium text-purple-700">Total Fringe Rate</h4>
+                    <p className="text-sm text-gray-600">
+                      Combined rate for quick budget estimates (typically 25-35%)
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">API Endpoints</h3>
+                <div className="space-y-3 font-mono text-sm">
+                  <div className="bg-gray-50 rounded p-3">
+                    <div className="text-blue-600">POST /api/ai/fringes/calculate/:productionId</div>
+                    <div className="text-gray-500 text-xs mt-1">Calculate fringes for entire production</div>
+                  </div>
+                  <div className="bg-gray-50 rounded p-3">
+                    <div className="text-blue-600">POST /api/ai/fringes/estimate</div>
+                    <div className="text-gray-500 text-xs mt-1">Quick estimate without full production data</div>
+                  </div>
+                  <div className="bg-gray-50 rounded p-3">
+                    <div className="text-blue-600">GET /api/ai/fringes/rates</div>
+                    <div className="text-gray-500 text-xs mt-1">Get current fringe rates by union</div>
+                  </div>
+                  <div className="bg-gray-50 rounded p-3">
+                    <div className="text-blue-600">POST /api/ai/fringes/audit/:productionId</div>
+                    <div className="text-gray-500 text-xs mt-1">Validate fringe calculations for compliance</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Common Fringe Rates</h3>
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="text-left p-3 border">Union/Category</th>
+                      <th className="text-left p-3 border">Typical Range</th>
+                      <th className="text-left p-3 border">Components</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="p-3 border font-medium">IATSE</td>
+                      <td className="p-3 border">25-30%</td>
+                      <td className="p-3 border">Pension (8.5%), H&W (9%), Vacation (5%)</td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 border font-medium">DGA</td>
+                      <td className="p-3 border">28-32%</td>
+                      <td className="p-3 border">Pension (10%), H&W (8.5%), Vacation (7%)</td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 border font-medium">SAG-AFTRA</td>
+                      <td className="p-3 border">19-23%</td>
+                      <td className="p-3 border">Pension (17%), H&W (varies)</td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 border font-medium">Payroll Taxes (CA)</td>
+                      <td className="p-3 border">10-12%</td>
+                      <td className="p-3 border">FICA/Medicare (7.65%), SUTA, Workers Comp</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
