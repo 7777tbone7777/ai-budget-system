@@ -1,12 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import MultiPeriodForm from './MultiPeriodForm';
 import CalculationPanel from '../../../../components/CalculationPanel';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-8e04.up.railway.app';
+
+// Budget info response type
+interface BudgetInfo {
+  has_budget: boolean;
+  budget: {
+    id: string;
+    version_number: number;
+    budget_type: string;
+    total_topsheet_categories: number;
+    total_accounts: number;
+    total_detail_lines: number;
+  } | null;
+}
 
 // Currency formatting helper
 const formatCurrency = (value: number | undefined | null): string => {
@@ -17,11 +30,33 @@ const formatCurrency = (value: number | undefined | null): string => {
   });
 };
 
+// Format number with commas for display
+const formatNumberWithCommas = (value: string | number): string => {
+  const num = typeof value === 'string' ? value.replace(/,/g, '') : value.toString();
+  if (!num || isNaN(Number(num))) return '';
+  return Number(num).toLocaleString('en-US');
+};
+
+// Format quantity (remove trailing .00 for whole numbers)
+const formatQuantity = (value: number | string | undefined | null): string => {
+  if (value === undefined || value === null) return '0';
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  if (isNaN(num)) return '0';
+  return Number.isInteger(num) ? num.toString() : num.toFixed(2);
+};
+
 // Helper to get values from either old or new column names
+// Check for non-zero values first before falling back to alternate columns
 const getLineItemValues = (item: any) => ({
-  subtotal: parseFloat(item.current_subtotal?.toString() || item.subtotal?.toString() || '0'),
-  fringes: parseFloat(item.current_fringe?.toString() || item.fringes?.toString() || '0'),
-  total: parseFloat(item.current_total?.toString() || item.total?.toString() || '0'),
+  subtotal: parseFloat(
+    (item.current_subtotal > 0 ? item.current_subtotal : item.subtotal)?.toString() || '0'
+  ),
+  fringes: parseFloat(
+    (item.fringes > 0 ? item.fringes : item.current_fringe > 0 ? item.current_fringe : item.fringe)?.toString() || '0'
+  ),
+  total: parseFloat(
+    (item.current_total > 0 ? item.current_total : item.total)?.toString() || '0'
+  ),
   accountCode: item.account_code || item.line_number || '-',
 });
 
@@ -51,6 +86,12 @@ interface LineItem {
   children?: LineItem[];
 }
 
+interface QuickAddState {
+  parentId: string;
+  parentDescription: string;
+  isOpen: boolean;
+}
+
 interface Sideletter {
   id: string;
   sideletter_name: string;
@@ -69,6 +110,10 @@ interface Production {
   budget_target?: number;
   applied_sideletters?: Sideletter[];
   principal_photography_start?: string;
+  // Production schedule
+  prep_weeks?: number;
+  shoot_weeks?: number;
+  post_weeks?: number;
 }
 
 interface RateCard {
@@ -93,6 +138,13 @@ export default function ProductionBudgetPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [quickAdd, setQuickAdd] = useState<QuickAddState>({ parentId: '', parentDescription: '', isOpen: false });
+  const [quickAddForm, setQuickAddForm] = useState({ description: '', quantity: 1, rate: 0 });
+
+  // Budget hierarchy state
+  const [budgetInfo, setBudgetInfo] = useState<BudgetInfo | null>(null);
+  const [checkingBudget, setCheckingBudget] = useState(true);
+  const [initializingBudget, setInitializingBudget] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -123,27 +175,78 @@ export default function ProductionBudgetPage() {
     grand_total: 0
   });
 
+  // Check if a budget hierarchy exists and redirect to new budget viewer if so
   useEffect(() => {
-    loadData();
-  }, [productionId]);
+    const checkBudgetHierarchy = async () => {
+      try {
+        setCheckingBudget(true);
+        const response = await axios.get(`${API_URL}/api/productions/${productionId}/budget-info`);
+        setBudgetInfo(response.data);
+
+        // If a budget with line items exists in the hierarchy, redirect to the new budget viewer
+        if (response.data.has_budget && response.data.budget?.total_detail_lines > 0) {
+          router.push(`/budgets/${response.data.budget.id}`);
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking budget hierarchy:', error);
+        // Continue with legacy view if check fails
+      } finally {
+        setCheckingBudget(false);
+      }
+    };
+
+    checkBudgetHierarchy();
+  }, [productionId, router]);
+
+  // Initialize budget hierarchy
+  const handleInitializeBudget = async () => {
+    try {
+      setInitializingBudget(true);
+      const response = await axios.post(`${API_URL}/api/productions/${productionId}/initialize-budget`, {
+        template: 'theatrical',
+        include_accounts: true
+      });
+
+      if (response.data.success) {
+        // Redirect to the new budget hierarchy viewer
+        router.push(`/budgets/${response.data.budget_id}`);
+      } else {
+        alert('Failed to initialize budget: ' + response.data.error);
+      }
+    } catch (error: any) {
+      console.error('Error initializing budget:', error);
+      alert('Failed to initialize budget: ' + (error.response?.data?.error || error.message));
+    } finally {
+      setInitializingBudget(false);
+    }
+  };
+
+  useEffect(() => {
+    // Only load legacy data if not redirecting to new budget viewer
+    if (!checkingBudget && (!budgetInfo?.has_budget || budgetInfo?.budget?.total_detail_lines === 0)) {
+      loadData();
+    }
+  }, [productionId, checkingBudget, budgetInfo]);
 
   const loadData = async () => {
     try {
       setLoading(true);
 
-      // Load production details, line items, and rate cards in parallel
+      // Load production details, line items (with children tree), and rate cards in parallel
       const [prodRes, lineItemsRes, rateCardsRes] = await Promise.all([
         axios.get(`${API_URL}/api/productions/${productionId}`),
-        axios.get(`${API_URL}/api/productions/${productionId}/line-items`),
+        axios.get(`${API_URL}/api/productions/${productionId}/line-items/tree`),
         axios.get(`${API_URL}/api/rate-cards`)
       ]);
 
       setProduction(prodRes.data.data);
-      setLineItems(lineItemsRes.data.data || []);
+      // Tree endpoint returns items in 'items' array with nested children
+      setLineItems(lineItemsRes.data.items || []);
       setRateCards(rateCardsRes.data.data || []);
 
       // Calculate totals
-      calculateTotals(lineItemsRes.data.data || []);
+      calculateTotals(lineItemsRes.data.items || []);
     } catch (error) {
       console.error('Error loading data:', error);
       alert('Failed to load budget data');
@@ -190,6 +293,38 @@ export default function ProductionBudgetPage() {
 
   const handleChildAdded = () => {
     loadData(); // Refresh data when a child is added from the panel
+  };
+
+  // Quick add modal handlers
+  const openQuickAdd = (parentId: string, parentDescription: string) => {
+    setQuickAdd({ parentId, parentDescription, isOpen: true });
+    setQuickAddForm({ description: '', quantity: 1, rate: 0 });
+    // Also expand the parent to show the new child once added
+    setExpandedItems(prev => new Set(prev).add(parentId));
+  };
+
+  const closeQuickAdd = () => {
+    setQuickAdd({ parentId: '', parentDescription: '', isOpen: false });
+    setQuickAddForm({ description: '', quantity: 1, rate: 0 });
+  };
+
+  const handleQuickAddSubmit = async () => {
+    if (!quickAdd.parentId || !quickAddForm.description) return;
+
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/line-items/${quickAdd.parentId}/children`,
+        quickAddForm
+      );
+
+      if (response.data.success) {
+        closeQuickAdd();
+        await loadData(); // Refresh to show new child
+      }
+    } catch (error: any) {
+      console.error('Error adding sub-item:', error);
+      alert('Failed to add sub-item: ' + (error.response?.data?.error || error.message));
+    }
   };
 
   const handleAddLineItem = async () => {
@@ -289,10 +424,15 @@ export default function ProductionBudgetPage() {
         .sort()
     : [];
 
-  if (loading) {
+  if (checkingBudget || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl">Loading budget...</div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="text-xl text-gray-600">
+            {checkingBudget ? 'Checking budget status...' : 'Loading budget...'}
+          </div>
+        </div>
       </div>
     );
   }
@@ -488,14 +628,21 @@ export default function ProductionBudgetPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Rate Override (optional)
                 </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={formData.rate_override}
-                  onChange={(e) => setFormData({...formData, rate_override: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                  placeholder="Leave blank for automatic lookup"
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                  <input
+                    type="text"
+                    value={formData.rate_override ? formatNumberWithCommas(formData.rate_override) : ''}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/,/g, '');
+                      if (raw === '' || /^\d*\.?\d*$/.test(raw)) {
+                        setFormData({...formData, rate_override: raw});
+                      }
+                    }}
+                    className="w-full pl-7 pr-4 py-2 border border-gray-300 rounded-md"
+                    placeholder="Leave blank for automatic lookup"
+                  />
+                </div>
               </div>
             </div>
 
@@ -548,77 +695,115 @@ export default function ProductionBudgetPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Account</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Union</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantity</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Rate</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Fringes</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">% of Budget</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {groupedItems.atl.map((item) => (
-                    <tr
-                      key={item.id}
-                      onClick={() => setSelectedItemId(item.id)}
-                      className={`cursor-pointer transition-colors ${
-                        selectedItemId === item.id
-                          ? 'bg-blue-50 border-l-4 border-l-blue-500'
-                          : 'hover:bg-gray-50'
-                      }`}
-                    >
-                      {(() => {
-                        const vals = getLineItemValues(item);
-                        return (
-                          <>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              <div className="flex items-center gap-2">
-                                {item.is_parent && (
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); toggleExpanded(item.id); }}
-                                    className="text-gray-400 hover:text-gray-600"
-                                  >
-                                    {expandedItems.has(item.id) ? '▼' : '►'}
-                                  </button>
-                                )}
-                                {vals.accountCode}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-900">
-                              <div className="flex items-center gap-2">
-                                {item.description}
-                                {item.is_parent && (
-                                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
-                                    {item.children?.length || 0} sub-items
-                                  </span>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.union_local || '-'}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.rate)}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(vals.subtotal)}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">${formatCurrency(vals.fringes)}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${formatCurrency(vals.total)}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
-                              {production?.budget_target
-                                ? ((vals.total / parseFloat(production.budget_target.toString())) * 100).toFixed(2)
-                                : '0.00'}%
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                  {groupedItems.atl.map((item) => {
+                    const vals = getLineItemValues(item);
+                    const hasChildren = item.children && item.children.length > 0;
+                    const isExpanded = expandedItems.has(item.id);
+
+                    return (
+                      <React.Fragment key={item.id}>
+                        {/* Parent Row */}
+                        <tr
+                          onClick={() => setSelectedItemId(item.id)}
+                          className={`cursor-pointer transition-colors ${
+                            selectedItemId === item.id
+                              ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                              : 'hover:bg-gray-50'
+                          }`}
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); toggleExpanded(item.id); }}
+                                className={`w-5 h-5 flex items-center justify-center rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 ${hasChildren ? '' : 'invisible'}`}
+                              >
+                                {isExpanded ? '▼' : '►'}
+                              </button>
+                              {vals.accountCode}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-900">
+                            <div className="flex items-center gap-2">
+                              {item.description}
+                              {hasChildren && (
+                                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                                  {item.children?.length} sub-items
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.union_local || '-'}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.rate)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(vals.subtotal)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${formatCurrency(vals.total)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
+                            {production?.budget_target
+                              ? ((vals.total / parseFloat(production.budget_target.toString())) * 100).toFixed(2)
+                              : '0.00'}%
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); openQuickAdd(item.id, item.description); }}
+                                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                title="Add sub-item"
+                              >
+                                +
+                              </button>
                               <button
                                 onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(item.id); }}
                                 className="text-red-600 hover:text-red-800 text-sm"
                               >
                                 Delete
                               </button>
-                            </td>
-                          </>
-                        );
-                      })()}
-                    </tr>
-                  ))}
+                            </div>
+                          </td>
+                        </tr>
+
+                        {/* Child Rows (when expanded) */}
+                        {isExpanded && hasChildren && item.children?.map((child, idx) => {
+                          const childVals = getLineItemValues(child);
+                          return (
+                            <tr
+                              key={child.id}
+                              onClick={() => setSelectedItemId(child.id)}
+                              className={`bg-gray-50 cursor-pointer transition-colors ${
+                                selectedItemId === child.id
+                                  ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                                  : 'hover:bg-gray-100'
+                              }`}
+                            >
+                              <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500 pl-12">
+                                <span className="text-gray-300">└</span> {idx + 1}
+                              </td>
+                              <td className="px-6 py-3 text-sm text-gray-700">{child.description}</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500">{child.union_local || '-'}</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">${formatCurrency(child.rate)}</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">${formatCurrency(childVals.subtotal)}</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-700 text-right">${formatCurrency(childVals.total)}</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500 text-right">-</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-right">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(child.id); }}
+                                  className="text-red-500 hover:text-red-700 text-xs"
+                                >
+                                  Delete
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </React.Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -640,78 +825,117 @@ export default function ProductionBudgetPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Department</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Union</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantity</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Rate</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Fringes</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">% of Budget</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {groupedItems.btl.map((item) => (
-                    <tr
-                      key={item.id}
-                      onClick={() => setSelectedItemId(item.id)}
-                      className={`cursor-pointer transition-colors ${
-                        selectedItemId === item.id
-                          ? 'bg-blue-50 border-l-4 border-l-blue-500'
-                          : 'hover:bg-gray-50'
-                      }`}
-                    >
-                      {(() => {
-                        const vals = getLineItemValues(item);
-                        return (
-                          <>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              <div className="flex items-center gap-2">
-                                {item.is_parent && (
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); toggleExpanded(item.id); }}
-                                    className="text-gray-400 hover:text-gray-600"
-                                  >
-                                    {expandedItems.has(item.id) ? '▼' : '►'}
-                                  </button>
-                                )}
-                                {vals.accountCode}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-900">
-                              <div className="flex items-center gap-2">
-                                {item.description}
-                                {item.is_parent && (
-                                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
-                                    {item.children?.length || 0} sub-items
-                                  </span>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.department || '-'}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.union_local || '-'}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.rate)}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(vals.subtotal)}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">${formatCurrency(vals.fringes)}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${formatCurrency(vals.total)}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
-                              {production?.budget_target
-                                ? ((vals.total / parseFloat(production.budget_target.toString())) * 100).toFixed(2)
-                                : '0.00'}%
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                  {groupedItems.btl.map((item) => {
+                    const vals = getLineItemValues(item);
+                    const hasChildren = item.children && item.children.length > 0;
+                    const isExpanded = expandedItems.has(item.id);
+
+                    return (
+                      <React.Fragment key={item.id}>
+                        {/* Parent Row */}
+                        <tr
+                          onClick={() => setSelectedItemId(item.id)}
+                          className={`cursor-pointer transition-colors ${
+                            selectedItemId === item.id
+                              ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                              : 'hover:bg-gray-50'
+                          }`}
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); toggleExpanded(item.id); }}
+                                className={`w-5 h-5 flex items-center justify-center rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 ${hasChildren ? '' : 'invisible'}`}
+                              >
+                                {isExpanded ? '▼' : '►'}
+                              </button>
+                              {vals.accountCode}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-900">
+                            <div className="flex items-center gap-2">
+                              {item.description}
+                              {hasChildren && (
+                                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                                  {item.children?.length} sub-items
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.department || '-'}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.union_local || '-'}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.rate)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(vals.subtotal)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${formatCurrency(vals.total)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
+                            {production?.budget_target
+                              ? ((vals.total / parseFloat(production.budget_target.toString())) * 100).toFixed(2)
+                              : '0.00'}%
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); openQuickAdd(item.id, item.description); }}
+                                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                title="Add sub-item"
+                              >
+                                +
+                              </button>
                               <button
                                 onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(item.id); }}
                                 className="text-red-600 hover:text-red-800 text-sm"
                               >
                                 Delete
                               </button>
-                            </td>
-                          </>
-                        );
-                      })()}
-                    </tr>
-                  ))}
+                            </div>
+                          </td>
+                        </tr>
+
+                        {/* Child Rows (when expanded) */}
+                        {isExpanded && hasChildren && item.children?.map((child, idx) => {
+                          const childVals = getLineItemValues(child);
+                          return (
+                            <tr
+                              key={child.id}
+                              onClick={() => setSelectedItemId(child.id)}
+                              className={`bg-gray-50 cursor-pointer transition-colors ${
+                                selectedItemId === child.id
+                                  ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                                  : 'hover:bg-gray-100'
+                              }`}
+                            >
+                              <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500 pl-12">
+                                <span className="text-gray-300">└</span> {idx + 1}
+                              </td>
+                              <td className="px-6 py-3 text-sm text-gray-700">{child.description}</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500">{child.department || '-'}</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500">{child.union_local || '-'}</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">${formatCurrency(child.rate)}</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">${formatCurrency(childVals.subtotal)}</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-700 text-right">${formatCurrency(childVals.total)}</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500 text-right">-</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-right">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(child.id); }}
+                                  className="text-red-500 hover:text-red-700 text-xs"
+                                >
+                                  Delete
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </React.Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -731,7 +955,6 @@ export default function ProductionBudgetPage() {
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Account</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantity</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Rate</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">% of Budget</th>
@@ -739,78 +962,162 @@ export default function ProductionBudgetPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {groupedItems.other.map((item) => (
-                    <tr
-                      key={item.id}
-                      onClick={() => setSelectedItemId(item.id)}
-                      className={`cursor-pointer transition-colors ${
-                        selectedItemId === item.id
-                          ? 'bg-blue-50 border-l-4 border-l-blue-500'
-                          : 'hover:bg-gray-50'
-                      }`}
-                    >
-                      {(() => {
-                        const vals = getLineItemValues(item);
-                        return (
-                          <>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              <div className="flex items-center gap-2">
-                                {item.is_parent && (
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); toggleExpanded(item.id); }}
-                                    className="text-gray-400 hover:text-gray-600"
-                                  >
-                                    {expandedItems.has(item.id) ? '▼' : '►'}
-                                  </button>
-                                )}
-                                {vals.accountCode}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-900">
-                              <div className="flex items-center gap-2">
-                                {item.description}
-                                {item.is_parent && (
-                                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
-                                    {item.children?.length || 0} sub-items
-                                  </span>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.rate)}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${formatCurrency(vals.total)}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
-                              {production?.budget_target
-                                ? ((vals.total / parseFloat(production.budget_target.toString())) * 100).toFixed(2)
-                                : '0.00'}%
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                  {groupedItems.other.map((item) => {
+                    const vals = getLineItemValues(item);
+                    const hasChildren = item.children && item.children.length > 0;
+                    const isExpanded = expandedItems.has(item.id);
+
+                    return (
+                      <React.Fragment key={item.id}>
+                        {/* Parent Row */}
+                        <tr
+                          onClick={() => setSelectedItemId(item.id)}
+                          className={`cursor-pointer transition-colors ${
+                            selectedItemId === item.id
+                              ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                              : 'hover:bg-gray-50'
+                          }`}
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); toggleExpanded(item.id); }}
+                                className={`w-5 h-5 flex items-center justify-center rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 ${hasChildren ? '' : 'invisible'}`}
+                              >
+                                {isExpanded ? '▼' : '►'}
+                              </button>
+                              {vals.accountCode}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-900">
+                            <div className="flex items-center gap-2">
+                              {item.description}
+                              {hasChildren && (
+                                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                                  {item.children?.length} sub-items
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatCurrency(item.rate)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">${formatCurrency(vals.total)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
+                            {production?.budget_target
+                              ? ((vals.total / parseFloat(production.budget_target.toString())) * 100).toFixed(2)
+                              : '0.00'}%
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); openQuickAdd(item.id, item.description); }}
+                                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                title="Add sub-item"
+                              >
+                                +
+                              </button>
                               <button
                                 onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(item.id); }}
                                 className="text-red-600 hover:text-red-800 text-sm"
                               >
                                 Delete
                               </button>
-                            </td>
-                          </>
-                        );
-                      })()}
-                    </tr>
-                  ))}
+                            </div>
+                          </td>
+                        </tr>
+
+                        {/* Child Rows (when expanded) */}
+                        {isExpanded && hasChildren && item.children?.map((child, idx) => {
+                          const childVals = getLineItemValues(child);
+                          return (
+                            <tr
+                              key={child.id}
+                              onClick={() => setSelectedItemId(child.id)}
+                              className={`bg-gray-50 cursor-pointer transition-colors ${
+                                selectedItemId === child.id
+                                  ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                                  : 'hover:bg-gray-100'
+                              }`}
+                            >
+                              <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500 pl-12">
+                                <span className="text-gray-300">└</span> {idx + 1}
+                              </td>
+                              <td className="px-6 py-3 text-sm text-gray-700">{child.description}</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">${formatCurrency(child.rate)}</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-700 text-right">${formatCurrency(childVals.total)}</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500 text-right">-</td>
+                              <td className="px-6 py-3 whitespace-nowrap text-right">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleDeleteLineItem(child.id); }}
+                                  className="text-red-500 hover:text-red-700 text-xs"
+                                >
+                                  Delete
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </React.Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           </div>
         )}
 
-        {/* Empty State */}
+        {/* Empty State with Budget Initialization Option */}
         {lineItems.length === 0 && (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
             <div className="text-gray-400 text-6xl mb-4">📋</div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">No Budget Line Items Yet</h3>
             <p className="text-gray-600 mb-6">
-              Get started by adding your first budget line item above
+              Choose how you want to set up your budget:
             </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+              {/* New Hierarchy Budget Option */}
+              <div className="border-2 border-blue-200 rounded-lg p-6 hover:border-blue-400 transition-colors">
+                <div className="text-blue-600 text-4xl mb-3">🏗️</div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">Professional Budget Structure</h4>
+                <p className="text-sm text-gray-600 mb-4">
+                  Initialize a full 4-level budget hierarchy with 34 standard categories and 100+ account codes.
+                </p>
+                <button
+                  onClick={handleInitializeBudget}
+                  disabled={initializingBudget}
+                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 flex items-center justify-center gap-2"
+                >
+                  {initializingBudget ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Initializing...
+                    </>
+                  ) : (
+                    'Initialize Professional Budget'
+                  )}
+                </button>
+                <p className="text-xs text-gray-500 mt-2">Recommended for film & TV productions</p>
+              </div>
+
+              {/* Quick Add Option */}
+              <div className="border-2 border-gray-200 rounded-lg p-6 hover:border-gray-400 transition-colors">
+                <div className="text-gray-500 text-4xl mb-3">⚡</div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">Quick Add Mode</h4>
+                <p className="text-sm text-gray-600 mb-4">
+                  Add line items manually or use the Auto-Generate feature for quick estimates.
+                </p>
+                <button
+                  onClick={() => setShowAddForm(true)}
+                  className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                >
+                  Add Line Item Manually
+                </button>
+                <p className="text-xs text-gray-500 mt-2">Good for quick estimates or simple budgets</p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -840,6 +1147,86 @@ export default function ProductionBudgetPage() {
       </div>
       </div>
 
+      {/* Quick Add Modal */}
+      {quickAdd.isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-96">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">Add Cast Member</h3>
+              <button onClick={closeQuickAdd} className="text-gray-400 hover:text-gray-600">
+                &times;
+              </button>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              Adding to: <span className="font-medium">{quickAdd.parentDescription}</span>
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name / Description
+                </label>
+                <input
+                  type="text"
+                  value={quickAddForm.description}
+                  onChange={(e) => setQuickAddForm(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="e.g., Lead #1, Supporting Actor #2"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  autoFocus
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Weeks/Days
+                  </label>
+                  <input
+                    type="number"
+                    value={quickAddForm.quantity}
+                    onChange={(e) => setQuickAddForm(prev => ({ ...prev, quantity: parseFloat(e.target.value) || 0 }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    min="0"
+                    step="0.5"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Rate ($)
+                  </label>
+                  <input
+                    type="number"
+                    value={quickAddForm.rate}
+                    onChange={(e) => setQuickAddForm(prev => ({ ...prev, rate: parseFloat(e.target.value) || 0 }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    min="0"
+                  />
+                </div>
+              </div>
+              <div className="bg-gray-50 rounded p-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Subtotal:</span>
+                  <span className="font-medium">${formatCurrency(quickAddForm.quantity * quickAddForm.rate)}</span>
+                </div>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={closeQuickAdd}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleQuickAddSubmit}
+                  disabled={!quickAddForm.description}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Calculation Panel Sidebar */}
       {selectedItemId && (
         <div className="w-96 flex-shrink-0 h-screen sticky top-0">
@@ -847,6 +1234,15 @@ export default function ProductionBudgetPage() {
             lineItemId={selectedItemId}
             onClose={() => setSelectedItemId(null)}
             onAddChild={handleChildAdded}
+            productionSchedule={production ? {
+              prep_weeks: production.prep_weeks || 4,
+              shoot_weeks: production.shoot_weeks || 12,
+              post_weeks: production.post_weeks || 8,
+            } : undefined}
+            onScheduleUpdate={(lineItemId, schedule) => {
+              // Refresh data when schedule is updated
+              loadData();
+            }}
           />
         </div>
       )}

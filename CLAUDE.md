@@ -82,7 +82,7 @@ PGPASSWORD=<password> psql -h <host> -U <user> -d <database> -f database/migrati
 
 ## Budget Hierarchy System (4-Level Structure)
 
-**Status:** API implemented, migration created, **NOT YET DEPLOYED to Railway**
+**Status:** ✅ Schema deployed to Railway, triggers working, **data migration needed for existing line items**
 
 The budget system uses a 4-level hierarchy based on professional film/TV production budgeting standards:
 
@@ -185,36 +185,33 @@ cd /Users/anthonyvazquez/ai-budget-system/database/migrations
 DATABASE_URL=<railway-db-url> node view_test_results.js
 ```
 
-### Current Status & Known Issues
+### Current Status (Updated 2026-01-28)
 
-**CRITICAL ISSUE (2025-11-27):**
+**Database Schema:** ✅ Fully deployed to Railway
 
-The budget hierarchy system was built and tested locally but **migrations have NOT been run on Railway's PostgreSQL database**. This causes errors when users try to view budgets:
+| Component | Status | Details |
+|-----------|--------|---------|
+| `budget_metadata` table | ✅ Deployed | 0 rows (needs hierarchy setup) |
+| `budget_topsheet` table | ✅ Deployed | 0 rows (needs hierarchy setup) |
+| `budget_accounts` table | ✅ Deployed | 0 rows (needs hierarchy setup) |
+| `budget_line_items` table | ✅ Deployed | 114 rows (using old flat structure) |
+| `fringe_calculation_rules` | ✅ Deployed | 6 rules |
+| Auto-calc triggers | ✅ Working | All 4 triggers installed |
+| Rate cards | ✅ Loaded | 2,860 cards |
+| Sideletter rules | ✅ Loaded | 66 rules |
 
-**Error:** `"column bli.account_code does not exist"`
+**Current Data State:**
+The existing 114 line items are linked directly to the production (old structure) with `budget_id = NULL` and `account_id = NULL`. To use the new 4-level hierarchy features:
+1. Create `budget_metadata` record for the production
+2. Create `budget_topsheet` categories (1100, 2000, 3300, etc.)
+3. Create `budget_accounts` for each account code
+4. Update line items to link to their accounts
 
-**Root Cause:**
-- Backend code (server.js, /backend/api/budgets.js) references new budget hierarchy tables
-- Frontend (/frontend/app/productions/[id]/budget/page.tsx) calls `/api/productions/${id}/line-items`
-- This endpoint queries `budget_line_items` table which doesn't exist on Railway yet
-- Migration `001_add_4_level_hierarchy.sql` needs to be applied to Railway database
-
-**Fix Required:**
-1. Apply migration `001_add_4_level_hierarchy.sql` to Railway PostgreSQL
-2. Optionally apply `002_seed_fringe_rules.sql` for fringe calculation data
-3. Test with `003_test_sample_budget.sql` or via API
-
-**To Deploy Migration:**
-```bash
-# Get Railway DB credentials
-railway variables --service backend | grep DATABASE_URL
-
-# Parse DATABASE_URL to get connection details
-# postgres://user:password@host:port/database
-
-# Run migration
-PGPASSWORD=<password> psql -h <host> -U <user> -d <database> -f database/migrations/001_add_4_level_hierarchy.sql
-```
+**Database Connection (Railway Public Endpoint):**
+- Host: `caboose.proxy.rlwy.net`
+- Port: `14463`
+- Database: `railway`
+- User: `postgres`
 
 ## AI Features (in server.js)
 
@@ -423,23 +420,22 @@ The user has direct access to Railway, Vercel, and other service dashboards.
 2. If they decline, then use CLI commands to fetch logs
 3. Screenshots can be read directly - just ask for the file path
 
-### 9. Budget Hierarchy Migration Gap (2025-11-27)
+### 9. Budget Hierarchy Migration Gap (2025-11-27) - RESOLVED 2026-01-28
 Created comprehensive 4-level budget hierarchy system with:
 - 5 new database tables (`budget_metadata`, `budget_topsheet`, `budget_accounts`, `budget_line_items`, `fringe_calculation_rules`)
 - 4 database triggers for auto-calculations and rollups
 - Complete API implementation in `/backend/api/budgets.js`
 - Migration file `001_add_4_level_hierarchy.sql`
 
-**The Problem:** Built and tested everything locally but forgot to run the migration on Railway's PostgreSQL database. When users clicked "View Budget", got error: `"column bli.account_code does not exist"`.
+**Original Problem:** Built and tested everything locally but forgot to run the migration on Railway's PostgreSQL database.
 
-**Root Cause:** Frontend calls old `/api/productions/${id}/line-items` endpoint, which queries `budget_line_items` table that only exists locally.
+**Resolution (2026-01-28):** Migration has been deployed. All tables and triggers exist. However, existing line items (114 rows) use the old flat structure (`budget_id = NULL`, `account_id = NULL`). The hierarchy needs to be populated for each production.
 
-**Lesson:** **Always deploy database migrations to production immediately after creating them**, or at minimum, add a clear "TODO: Deploy to Railway" comment in the migration file and CLAUDE.md. Don't assume schema changes will "just work" - they must be explicitly deployed.
+**Lesson:** Database migrations have TWO steps:
+1. **Schema deployment** - Run the migration SQL to create tables/triggers
+2. **Data migration** - Populate the new structure and link existing data
 
-**Prevention:**
-- Create a migrations checklist in CLAUDE.md
-- Add Railway migration deployment as a standard step in the development workflow
-- Consider creating a `/database/migrations/README.md` with deployment instructions
+Just deploying the schema doesn't automatically organize existing data into the new hierarchy.
 
 ### 10. Production Form UX & Union Agreement Intelligence (2025-11-27)
 
@@ -540,4 +536,4 @@ Created comprehensive 4-level budget hierarchy system with:
 - Add validation to prevent conflicting custom agreements (e.g., two custom IATSE sideletters)
 
 ---
-*Last updated: 2025-12-01*
+*Last updated: 2026-01-28*

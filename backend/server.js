@@ -4458,6 +4458,226 @@ app.post('/api/ai/crew/apply/:productionId', async (req, res) => {
   }
 });
 
+// ============================================================================
+// BUDGET HIERARCHY INITIALIZATION
+// ============================================================================
+
+// Standard theatrical budget categories (based on industry standard chart of accounts)
+const STANDARD_BUDGET_CATEGORIES = [
+  { number: 1100, name: 'Story & Rights', atl: true },
+  { number: 1200, name: 'Producers Unit', atl: true },
+  { number: 1300, name: 'Direction', atl: true },
+  { number: 1400, name: 'Cast', atl: true },
+  { number: 1500, name: 'Travel & Living - ATL', atl: true },
+  { number: 2000, name: 'Production Staff', atl: false },
+  { number: 2100, name: 'Extra Talent', atl: false },
+  { number: 2200, name: 'Art Department', atl: false },
+  { number: 2300, name: 'Set Construction', atl: false },
+  { number: 2400, name: 'Set Striking', atl: false },
+  { number: 2500, name: 'Set Operations', atl: false },
+  { number: 2600, name: 'Property', atl: false },
+  { number: 2700, name: 'Set Dressing', atl: false },
+  { number: 2800, name: 'Special Effects', atl: false },
+  { number: 2900, name: 'Wardrobe', atl: false },
+  { number: 3000, name: 'Makeup', atl: false },
+  { number: 3100, name: 'Hairdressing', atl: false },
+  { number: 3200, name: 'Set Lighting', atl: false },
+  { number: 3300, name: 'Camera', atl: false },
+  { number: 3400, name: 'Production Sound', atl: false },
+  { number: 3500, name: 'Transportation', atl: false },
+  { number: 3600, name: 'Location Expenses', atl: false },
+  { number: 3700, name: 'Stage Rental & Facilities', atl: false },
+  { number: 3800, name: 'Second Unit', atl: false },
+  { number: 4000, name: 'Tests & Stunts', atl: false },
+  { number: 4100, name: 'Editorial', atl: false },
+  { number: 4200, name: 'Music', atl: false },
+  { number: 4300, name: 'Post Production Sound', atl: false },
+  { number: 4400, name: 'Post Production Film & Lab', atl: false },
+  { number: 4500, name: 'Visual Effects', atl: false },
+  { number: 4600, name: 'Main & End Titles', atl: false },
+  { number: 6500, name: 'Publicity', atl: false },
+  { number: 6700, name: 'Insurance', atl: false },
+  { number: 6800, name: 'General & Administrative', atl: false }
+];
+
+// Standard account names by category prefix (maps account codes to descriptive names)
+const STANDARD_ACCOUNT_NAMES = {
+  '1101': 'Story Acquisition', '1102': 'Writer', '1103': 'Script Clearance',
+  '1201': 'Executive Producer', '1202': 'Producer', '1203': 'Co-Producer', '1204': 'Associate Producer',
+  '1301': 'Director', '1302': 'Second Unit Director',
+  '1400': 'Lead Cast', '1401': 'Principal Cast', '1402': 'Supporting Cast', '1403': 'Day Players',
+  '1504': 'ATL Travel & Living',
+  '2001': 'Unit Production Manager', '2002': 'Production Supervisor', '2003': 'First Assistant Director',
+  '2004': 'Second Assistant Director', '2005': 'Second Second AD', '2006': 'Production Coordinator',
+  '2007': 'Assistant Production Coordinator', '2008': 'Production Secretary', '2009': 'Travel Coordinator',
+  '2010': 'Production Accountant', '2011': 'First Assistant Accountant', '2012': 'Second Assistant Accountant',
+  '2013': 'Payroll Accountant', '2014': 'Post Production Accountant', '2015': 'Office PA',
+  '2101': 'Extras Casting', '2102': 'Stand-Ins', '2103': 'Photo Doubles',
+  '2201': 'Production Designer', '2202': 'Art Director', '2203': 'Assistant Art Director',
+  '2204': 'Set Designer', '2205': 'Art Department Coordinator', '2206': 'Art PA',
+  '2207': 'Storyboard Artist', '2208': 'Graphics', '2216': 'Art Department Purchases',
+  '2301': 'Construction Coordinator', '2302': 'Construction Foreman', '2303': 'Labor Foreman',
+  '2304': 'Propmaker Foreman', '2305': 'Paint Foreman', '2306': 'Greens Foreman', '2316': 'Construction Materials',
+  '2401': 'Set Strike Labor', '2402': 'Strike Disposal', '2403': 'Strike Equipment',
+  '2501': 'Key Grip', '2502': 'Best Boy Grip', '2503': 'Dolly Grip', '2504': 'Grips',
+  '2505': 'Rigging Grip', '2506': 'Grip Trainee', '2518': 'Grip Equipment',
+  '2601': 'Property Master', '2602': 'Assistant Property Master', '2603': 'Props Buyer',
+  '2701': 'Set Decorator', '2702': 'Lead Person', '2703': 'Set Dressers', '2704': 'Draper', '2716': 'Set Dressing Purchases',
+  '2816': 'Special Effects Purchases',
+  '2901': 'Costume Designer', '2902': 'Assistant Costume Designer', '2903': 'Costume Supervisor',
+  '2904': 'Key Costumer', '2905': 'Set Costumers', '2908': 'Wardrobe Purchases',
+  '3001': 'Makeup Department Head', '3002': 'Key Makeup Artist',
+  '3101': 'Hair Department Head', '3102': 'Key Hair Stylist', '3116': 'Hair & Makeup Supplies',
+  '3201': 'Gaffer', '3202': 'Best Boy Electric', '3203': 'Electricians', '3204': 'Rigging Electricians',
+  '3205': 'Generator Operator', '3206': 'Electric Trainee', '3216': 'Lighting Equipment',
+  '3301': 'Director of Photography', '3302': 'Camera Operator', '3303': 'First Assistant Camera',
+  '3304': 'Second Assistant Camera', '3305': 'Digital Imaging Technician', '3306': 'Camera Loader',
+  '3307': 'Camera Trainee', '3318': 'Camera Equipment',
+  '3401': 'Production Sound Mixer', '3402': 'Boom Operator', '3403': 'Sound Utility',
+  '3501': 'Transportation Coordinator', '3502': 'Transportation Captain', '3503': 'Drivers', '3518': 'Picture Vehicles',
+  '3601': 'Location Manager', '3602': 'Assistant Location Manager', '3603': 'Location Scout',
+  '3604': 'Location PA', '3685': 'Location Fees & Permits',
+  '3801': 'Second Unit Director', '3802': 'Second Unit DP', '3803': 'Second Unit Crew',
+  '4001': 'Stunt Coordinator', '4002': 'Stunt Performers',
+  '4100': 'Post Production Supervisor',
+  '4201': 'Composer', '4202': 'Music Supervisor', '4206': 'Music Licensing',
+  '4301': 'Re-Recording Mixer', '4302': 'Sound Editorial',
+  '4432': 'Digital Intermediate',
+  '4602': 'Visual Effects Supervisor', '4605': 'VFX Vendor', '4646': 'Titles',
+  '6701': 'Production Insurance',
+  '6864': 'Legal & Accounting', '6885': 'Overhead & Contingency'
+};
+
+// Initialize budget hierarchy for a production
+// Creates: budget_metadata, budget_topsheet, and budget_accounts
+app.post('/api/productions/:productionId/initialize-budget', async (req, res) => {
+  const { productionId } = req.params;
+  const { template = 'theatrical', include_accounts = true } = req.body;
+
+  try {
+    aiLogger.info('Initializing budget hierarchy', { productionId, template });
+
+    // 1. Check if production exists
+    const prodResult = await db.query('SELECT * FROM productions WHERE id = $1', [productionId]);
+    if (prodResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Production not found' });
+    }
+    const production = prodResult.rows[0];
+
+    // 2. Check if budget already exists
+    const existingBudget = await db.query(
+      'SELECT id FROM budget_metadata WHERE production_id = $1',
+      [productionId]
+    );
+    if (existingBudget.rows.length > 0) {
+      return res.json({
+        success: true,
+        budget_id: existingBudget.rows[0].id,
+        message: 'Budget already exists',
+        already_exists: true
+      });
+    }
+
+    // 3. Create budget_metadata
+    const budgetResult = await db.query(`
+      INSERT INTO budget_metadata (production_id, version_number, budget_type, notes)
+      VALUES ($1, 1, 'original', $2)
+      RETURNING id
+    `, [productionId, `Initialized from ${template} template`]);
+    const budgetId = budgetResult.rows[0].id;
+
+    // 4. Create topsheet categories
+    const categoryMap = {}; // Store category number -> id mapping
+    let sortOrder = 1;
+    for (const cat of STANDARD_BUDGET_CATEGORIES) {
+      const topsheetResult = await db.query(`
+        INSERT INTO budget_topsheet (budget_id, category_number, category_name, sort_order)
+        VALUES ($1, $2, $3, $4)
+        RETURNING id
+      `, [budgetId, cat.number, cat.name, sortOrder++]);
+      categoryMap[cat.number] = topsheetResult.rows[0].id;
+    }
+
+    // 5. Create accounts if requested
+    let accountsCreated = 0;
+    if (include_accounts) {
+      let accountSortOrder = 1;
+      for (const [accountCode, accountName] of Object.entries(STANDARD_ACCOUNT_NAMES)) {
+        const categoryPrefix = Math.floor(parseInt(accountCode) / 100) * 100;
+        const topsheetId = categoryMap[categoryPrefix];
+
+        if (topsheetId) {
+          await db.query(`
+            INSERT INTO budget_accounts (topsheet_category_id, budget_id, account_code, account_name, sort_order)
+            VALUES ($1, $2, $3, $4, $5)
+          `, [topsheetId, budgetId, accountCode, accountName, accountSortOrder++]);
+          accountsCreated++;
+        }
+      }
+    }
+
+    // 6. Update metadata counts
+    await db.query(`
+      UPDATE budget_metadata SET
+        total_topsheet_categories = (SELECT COUNT(*) FROM budget_topsheet WHERE budget_id = $1),
+        total_accounts = (SELECT COUNT(*) FROM budget_accounts WHERE budget_id = $1),
+        last_calculation_date = NOW()
+      WHERE id = $1
+    `, [budgetId]);
+
+    aiLogger.info('Budget hierarchy initialized', { budgetId, categories: Object.keys(categoryMap).length, accounts: accountsCreated });
+
+    res.json({
+      success: true,
+      budget_id: budgetId,
+      production_id: productionId,
+      categories_created: Object.keys(categoryMap).length,
+      accounts_created: accountsCreated,
+      message: 'Budget hierarchy initialized successfully'
+    });
+
+  } catch (error) {
+    aiLogger.error('Failed to initialize budget hierarchy', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Get budget for a production (returns budget_id or null)
+app.get('/api/productions/:productionId/budget-info', async (req, res) => {
+  const { productionId } = req.params;
+
+  try {
+    const result = await db.query(`
+      SELECT bm.id, bm.version_number, bm.budget_type,
+             bm.total_topsheet_categories, bm.total_accounts, bm.total_detail_lines,
+             bm.created_at
+      FROM budget_metadata bm
+      WHERE bm.production_id = $1
+      ORDER BY bm.version_number DESC
+      LIMIT 1
+    `, [productionId]);
+
+    if (result.rows.length === 0) {
+      return res.json({
+        success: true,
+        has_budget: false,
+        budget: null
+      });
+    }
+
+    res.json({
+      success: true,
+      has_budget: true,
+      budget: result.rows[0]
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Auto-generate budget for a production using AI crew builder + agreement rules
 app.post('/api/productions/:productionId/auto-generate-budget', async (req, res) => {
   const { productionId } = req.params;
@@ -4611,19 +4831,21 @@ app.post('/api/productions/:productionId/auto-generate-budget', async (req, res)
         await db.query(
           `INSERT INTO budget_line_items (
             production_id, account_code, description, quantity, rate,
-            subtotal, fringes, total, notes, atl_or_btl
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+            subtotal, fringes, total, notes, atl_or_btl, union_local, department
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
           [
             productionId,
             accountCode,
-            `${crew.position_title} (${crew.department})`,
+            crew.position_title,
             quantity,
             rate,
             subtotal,
             fringes,
             total,
-            `${crew.union_local} - Prep: ${prepDays}d, Shoot: ${shootDaysForPos}d, Wrap: ${wrapDays}d`,
-            'BTL'
+            `Prep: ${prepDays}d, Shoot: ${shootDaysForPos}d, Wrap: ${wrapDays}d`,
+            'BTL',
+            crew.union_local || null,
+            crew.department || null
           ]
         );
 
@@ -4650,8 +4872,8 @@ app.post('/api/productions/:productionId/auto-generate-budget', async (req, res)
           await db.query(
             `INSERT INTO budget_line_items (
               production_id, account_code, description, quantity, rate,
-              subtotal, fringes, total, notes, atl_or_btl
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+              subtotal, fringes, total, notes, atl_or_btl, union_local, department
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
             [
               productionId,
               accountCode,
@@ -4661,8 +4883,10 @@ app.post('/api/productions/:productionId/auto-generate-budget', async (req, res)
               position.baseCost || 0,
               position.fringes || 0,
               position.total || 0,
-              `${position.union || 'Union'} - ${position.quantity || 1} × ${position.weeks || 1} weeks`,
-              'BTL'
+              `${position.quantity || 1} × ${position.weeks || 1} weeks`,
+              'BTL',
+              position.union || null,
+              dept.name || null
             ]
           );
           itemsCreated++;
@@ -5197,6 +5421,29 @@ app.post('/api/ai/crew/union-rates/iatse-videotape/seed', async (req, res) => {
   } catch (error) {
     aiLogger.error('Failed to seed IATSE Videotape rates', error);
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get list of Chart of Accounts templates
+app.get('/api/chart-of-accounts', async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT id, name, description, is_default, is_active, created_at, updated_at
+      FROM chart_of_accounts
+      WHERE name IS NOT NULL
+        AND name != ''
+        AND (account_code IS NULL OR account_code = '')
+        AND is_active = true
+      ORDER BY is_default DESC, name ASC
+    `);
+
+    res.json({
+      success: true,
+      data: result.rows
+    });
+  } catch (error) {
+    console.error('Error fetching chart of accounts:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch chart of accounts' });
   }
 });
 
@@ -5810,11 +6057,12 @@ app.get('/api/line-items/:id/calculation', async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Query with only the legacy columns that actually exist
+    // Query with only the legacy columns that actually exist, plus schedule columns
     const result = await db.query(`
       SELECT id, description, quantity, rate, subtotal, fringes, total,
              current_subtotal, current_fringe, current_total,
-             unit_type, rate_type, multiplier, notes
+             unit_type, rate_type, multiplier, notes,
+             prep_weeks, shoot_weeks, post_weeks
       FROM budget_line_items WHERE id = $1
     `, [id]);
 
@@ -5863,6 +6111,70 @@ app.post('/api/line-items/:parentId/recalculate', async (req, res) => {
     });
   } catch (error) {
     apiLogger.error('Failed to recalculate', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update line item schedule (prep/shoot/post weeks) and recalculate totals
+app.put('/api/line-items/:id/schedule', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { prep_weeks, shoot_weeks, post_weeks } = req.body;
+
+    // Calculate new quantity from schedule weeks
+    const newQuantity = (parseFloat(prep_weeks) || 0) + (parseFloat(shoot_weeks) || 0) + (parseFloat(post_weeks) || 0);
+
+    apiLogger.info(`Updating schedule for line item ${id}`, { prep_weeks, shoot_weeks, post_weeks, newQuantity });
+
+    // First get the current rate and fringe rate
+    const currentItem = await db.query('SELECT rate, total_fringe_rate, fringes, subtotal FROM budget_line_items WHERE id = $1', [id]);
+    if (currentItem.rowCount === 0) {
+      return res.status(404).json({ success: false, error: 'Line item not found' });
+    }
+
+    const rate = parseFloat(currentItem.rows[0].rate) || 0;
+    const oldSubtotal = parseFloat(currentItem.rows[0].subtotal) || 0;
+    const oldFringes = parseFloat(currentItem.rows[0].fringes) || 0;
+
+    // Calculate fringe rate from existing data (typically 32%)
+    const fringeRate = oldSubtotal > 0 ? (oldFringes / oldSubtotal) : 0.32;
+
+    // Calculate new values
+    const newSubtotal = newQuantity * rate;
+    const newFringes = newSubtotal * fringeRate;
+    const newTotal = newSubtotal + newFringes;
+
+    // Update the line item with new schedule and recalculated values
+    const result = await db.query(
+      `UPDATE budget_line_items
+       SET prep_weeks = $1,
+           shoot_weeks = $2,
+           post_weeks = $3,
+           quantity = $4,
+           subtotal = $5,
+           current_subtotal = $5,
+           fringes = $6,
+           current_fringe = $6,
+           total = $7,
+           current_total = $7
+       WHERE id = $8
+       RETURNING *`,
+      [prep_weeks, shoot_weeks, post_weeks, newQuantity, newSubtotal, newFringes, newTotal, id]
+    );
+
+    res.json({
+      success: true,
+      item: result.rows[0],
+      calculations: {
+        quantity: newQuantity,
+        rate: rate,
+        subtotal: newSubtotal,
+        fringes: newFringes,
+        total: newTotal
+      }
+    });
+  } catch (error) {
+    apiLogger.error('Failed to update schedule', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
