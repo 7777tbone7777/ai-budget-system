@@ -49,6 +49,41 @@ router.post('/', async (req, res) => {
 });
 
 /**
+ * @route   GET /api/budgets/by-production/:production_id
+ * @desc    Get all budgets for a production
+ * @access  Public
+ */
+router.get('/by-production/:production_id', async (req, res) => {
+  const { production_id } = req.params;
+
+  try {
+    const client = req.app.locals.pool;
+
+    const result = await client.query(
+      `SELECT
+        bm.*,
+        p.name as production_name,
+        p.production_type,
+        p.episode_count
+      FROM budget_metadata bm
+      JOIN productions p ON bm.production_id = p.id
+      WHERE bm.production_id = $1
+      ORDER BY bm.version_number DESC`,
+      [production_id]
+    );
+
+    res.json({
+      success: true,
+      budgets: result.rows,
+      count: result.rows.length
+    });
+  } catch (err) {
+    console.error('Error fetching budgets for production:', err);
+    res.status(500).json({ error: 'Failed to fetch budgets', details: err.message });
+  }
+});
+
+/**
  * @route   GET /api/budgets/:budget_id
  * @desc    Get budget metadata
  * @access  Public

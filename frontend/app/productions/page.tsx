@@ -83,7 +83,7 @@ export default function ProductionsPage() {
     const types: { [key: string]: string } = {
       'multi_camera': 'Multi-Camera Sitcom',
       'single_camera': 'Single-Camera Comedy/Drama',
-      'theatrical': 'Theatrical Feature',
+      'theatrical': 'Feature Film',
       'long_form': 'Long-Form/MOW',
       'mini_series': 'Mini-Series',
     };
@@ -157,11 +157,11 @@ export default function ProductionsPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {productions.map((production) => (
             <div
               key={production.id}
-              className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 hover:shadow-lg transition cursor-pointer"
+              className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 hover:shadow-lg transition cursor-pointer min-h-[320px]"
               onClick={() => router.push(`/productions/${production.id}/budget`)}
             >
               <div className="flex justify-between items-start mb-4">
@@ -224,23 +224,54 @@ export default function ProductionsPage() {
                 )}
               </div>
 
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push(`/productions/${production.id}/budget`);
-                  }}
-                  className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm"
-                >
-                  View Budget →
-                </button>
-                <div className="flex gap-4">
+              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+                {/* Navigation Links */}
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/productions/${production.id}/budget`);
+                    }}
+                    className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-md font-medium text-sm transition"
+                  >
+                    Budget
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/productions/${production.id}/what-if`);
+                    }}
+                    className="px-3 py-1.5 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-md font-medium text-sm transition"
+                  >
+                    What-If
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/productions/${production.id}/crew-builder`);
+                    }}
+                    className="px-3 py-1.5 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/50 rounded-md font-medium text-sm transition"
+                  >
+                    Crew
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/productions/${production.id}/sideletters`);
+                    }}
+                    className="px-3 py-1.5 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50 rounded-md font-medium text-sm transition"
+                  >
+                    Sideletters
+                  </button>
+                </div>
+                {/* Edit/Delete Links */}
+                <div className="flex justify-end gap-4">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       setEditingProduction(production);
                     }}
-                    className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 text-sm"
+                    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-sm"
                   >
                     Edit
                   </button>
@@ -249,7 +280,7 @@ export default function ProductionsPage() {
                       e.stopPropagation();
                       handleDeleteProduction(production.id, production.name);
                     }}
-                    className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm"
+                    className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-sm"
                   >
                     Delete
                   </button>
@@ -340,7 +371,7 @@ export default function ProductionsPage() {
                     >
                       <option value="single_camera">Single-Camera Comedy/Drama</option>
                       <option value="multi_camera">Multi-Camera Sitcom</option>
-                      <option value="theatrical">Theatrical Feature</option>
+                      <option value="theatrical">Feature Film</option>
                       <option value="long_form">Long-Form/MOW</option>
                       <option value="mini_series">Mini-Series</option>
                     </select>

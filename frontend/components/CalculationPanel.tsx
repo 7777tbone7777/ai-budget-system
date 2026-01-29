@@ -12,6 +12,16 @@ interface LineItem {
   total: number;
   is_parent?: boolean;
   children?: LineItem[];
+  // Schedule fields (line item overrides)
+  prep_weeks?: number | null;
+  shoot_weeks?: number | null;
+  post_weeks?: number | null;
+}
+
+interface ProductionSchedule {
+  prep_weeks: number;
+  shoot_weeks: number;
+  post_weeks: number;
 }
 
 interface CalculationStep {
@@ -32,11 +42,13 @@ interface CalculationPanelProps {
   onClose: () => void;
   onAddChild?: (parentId: string, child: Partial<LineItem>) => void;
   onUpdate?: (item: LineItem) => void;
+  productionSchedule?: ProductionSchedule;
+  onScheduleUpdate?: (lineItemId: string, schedule: { prep_weeks: number | null; shoot_weeks: number | null; post_weeks: number | null }) => void;
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-export default function CalculationPanel({ lineItemId, onClose, onAddChild, onUpdate }: CalculationPanelProps) {
+export default function CalculationPanel({ lineItemId, onClose, onAddChild, onUpdate, productionSchedule, onScheduleUpdate }: CalculationPanelProps) {
   const [item, setItem] = useState<LineItem | null>(null);
   const [breakdown, setBreakdown] = useState<Breakdown | null>(null);
   const [children, setChildren] = useState<LineItem[]>([]);
@@ -44,11 +56,37 @@ export default function CalculationPanel({ lineItemId, onClose, onAddChild, onUp
   const [showAddChild, setShowAddChild] = useState(false);
   const [newChild, setNewChild] = useState({ description: '', quantity: 1, rate: 0 });
 
+  // Schedule editing state
+  const [scheduleValues, setScheduleValues] = useState<{
+    prep_weeks: string;
+    shoot_weeks: string;
+    post_weeks: string;
+  }>({ prep_weeks: '', shoot_weeks: '', post_weeks: '' });
+  const [scheduleModified, setScheduleModified] = useState(false);
+
   useEffect(() => {
     if (lineItemId) {
       fetchCalculation();
     }
   }, [lineItemId]);
+
+  // Initialize schedule values when item loads
+  useEffect(() => {
+    if (item && productionSchedule) {
+      setScheduleValues({
+        prep_weeks: item.prep_weeks !== null && item.prep_weeks !== undefined
+          ? item.prep_weeks.toString()
+          : productionSchedule.prep_weeks.toString(),
+        shoot_weeks: item.shoot_weeks !== null && item.shoot_weeks !== undefined
+          ? item.shoot_weeks.toString()
+          : productionSchedule.shoot_weeks.toString(),
+        post_weeks: item.post_weeks !== null && item.post_weeks !== undefined
+          ? item.post_weeks.toString()
+          : productionSchedule.post_weeks.toString(),
+      });
+      setScheduleModified(false);
+    }
+  }, [item, productionSchedule]);
 
   const fetchCalculation = async () => {
     if (!lineItemId) return;
@@ -99,6 +137,74 @@ export default function CalculationPanel({ lineItemId, onClose, onAddChild, onUp
     }).format(value);
   };
 
+  // Schedule change handler
+  const handleScheduleChange = (field: 'prep_weeks' | 'shoot_weeks' | 'post_weeks', value: string) => {
+    setScheduleValues(prev => ({ ...prev, [field]: value }));
+    setScheduleModified(true);
+  };
+
+  // Save schedule handler
+  const handleSaveSchedule = async () => {
+    if (!lineItemId) return;
+
+    const schedule = {
+      prep_weeks: scheduleValues.prep_weeks ? parseFloat(scheduleValues.prep_weeks) : 0,
+      shoot_weeks: scheduleValues.shoot_weeks ? parseFloat(scheduleValues.shoot_weeks) : 0,
+      post_weeks: scheduleValues.post_weeks ? parseFloat(scheduleValues.post_weeks) : 0,
+    };
+
+    try {
+      const response = await fetch(`${API_URL}/api/line-items/${lineItemId}/schedule`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(schedule)
+      });
+      const data = await response.json();
+      if (data.success) {
+        setScheduleModified(false);
+        // Update item with new calculated values from server
+        if (data.item) {
+          setItem({
+            ...item,
+            ...data.item,
+            quantity: data.calculations?.quantity || data.item.quantity,
+            subtotal: data.calculations?.subtotal || data.item.subtotal,
+            fringes: data.calculations?.fringes || data.item.fringes,
+            total: data.calculations?.total || data.item.total,
+          });
+        }
+        // Notify parent to refresh budget totals
+        if (onScheduleUpdate) {
+          onScheduleUpdate(lineItemId, schedule);
+        }
+        // Refresh the breakdown
+        fetchCalculation();
+      }
+    } catch (err) {
+      console.error('Failed to save schedule:', err);
+    }
+  };
+
+  // Reset to production defaults
+  const handleResetSchedule = () => {
+    if (productionSchedule) {
+      setScheduleValues({
+        prep_weeks: productionSchedule.prep_weeks.toString(),
+        shoot_weeks: productionSchedule.shoot_weeks.toString(),
+        post_weeks: productionSchedule.post_weeks.toString(),
+      });
+      setScheduleModified(true);
+    }
+  };
+
+  // Calculate total weeks
+  const getTotalWeeks = () => {
+    const prep = parseFloat(scheduleValues.prep_weeks) || 0;
+    const shoot = parseFloat(scheduleValues.shoot_weeks) || 0;
+    const post = parseFloat(scheduleValues.post_weeks) || 0;
+    return prep + shoot + post;
+  };
+
   if (!lineItemId) {
     return (
       <div className="bg-gray-50 border-l h-full p-6 flex items-center justify-center text-gray-400">
@@ -145,6 +251,81 @@ export default function CalculationPanel({ lineItemId, onClose, onAddChild, onUp
               <p className="text-3xl font-bold text-gray-900">{formatCurrency(item.total)}</p>
             </div>
           </div>
+
+          {/* Schedule Section */}
+          {productionSchedule && (
+            <div className="border rounded-lg p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium text-gray-700">Work Schedule</h3>
+                <span className="text-sm font-medium text-blue-600">
+                  {getTotalWeeks()} weeks
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mb-3">
+                Production defaults: {productionSchedule.prep_weeks} prep / {productionSchedule.shoot_weeks} shoot / {productionSchedule.post_weeks} post
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">Prep</label>
+                  <input
+                    type="number"
+                    value={scheduleValues.prep_weeks}
+                    onChange={(e) => handleScheduleChange('prep_weeks', e.target.value)}
+                    className="w-full border rounded px-3 py-2 text-sm text-center"
+                    min="0"
+                    step="0.5"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">Shoot</label>
+                  <input
+                    type="number"
+                    value={scheduleValues.shoot_weeks}
+                    onChange={(e) => handleScheduleChange('shoot_weeks', e.target.value)}
+                    className="w-full border rounded px-3 py-2 text-sm text-center"
+                    min="0"
+                    step="0.5"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">Post</label>
+                  <input
+                    type="number"
+                    value={scheduleValues.post_weeks}
+                    onChange={(e) => handleScheduleChange('post_weeks', e.target.value)}
+                    className="w-full border rounded px-3 py-2 text-sm text-center"
+                    min="0"
+                    step="0.5"
+                  />
+                </div>
+              </div>
+              {/* Preview calculation when modified */}
+              {scheduleModified && item && (
+                <div className="mt-3 p-2 bg-yellow-50 rounded border border-yellow-200">
+                  <p className="text-xs text-yellow-800 font-medium mb-1">Preview (unsaved):</p>
+                  <p className="text-sm text-yellow-900">
+                    {getTotalWeeks()} weeks × {formatCurrency(item.rate)} = {formatCurrency(getTotalWeeks() * item.rate)}
+                  </p>
+                </div>
+              )}
+              {scheduleModified && (
+                <div className="flex gap-2 mt-3">
+                  <button
+                    onClick={handleResetSchedule}
+                    className="flex-1 px-3 py-1.5 text-sm border rounded hover:bg-gray-50"
+                  >
+                    Reset
+                  </button>
+                  <button
+                    onClick={handleSaveSchedule}
+                    className="flex-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Save & Recalculate
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Calculation Steps */}
           {breakdown && (

@@ -17,7 +17,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <nav className="bg-gray-900 text-white">
+        {/* Background image overlay */}
+        <div
+          className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/bg-production.png)' }}
+        >
+          <div className="absolute inset-0 bg-gray-900/50"></div>
+        </div>
+        <nav className="bg-gray-900/80 text-white backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
@@ -56,7 +63,9 @@ export default function RootLayout({
           </div>
         </nav>
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {children}
+          <div className="bg-white/95 dark:bg-gray-800/95 rounded-lg shadow-xl p-6 backdrop-blur-sm">
+            {children}
+          </div>
         </main>
       </body>
     </html>

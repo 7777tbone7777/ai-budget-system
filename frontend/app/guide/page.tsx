@@ -186,6 +186,7 @@ export default function UserGuidePage() {
                   <li><strong>Production Name</strong> - Your project title</li>
                   <li><strong>Production Type</strong> - Feature Film, TV Series, Commercial, etc.</li>
                   <li><strong>Shooting Location</strong> - Primary location for union rate lookup</li>
+                  <li><strong>Chart of Accounts</strong> - Select budget structure (Standard Film/TV, AICP, Disney, Netflix)</li>
                   <li><strong>Union Signatory</strong> - Whether bound by union agreements</li>
                   <li><strong>Agreement Selection</strong> - Choose IATSE, SAG-AFTRA, DGA agreements</li>
                 </ul>
@@ -305,6 +306,10 @@ export default function UserGuidePage() {
                       <td className="p-3 border">Production schedule dates</td>
                     </tr>
                     <tr>
+                      <td className="p-3 border font-medium">Chart of Accounts</td>
+                      <td className="p-3 border">Budget structure template: Standard Film/TV (default), AICP (commercials), Disney, or Netflix</td>
+                    </tr>
+                    <tr>
                       <td className="p-3 border font-medium">IATSE Agreement</td>
                       <td className="p-3 border">e.g., IATSE West Coast Studio Agreement 2024-2027</td>
                     </tr>
@@ -381,6 +386,44 @@ export default function UserGuidePage() {
                     </p>
                   </div>
                 </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Chart of Accounts (COA)</h3>
+                <p className="text-gray-600 mb-4">
+                  When creating a production, you select a Chart of Accounts that determines your budget&apos;s account
+                  code structure. Different studios and production types use different COA systems:
+                </p>
+                <table className="w-full text-sm border-collapse mb-4">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="text-left p-3 border">COA Template</th>
+                      <th className="text-left p-3 border">Best For</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="p-3 border font-medium">Standard Film/TV</td>
+                      <td className="p-3 border">Most productions. Compatible with Movie Magic Budgeting and EP Budgeting. Industry-standard account codes.</td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 border font-medium">AICP</td>
+                      <td className="p-3 border">Commercials and advertising production. Uses AICP bid form structure.</td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 border font-medium">Disney</td>
+                      <td className="p-3 border">Disney/ABC productions. Custom account structure required by Disney accounting.</td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 border font-medium">Netflix</td>
+                      <td className="p-3 border">Netflix originals. Custom account structure required by Netflix content accounting.</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p className="text-gray-500 text-sm">
+                  The selected COA determines which account codes appear when building your budget. If you&apos;re unsure,
+                  choose &quot;Standard Film/TV&quot; as it works with most productions and accounting systems.
+                </p>
               </div>
 
               <div className="bg-white rounded-lg shadow p-6">

@@ -7,10 +7,11 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-8
 
 interface CrewPosition {
   id: string
-  position_name: string
+  position_title: string
   department: string
-  typical_production_types: string[]
-  union_jurisdiction: string
+  union_local: string
+  union_classification: string
+  typical_for_production_types: string[]
 }
 
 interface RateCard {
@@ -113,7 +114,7 @@ export default function BudgetCalculator() {
         gross_wages: subtotal,
       })
 
-      const fringes = fringesResponse.data.total_fringes || subtotal * 0.25
+      const fringes = parseFloat(fringesResponse.data.total_fringes) || subtotal * 0.25
       const total = subtotal + fringes
 
       const newLine: BudgetLine = {
@@ -237,13 +238,20 @@ export default function BudgetCalculator() {
             </label>
             <select
               value={selectedPosition}
-              onChange={(e) => setSelectedPosition(e.target.value)}
+              onChange={(e) => {
+                setSelectedPosition(e.target.value)
+                // Auto-set union local from position
+                const pos = positions.find(p => p.union_classification === e.target.value)
+                if (pos?.union_local) {
+                  setSelectedUnionLocal(pos.union_local)
+                }
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
               <option value="">Select Position...</option>
               {positions.map((pos) => (
-                <option key={pos.id} value={pos.position_name}>
-                  {pos.position_name} ({pos.department})
+                <option key={pos.id} value={pos.union_classification}>
+                  {pos.position_title} ({pos.department})
                 </option>
               ))}
             </select>

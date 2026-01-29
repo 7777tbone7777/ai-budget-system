@@ -71,7 +71,7 @@ interface Prediction {
 }
 
 const PRODUCTION_TYPES = [
-  { value: 'theatrical', label: 'Theatrical Feature' },
+  { value: 'theatrical', label: 'Feature Film' },
   { value: 'hbsvod', label: 'High Budget SVOD' },
   { value: 'television', label: 'TV Series' },
   { value: 'indie', label: 'Independent Film' },
@@ -284,8 +284,8 @@ export default function WhatIfAnalyzer() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <Link href={`/productions/${productionId}`} className="text-blue-600 hover:text-blue-800 text-sm">
-                Back to Production
+              <Link href="/productions" className="text-blue-600 hover:text-blue-800 text-sm">
+                ← Back to Productions
               </Link>
               <h1 className="text-2xl font-bold text-gray-900 mt-1">What-If Analyzer</h1>
               <p className="text-gray-500 text-sm">Model budget scenarios and predict variance</p>

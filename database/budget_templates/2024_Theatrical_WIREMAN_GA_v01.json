@@ -1,0 +1,1857 @@
+{
+  "metadata": {
+    "filename": "BUDGET TEMPLATE 2024 - WIREMAN.pdf",
+    "project_name": "WIREMAN",
+    "location": "Georgia",
+    "production_type": "Theatrical Feature",
+    "shoot_days": 35,
+    "shoot_dates": null,
+    "script_pages": 120,
+    "total_budget": 34852483,
+    "atl_total": 10025495,
+    "btl_total": 24826988,
+    "georgia_tax_rebate": 7036666,
+    "chicago_tax_rebate": 252000,
+    "net_total": 27563817,
+    "budget_date": "03/11/2024",
+    "pdf_path": "/Users/anthonyvazquez/Downloads/BUDGET TEMPLATE 2024.pdf"
+  },
+  "departments": [
+    {
+      "name": "WRITER",
+      "account": "1100",
+      "total": 262500,
+      "line_items": [
+        {
+          "account": "1101",
+          "description": "WRITER",
+          "position": "TBD",
+          "quantity": 1,
+          "unit": "flat",
+          "rate": 250000,
+          "subtotal": 250000
+        },
+        {
+          "account": "1199",
+          "description": "FRINGES @ 5%",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 12500,
+          "subtotal": 12500
+        }
+      ]
+    },
+    {
+      "name": "PRODUCER",
+      "account": "1200",
+      "total": 1837500,
+      "line_items": [
+        {
+          "account": "1201",
+          "description": "EXECUTIVE PRODUCER",
+          "position": "TBD",
+          "quantity": 1,
+          "unit": "flat",
+          "rate": 500000,
+          "subtotal": 500000
+        },
+        {
+          "account": "1202",
+          "description": "PRODUCER",
+          "position": "TBD",
+          "quantity": 1,
+          "unit": "flat",
+          "rate": 750000,
+          "subtotal": 750000
+        },
+        {
+          "account": "1205",
+          "description": "CO-PRODUCER",
+          "position": "TBD",
+          "quantity": 1,
+          "unit": "flat",
+          "rate": 500000,
+          "subtotal": 500000
+        },
+        {
+          "account": "1299",
+          "description": "FRINGES @ 5%",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 87500,
+          "subtotal": 87500
+        }
+      ]
+    },
+    {
+      "name": "DIRECTOR",
+      "account": "1300",
+      "total": 1706250,
+      "line_items": [
+        {
+          "account": "1301",
+          "description": "DIRECTOR",
+          "position": "TBD",
+          "quantity": 1,
+          "unit": "flat",
+          "rate": 1500000,
+          "subtotal": 1500000
+        },
+        {
+          "account": "1302",
+          "description": "DGA PENSION",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 118750,
+          "subtotal": 118750
+        },
+        {
+          "account": "1399",
+          "description": "FRINGES @ 5%",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 87500,
+          "subtotal": 87500
+        }
+      ]
+    },
+    {
+      "name": "CAST",
+      "account": "1400",
+      "total": 6219245,
+      "line_items": [
+        {
+          "account": "1401",
+          "description": "LEAD #1",
+          "position": "Principal",
+          "quantity": 1,
+          "unit": "flat",
+          "rate": 3000000,
+          "subtotal": 3000000
+        },
+        {
+          "account": "1402",
+          "description": "LEAD #2",
+          "position": "Principal",
+          "quantity": 1,
+          "unit": "flat",
+          "rate": 1500000,
+          "subtotal": 1500000
+        },
+        {
+          "account": "1403",
+          "description": "SUPPORTING #1",
+          "position": "Supporting",
+          "quantity": 1,
+          "unit": "flat",
+          "rate": 300000,
+          "subtotal": 300000
+        },
+        {
+          "account": "1404",
+          "description": "SUPPORTING #2",
+          "position": "Supporting",
+          "quantity": 1,
+          "unit": "flat",
+          "rate": 200000,
+          "subtotal": 200000
+        },
+        {
+          "account": "1405",
+          "description": "DAY PLAYERS",
+          "position": "Day Player",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 250000,
+          "subtotal": 250000
+        },
+        {
+          "account": "1499",
+          "description": "CAST FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 969245,
+          "subtotal": 969245
+        }
+      ]
+    },
+    {
+      "name": "PRODUCTION STAFF",
+      "account": "2000",
+      "total": 1096983,
+      "line_items": [
+        {
+          "account": "2001",
+          "description": "UNIT PRODUCTION MANAGER",
+          "position": "UPM",
+          "quantity": 18,
+          "unit": "weeks",
+          "rate": 6250,
+          "subtotal": 112500
+        },
+        {
+          "account": "2002",
+          "description": "FIRST ASSISTANT DIRECTOR",
+          "position": "1st AD",
+          "quantity": 14,
+          "unit": "weeks",
+          "rate": 5500,
+          "subtotal": 77000
+        },
+        {
+          "account": "2003",
+          "description": "SECOND ASSISTANT DIRECTOR",
+          "position": "2nd AD",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 3500,
+          "subtotal": 42000
+        },
+        {
+          "account": "2004",
+          "description": "SECOND 2ND ASSISTANT DIRECTOR",
+          "position": "2nd 2nd AD",
+          "quantity": 10,
+          "unit": "weeks",
+          "rate": 2500,
+          "subtotal": 25000
+        },
+        {
+          "account": "2010",
+          "description": "PRODUCTION COORDINATOR",
+          "position": "POC",
+          "quantity": 16,
+          "unit": "weeks",
+          "rate": 2800,
+          "subtotal": 44800
+        },
+        {
+          "account": "2011",
+          "description": "ASSISTANT PRODUCTION COORDINATOR",
+          "position": "APOC",
+          "quantity": 14,
+          "unit": "weeks",
+          "rate": 2000,
+          "subtotal": 28000
+        },
+        {
+          "account": "2020",
+          "description": "PRODUCTION ACCOUNTANT",
+          "position": "Accountant",
+          "quantity": 20,
+          "unit": "weeks",
+          "rate": 3500,
+          "subtotal": 70000
+        },
+        {
+          "account": "2021",
+          "description": "1ST ASSISTANT ACCOUNTANT",
+          "position": "1st Asst Accountant",
+          "quantity": 18,
+          "unit": "weeks",
+          "rate": 2500,
+          "subtotal": 45000
+        },
+        {
+          "account": "2022",
+          "description": "2ND ASSISTANT ACCOUNTANT",
+          "position": "2nd Asst Accountant",
+          "quantity": 16,
+          "unit": "weeks",
+          "rate": 1800,
+          "subtotal": 28800
+        },
+        {
+          "account": "2030",
+          "description": "SCRIPT SUPERVISOR",
+          "position": "Script Supervisor",
+          "quantity": 10,
+          "unit": "weeks",
+          "rate": 3200,
+          "subtotal": 32000
+        },
+        {
+          "account": "2040",
+          "description": "TECH ADVISOR",
+          "position": "Technical Advisor",
+          "quantity": 35,
+          "unit": "days",
+          "rate": 1000,
+          "subtotal": 35000
+        },
+        {
+          "account": "2099",
+          "description": "PRODUCTION STAFF FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 556883,
+          "subtotal": 556883
+        }
+      ]
+    },
+    {
+      "name": "EXTRA TALENT",
+      "account": "2100",
+      "total": 524805,
+      "line_items": [
+        {
+          "account": "2101",
+          "description": "EXTRAS",
+          "position": "Background",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 350000,
+          "subtotal": 350000
+        },
+        {
+          "account": "2102",
+          "description": "STAND-INS",
+          "position": "Stand-In",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 50000,
+          "subtotal": 50000
+        },
+        {
+          "account": "2103",
+          "description": "EXTRAS CASTING",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 25000,
+          "subtotal": 25000
+        },
+        {
+          "account": "2199",
+          "description": "EXTRA TALENT FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 99805,
+          "subtotal": 99805
+        }
+      ]
+    },
+    {
+      "name": "ART DEPARTMENT",
+      "account": "2200",
+      "total": 799408,
+      "line_items": [
+        {
+          "account": "2201",
+          "description": "PRODUCTION DESIGNER",
+          "position": "Production Designer",
+          "quantity": 16,
+          "unit": "weeks",
+          "rate": 6000,
+          "subtotal": 96000
+        },
+        {
+          "account": "2202",
+          "description": "ART DIRECTOR",
+          "position": "Art Director",
+          "quantity": 14,
+          "unit": "weeks",
+          "rate": 4500,
+          "subtotal": 63000
+        },
+        {
+          "account": "2203",
+          "description": "SET DESIGNER",
+          "position": "Set Designer",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 3200,
+          "subtotal": 38400
+        },
+        {
+          "account": "2204",
+          "description": "ART DEPARTMENT COORDINATOR",
+          "position": "Art Dept Coordinator",
+          "quantity": 14,
+          "unit": "weeks",
+          "rate": 2200,
+          "subtotal": 30800
+        },
+        {
+          "account": "2205",
+          "description": "STORYBOARD ARTIST",
+          "position": "Storyboard Artist",
+          "quantity": 6,
+          "unit": "weeks",
+          "rate": 3500,
+          "subtotal": 21000
+        },
+        {
+          "account": "2210",
+          "description": "ART DEPARTMENT PURCHASES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 150000,
+          "subtotal": 150000
+        },
+        {
+          "account": "2211",
+          "description": "ART DEPARTMENT RENTALS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 75000,
+          "subtotal": 75000
+        },
+        {
+          "account": "2299",
+          "description": "ART DEPARTMENT FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 325208,
+          "subtotal": 325208
+        }
+      ]
+    },
+    {
+      "name": "SET CONSTRUCTION",
+      "account": "2500",
+      "total": 1543875,
+      "line_items": [
+        {
+          "account": "2501",
+          "description": "CONSTRUCTION COORDINATOR",
+          "position": "Construction Coordinator",
+          "quantity": 14,
+          "unit": "weeks",
+          "rate": 4500,
+          "subtotal": 63000
+        },
+        {
+          "account": "2502",
+          "description": "CONSTRUCTION FOREMAN",
+          "position": "Construction Foreman",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 3800,
+          "subtotal": 45600
+        },
+        {
+          "account": "2503",
+          "description": "LABOR",
+          "position": "Construction Labor",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 400000,
+          "subtotal": 400000
+        },
+        {
+          "account": "2510",
+          "description": "SET CONSTRUCTION MATERIALS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 500000,
+          "subtotal": 500000
+        },
+        {
+          "account": "2511",
+          "description": "SET CONSTRUCTION RENTALS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 150000,
+          "subtotal": 150000
+        },
+        {
+          "account": "2599",
+          "description": "SET CONSTRUCTION FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 385275,
+          "subtotal": 385275
+        }
+      ]
+    },
+    {
+      "name": "SPECIAL EFFECTS",
+      "account": "2600",
+      "total": 612325,
+      "line_items": [
+        {
+          "account": "2601",
+          "description": "SPECIAL EFFECTS COORDINATOR",
+          "position": "SFX Coordinator",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 5000,
+          "subtotal": 60000
+        },
+        {
+          "account": "2602",
+          "description": "SPECIAL EFFECTS TECHNICIANS",
+          "position": "SFX Technician",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 150000,
+          "subtotal": 150000
+        },
+        {
+          "account": "2610",
+          "description": "SPECIAL EFFECTS EQUIPMENT",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 200000,
+          "subtotal": 200000
+        },
+        {
+          "account": "2611",
+          "description": "SPECIAL EFFECTS MATERIALS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 100000,
+          "subtotal": 100000
+        },
+        {
+          "account": "2699",
+          "description": "SPECIAL EFFECTS FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 102325,
+          "subtotal": 102325
+        }
+      ]
+    },
+    {
+      "name": "SET DRESSING",
+      "account": "2700",
+      "total": 1213595,
+      "line_items": [
+        {
+          "account": "2701",
+          "description": "SET DECORATOR",
+          "position": "Set Decorator",
+          "quantity": 14,
+          "unit": "weeks",
+          "rate": 4500,
+          "subtotal": 63000
+        },
+        {
+          "account": "2702",
+          "description": "LEAD PERSON",
+          "position": "Lead Person",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 3500,
+          "subtotal": 42000
+        },
+        {
+          "account": "2703",
+          "description": "SWING GANG",
+          "position": "Set Dresser",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 200000,
+          "subtotal": 200000
+        },
+        {
+          "account": "2710",
+          "description": "SET DRESSING PURCHASES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 350000,
+          "subtotal": 350000
+        },
+        {
+          "account": "2711",
+          "description": "SET DRESSING RENTALS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 250000,
+          "subtotal": 250000
+        },
+        {
+          "account": "2799",
+          "description": "SET DRESSING FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 308595,
+          "subtotal": 308595
+        }
+      ]
+    },
+    {
+      "name": "PROPERTY",
+      "account": "2800",
+      "total": 404016,
+      "line_items": [
+        {
+          "account": "2801",
+          "description": "PROPERTY MASTER",
+          "position": "Property Master",
+          "quantity": 14,
+          "unit": "weeks",
+          "rate": 3800,
+          "subtotal": 53200
+        },
+        {
+          "account": "2802",
+          "description": "ASSISTANT PROPERTY MASTER",
+          "position": "Asst Property Master",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 2800,
+          "subtotal": 33600
+        },
+        {
+          "account": "2810",
+          "description": "PROPERTY PURCHASES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 125000,
+          "subtotal": 125000
+        },
+        {
+          "account": "2811",
+          "description": "PROPERTY RENTALS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 75000,
+          "subtotal": 75000
+        },
+        {
+          "account": "2899",
+          "description": "PROPERTY FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 117216,
+          "subtotal": 117216
+        }
+      ]
+    },
+    {
+      "name": "WARDROBE",
+      "account": "2900",
+      "total": 1152525,
+      "line_items": [
+        {
+          "account": "2901",
+          "description": "COSTUME DESIGNER",
+          "position": "Costume Designer",
+          "quantity": 16,
+          "unit": "weeks",
+          "rate": 5500,
+          "subtotal": 88000
+        },
+        {
+          "account": "2902",
+          "description": "ASSISTANT COSTUME DESIGNER",
+          "position": "Asst Costume Designer",
+          "quantity": 14,
+          "unit": "weeks",
+          "rate": 3500,
+          "subtotal": 49000
+        },
+        {
+          "account": "2903",
+          "description": "KEY COSTUMER",
+          "position": "Key Costumer",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 3200,
+          "subtotal": 38400
+        },
+        {
+          "account": "2904",
+          "description": "COSTUMERS",
+          "position": "Set Costumer",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 150000,
+          "subtotal": 150000
+        },
+        {
+          "account": "2910",
+          "description": "WARDROBE PURCHASES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 350000,
+          "subtotal": 350000
+        },
+        {
+          "account": "2911",
+          "description": "WARDROBE RENTALS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 150000,
+          "subtotal": 150000
+        },
+        {
+          "account": "2999",
+          "description": "WARDROBE FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 327125,
+          "subtotal": 327125
+        }
+      ]
+    },
+    {
+      "name": "PICTURE VEHICLES & ANIMALS",
+      "account": "3000",
+      "total": 427650,
+      "line_items": [
+        {
+          "account": "3001",
+          "description": "PICTURE VEHICLES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 250000,
+          "subtotal": 250000
+        },
+        {
+          "account": "3002",
+          "description": "PICTURE VEHICLE COORDINATOR",
+          "position": "Picture Car Coordinator",
+          "quantity": 10,
+          "unit": "weeks",
+          "rate": 3500,
+          "subtotal": 35000
+        },
+        {
+          "account": "3010",
+          "description": "ANIMALS & WRANGLERS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 100000,
+          "subtotal": 100000
+        },
+        {
+          "account": "3099",
+          "description": "PICTURE VEHICLES FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 42650,
+          "subtotal": 42650
+        }
+      ]
+    },
+    {
+      "name": "MAKE-UP & HAIR",
+      "account": "3100",
+      "total": 505423,
+      "line_items": [
+        {
+          "account": "3101",
+          "description": "MAKE-UP DEPARTMENT HEAD",
+          "position": "Key Make-Up",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 4200,
+          "subtotal": 50400
+        },
+        {
+          "account": "3102",
+          "description": "ASSISTANT MAKE-UP",
+          "position": "Asst Make-Up",
+          "quantity": 10,
+          "unit": "weeks",
+          "rate": 3200,
+          "subtotal": 32000
+        },
+        {
+          "account": "3103",
+          "description": "HAIR DEPARTMENT HEAD",
+          "position": "Key Hair",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 4200,
+          "subtotal": 50400
+        },
+        {
+          "account": "3104",
+          "description": "ASSISTANT HAIR",
+          "position": "Asst Hair",
+          "quantity": 10,
+          "unit": "weeks",
+          "rate": 3200,
+          "subtotal": 32000
+        },
+        {
+          "account": "3110",
+          "description": "MAKE-UP SUPPLIES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 75000,
+          "subtotal": 75000
+        },
+        {
+          "account": "3111",
+          "description": "HAIR SUPPLIES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 60000,
+          "subtotal": 60000
+        },
+        {
+          "account": "3120",
+          "description": "PROSTHETICS/SPECIAL MAKE-UP",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 50000,
+          "subtotal": 50000
+        },
+        {
+          "account": "3199",
+          "description": "MAKE-UP & HAIR FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 155623,
+          "subtotal": 155623
+        }
+      ]
+    },
+    {
+      "name": "SET LIGHTING",
+      "account": "3200",
+      "total": 789464,
+      "line_items": [
+        {
+          "account": "3201",
+          "description": "GAFFER",
+          "position": "Gaffer",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 4500,
+          "subtotal": 54000
+        },
+        {
+          "account": "3202",
+          "description": "BEST BOY ELECTRIC",
+          "position": "Best Boy Electric",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 3800,
+          "subtotal": 45600
+        },
+        {
+          "account": "3203",
+          "description": "ELECTRICIANS",
+          "position": "Set Electrician",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 200000,
+          "subtotal": 200000
+        },
+        {
+          "account": "3204",
+          "description": "RIGGING CREW",
+          "position": "Rigging Electrician",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 100000,
+          "subtotal": 100000
+        },
+        {
+          "account": "3210",
+          "description": "LIGHTING EQUIPMENT",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 150000,
+          "subtotal": 150000
+        },
+        {
+          "account": "3211",
+          "description": "GENERATOR/POWER",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 75000,
+          "subtotal": 75000
+        },
+        {
+          "account": "3299",
+          "description": "SET LIGHTING FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 164864,
+          "subtotal": 164864
+        }
+      ]
+    },
+    {
+      "name": "CAMERA",
+      "account": "3300",
+      "total": 1365744,
+      "line_items": [
+        {
+          "account": "3301",
+          "description": "DIRECTOR OF PHOTOGRAPHY",
+          "position": "DP",
+          "quantity": 14,
+          "unit": "weeks",
+          "rate": 12000,
+          "subtotal": 168000
+        },
+        {
+          "account": "3302",
+          "description": "CAMERA OPERATOR",
+          "position": "Camera Operator",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 5000,
+          "subtotal": 60000
+        },
+        {
+          "account": "3303",
+          "description": "FIRST ASSISTANT CAMERA",
+          "position": "1st AC",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 4200,
+          "subtotal": 50400
+        },
+        {
+          "account": "3304",
+          "description": "SECOND ASSISTANT CAMERA",
+          "position": "2nd AC",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 3500,
+          "subtotal": 42000
+        },
+        {
+          "account": "3305",
+          "description": "DIT",
+          "position": "DIT",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 4500,
+          "subtotal": 54000
+        },
+        {
+          "account": "3306",
+          "description": "LOADER",
+          "position": "Loader",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 2800,
+          "subtotal": 33600
+        },
+        {
+          "account": "3307",
+          "description": "STILL PHOTOGRAPHER",
+          "position": "Still Photographer",
+          "quantity": 8,
+          "unit": "weeks",
+          "rate": 3500,
+          "subtotal": 28000
+        },
+        {
+          "account": "3310",
+          "description": "CAMERA PACKAGE",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 350000,
+          "subtotal": 350000
+        },
+        {
+          "account": "3311",
+          "description": "ADDITIONAL CAMERA EQUIPMENT",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 150000,
+          "subtotal": 150000
+        },
+        {
+          "account": "3312",
+          "description": "STEADICAM",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 75000,
+          "subtotal": 75000
+        },
+        {
+          "account": "3399",
+          "description": "CAMERA FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 354744,
+          "subtotal": 354744
+        }
+      ]
+    },
+    {
+      "name": "GRIP",
+      "account": "3350",
+      "total": 698875,
+      "line_items": [
+        {
+          "account": "3351",
+          "description": "KEY GRIP",
+          "position": "Key Grip",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 4500,
+          "subtotal": 54000
+        },
+        {
+          "account": "3352",
+          "description": "BEST BOY GRIP",
+          "position": "Best Boy Grip",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 3800,
+          "subtotal": 45600
+        },
+        {
+          "account": "3353",
+          "description": "DOLLY GRIP",
+          "position": "Dolly Grip",
+          "quantity": 10,
+          "unit": "weeks",
+          "rate": 3500,
+          "subtotal": 35000
+        },
+        {
+          "account": "3354",
+          "description": "GRIPS",
+          "position": "Grip",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 175000,
+          "subtotal": 175000
+        },
+        {
+          "account": "3355",
+          "description": "RIGGING GRIPS",
+          "position": "Rigging Grip",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 75000,
+          "subtotal": 75000
+        },
+        {
+          "account": "3360",
+          "description": "GRIP EQUIPMENT",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 150000,
+          "subtotal": 150000
+        },
+        {
+          "account": "3399",
+          "description": "GRIP FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 164275,
+          "subtotal": 164275
+        }
+      ]
+    },
+    {
+      "name": "PRODUCTION SOUND",
+      "account": "3400",
+      "total": 294563,
+      "line_items": [
+        {
+          "account": "3401",
+          "description": "PRODUCTION SOUND MIXER",
+          "position": "Sound Mixer",
+          "quantity": 10,
+          "unit": "weeks",
+          "rate": 4500,
+          "subtotal": 45000
+        },
+        {
+          "account": "3402",
+          "description": "BOOM OPERATOR",
+          "position": "Boom Operator",
+          "quantity": 10,
+          "unit": "weeks",
+          "rate": 3500,
+          "subtotal": 35000
+        },
+        {
+          "account": "3403",
+          "description": "CABLE PERSON/UTILITY",
+          "position": "Sound Utility",
+          "quantity": 10,
+          "unit": "weeks",
+          "rate": 2800,
+          "subtotal": 28000
+        },
+        {
+          "account": "3410",
+          "description": "SOUND EQUIPMENT",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 100000,
+          "subtotal": 100000
+        },
+        {
+          "account": "3411",
+          "description": "WALKIE TALKIES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 15000,
+          "subtotal": 15000
+        },
+        {
+          "account": "3499",
+          "description": "PRODUCTION SOUND FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 71563,
+          "subtotal": 71563
+        }
+      ]
+    },
+    {
+      "name": "TRANSPORTATION",
+      "account": "3500",
+      "total": 2744022,
+      "line_items": [
+        {
+          "account": "3501",
+          "description": "TRANSPORTATION COORDINATOR",
+          "position": "Transportation Coordinator",
+          "quantity": 16,
+          "unit": "weeks",
+          "rate": 4200,
+          "subtotal": 67200
+        },
+        {
+          "account": "3502",
+          "description": "TRANSPORTATION CAPTAIN",
+          "position": "Transportation Captain",
+          "quantity": 14,
+          "unit": "weeks",
+          "rate": 3800,
+          "subtotal": 53200
+        },
+        {
+          "account": "3503",
+          "description": "DRIVERS",
+          "position": "Driver",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 500000,
+          "subtotal": 500000
+        },
+        {
+          "account": "3510",
+          "description": "PRODUCTION VEHICLES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 500000,
+          "subtotal": 500000
+        },
+        {
+          "account": "3511",
+          "description": "STAR TRAILERS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 200000,
+          "subtotal": 200000
+        },
+        {
+          "account": "3512",
+          "description": "PRODUCTION TRAILERS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 350000,
+          "subtotal": 350000
+        },
+        {
+          "account": "3513",
+          "description": "HONEYWAGONS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 100000,
+          "subtotal": 100000
+        },
+        {
+          "account": "3514",
+          "description": "CAMERA/SOUND TRUCKS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 75000,
+          "subtotal": 75000
+        },
+        {
+          "account": "3515",
+          "description": "FUEL",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 150000,
+          "subtotal": 150000
+        },
+        {
+          "account": "3516",
+          "description": "REPAIRS & MAINTENANCE",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 50000,
+          "subtotal": 50000
+        },
+        {
+          "account": "3599",
+          "description": "TRANSPORTATION FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 698622,
+          "subtotal": 698622
+        }
+      ]
+    },
+    {
+      "name": "LOCATIONS",
+      "account": "3600",
+      "total": 2378178,
+      "line_items": [
+        {
+          "account": "3601",
+          "description": "LOCATION MANAGER",
+          "position": "Location Manager",
+          "quantity": 18,
+          "unit": "weeks",
+          "rate": 4500,
+          "subtotal": 81000
+        },
+        {
+          "account": "3602",
+          "description": "ASSISTANT LOCATION MANAGER",
+          "position": "Asst Location Manager",
+          "quantity": 16,
+          "unit": "weeks",
+          "rate": 3200,
+          "subtotal": 51200
+        },
+        {
+          "account": "3603",
+          "description": "LOCATION SCOUTS",
+          "position": "Location Scout",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 75000,
+          "subtotal": 75000
+        },
+        {
+          "account": "3604",
+          "description": "LOCATION ASSISTANTS/PA'S",
+          "position": "Location PA",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 100000,
+          "subtotal": 100000
+        },
+        {
+          "account": "3610",
+          "description": "LOCATION FEES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 750000,
+          "subtotal": 750000
+        },
+        {
+          "account": "3611",
+          "description": "PERMITS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 100000,
+          "subtotal": 100000
+        },
+        {
+          "account": "3612",
+          "description": "POLICE/FIRE/SECURITY",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 200000,
+          "subtotal": 200000
+        },
+        {
+          "account": "3613",
+          "description": "CATERING",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 400000,
+          "subtotal": 400000
+        },
+        {
+          "account": "3614",
+          "description": "CRAFT SERVICE",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 150000,
+          "subtotal": 150000
+        },
+        {
+          "account": "3615",
+          "description": "LOCATION SITE EXPENSES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 200000,
+          "subtotal": 200000
+        },
+        {
+          "account": "3616",
+          "description": "LOCATION OFFICE",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 50000,
+          "subtotal": 50000
+        },
+        {
+          "account": "3699",
+          "description": "LOCATIONS FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 220978,
+          "subtotal": 220978
+        }
+      ]
+    },
+    {
+      "name": "PRODUCTION FILM & LAB",
+      "account": "3700",
+      "total": 98408,
+      "line_items": [
+        {
+          "account": "3701",
+          "description": "DIGITAL MEDIA",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 50000,
+          "subtotal": 50000
+        },
+        {
+          "account": "3702",
+          "description": "DAILIES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 35000,
+          "subtotal": 35000
+        },
+        {
+          "account": "3710",
+          "description": "DATA MANAGEMENT",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 13408,
+          "subtotal": 13408
+        }
+      ]
+    },
+    {
+      "name": "2ND UNIT",
+      "account": "4000",
+      "total": 2000000,
+      "line_items": [
+        {
+          "account": "4001",
+          "description": "2ND UNIT - CHICAGO",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 2000000,
+          "subtotal": 2000000,
+          "notes": "Chicago 2nd Unit - qualifies for Chicago 30% tax rebate"
+        }
+      ]
+    },
+    {
+      "name": "TESTS",
+      "account": "4100",
+      "total": 6693,
+      "line_items": [
+        {
+          "account": "4101",
+          "description": "SCREEN TESTS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 6693,
+          "subtotal": 6693
+        }
+      ]
+    },
+    {
+      "name": "STAGE RENTAL & FACILITIES",
+      "account": "4200",
+      "total": 600800,
+      "line_items": [
+        {
+          "account": "4201",
+          "description": "STAGE RENTAL",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 400000,
+          "subtotal": 400000
+        },
+        {
+          "account": "4202",
+          "description": "STAGE FACILITIES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 100000,
+          "subtotal": 100000
+        },
+        {
+          "account": "4203",
+          "description": "PRODUCTION OFFICES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 75000,
+          "subtotal": 75000
+        },
+        {
+          "account": "4204",
+          "description": "STORAGE",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 25800,
+          "subtotal": 25800
+        }
+      ]
+    },
+    {
+      "name": "VISUAL EFFECTS",
+      "account": "4400",
+      "total": 337478,
+      "line_items": [
+        {
+          "account": "4401",
+          "description": "VFX SUPERVISOR",
+          "position": "VFX Supervisor",
+          "quantity": 16,
+          "unit": "weeks",
+          "rate": 5500,
+          "subtotal": 88000
+        },
+        {
+          "account": "4402",
+          "description": "VFX COORDINATOR",
+          "position": "VFX Coordinator",
+          "quantity": 14,
+          "unit": "weeks",
+          "rate": 2800,
+          "subtotal": 39200
+        },
+        {
+          "account": "4410",
+          "description": "VFX VENDORS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 150000,
+          "subtotal": 150000
+        },
+        {
+          "account": "4499",
+          "description": "VFX FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 60278,
+          "subtotal": 60278
+        }
+      ]
+    },
+    {
+      "name": "EDITORIAL",
+      "account": "4500",
+      "total": 1446127,
+      "line_items": [
+        {
+          "account": "4501",
+          "description": "EDITOR",
+          "position": "Editor",
+          "quantity": 24,
+          "unit": "weeks",
+          "rate": 5500,
+          "subtotal": 132000
+        },
+        {
+          "account": "4502",
+          "description": "FIRST ASSISTANT EDITOR",
+          "position": "1st Asst Editor",
+          "quantity": 26,
+          "unit": "weeks",
+          "rate": 3500,
+          "subtotal": 91000
+        },
+        {
+          "account": "4503",
+          "description": "SECOND ASSISTANT EDITOR",
+          "position": "2nd Asst Editor",
+          "quantity": 24,
+          "unit": "weeks",
+          "rate": 2500,
+          "subtotal": 60000
+        },
+        {
+          "account": "4504",
+          "description": "APPRENTICE EDITOR",
+          "position": "Apprentice Editor",
+          "quantity": 20,
+          "unit": "weeks",
+          "rate": 1800,
+          "subtotal": 36000
+        },
+        {
+          "account": "4510",
+          "description": "AVID EQUIPMENT",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 75000,
+          "subtotal": 75000
+        },
+        {
+          "account": "4511",
+          "description": "POST FACILITY",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 250000,
+          "subtotal": 250000
+        },
+        {
+          "account": "4512",
+          "description": "EDITORIAL SUPPLIES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 25000,
+          "subtotal": 25000
+        },
+        {
+          "account": "4520",
+          "description": "POST SUPERVISION",
+          "position": "Post Supervisor",
+          "quantity": 30,
+          "unit": "weeks",
+          "rate": 4000,
+          "subtotal": 120000
+        },
+        {
+          "account": "4521",
+          "description": "POST COORDINATOR",
+          "position": "Post Coordinator",
+          "quantity": 28,
+          "unit": "weeks",
+          "rate": 2200,
+          "subtotal": 61600
+        },
+        {
+          "account": "4599",
+          "description": "EDITORIAL FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 595527,
+          "subtotal": 595527
+        }
+      ]
+    },
+    {
+      "name": "MUSIC",
+      "account": "4600",
+      "total": 551500,
+      "line_items": [
+        {
+          "account": "4601",
+          "description": "COMPOSER",
+          "position": "Composer",
+          "quantity": 1,
+          "unit": "flat",
+          "rate": 300000,
+          "subtotal": 300000
+        },
+        {
+          "account": "4602",
+          "description": "MUSIC SUPERVISOR",
+          "position": "Music Supervisor",
+          "quantity": 1,
+          "unit": "flat",
+          "rate": 75000,
+          "subtotal": 75000
+        },
+        {
+          "account": "4610",
+          "description": "MUSIC LICENSING",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 100000,
+          "subtotal": 100000
+        },
+        {
+          "account": "4611",
+          "description": "MUSIC CLEARANCES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 50000,
+          "subtotal": 50000
+        },
+        {
+          "account": "4699",
+          "description": "MUSIC FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 26500,
+          "subtotal": 26500
+        }
+      ]
+    },
+    {
+      "name": "POST PRODUCTION SOUND",
+      "account": "4700",
+      "total": 629050,
+      "line_items": [
+        {
+          "account": "4701",
+          "description": "RE-RECORDING MIXER",
+          "position": "Re-Recording Mixer",
+          "quantity": 8,
+          "unit": "weeks",
+          "rate": 6000,
+          "subtotal": 48000
+        },
+        {
+          "account": "4702",
+          "description": "SOUND DESIGNER",
+          "position": "Sound Designer",
+          "quantity": 12,
+          "unit": "weeks",
+          "rate": 5000,
+          "subtotal": 60000
+        },
+        {
+          "account": "4703",
+          "description": "SOUND EDITOR",
+          "position": "Sound Editor",
+          "quantity": 14,
+          "unit": "weeks",
+          "rate": 3500,
+          "subtotal": 49000
+        },
+        {
+          "account": "4704",
+          "description": "DIALOGUE EDITOR",
+          "position": "Dialogue Editor",
+          "quantity": 10,
+          "unit": "weeks",
+          "rate": 3200,
+          "subtotal": 32000
+        },
+        {
+          "account": "4705",
+          "description": "FOLEY",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 75000,
+          "subtotal": 75000
+        },
+        {
+          "account": "4710",
+          "description": "ADR",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 100000,
+          "subtotal": 100000
+        },
+        {
+          "account": "4711",
+          "description": "MIX STAGE",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 150000,
+          "subtotal": 150000
+        },
+        {
+          "account": "4799",
+          "description": "POST SOUND FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 115050,
+          "subtotal": 115050
+        }
+      ]
+    },
+    {
+      "name": "POST PROD D.I. & FILM",
+      "account": "4800",
+      "total": 360657,
+      "line_items": [
+        {
+          "account": "4801",
+          "description": "DIGITAL INTERMEDIATE",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 250000,
+          "subtotal": 250000
+        },
+        {
+          "account": "4802",
+          "description": "COLOR CORRECTION",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 75000,
+          "subtotal": 75000
+        },
+        {
+          "account": "4803",
+          "description": "DELIVERABLES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 35657,
+          "subtotal": 35657
+        }
+      ]
+    },
+    {
+      "name": "MAIN/END TITLES",
+      "account": "4900",
+      "total": 60000,
+      "line_items": [
+        {
+          "account": "4901",
+          "description": "MAIN TITLES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 40000,
+          "subtotal": 40000
+        },
+        {
+          "account": "4902",
+          "description": "END TITLES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 20000,
+          "subtotal": 20000
+        }
+      ]
+    },
+    {
+      "name": "PUBLICITY",
+      "account": "6500",
+      "total": 103229,
+      "line_items": [
+        {
+          "account": "6501",
+          "description": "UNIT PUBLICIST",
+          "position": "Unit Publicist",
+          "quantity": 10,
+          "unit": "weeks",
+          "rate": 3500,
+          "subtotal": 35000
+        },
+        {
+          "account": "6510",
+          "description": "PUBLICITY MATERIALS",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 50000,
+          "subtotal": 50000
+        },
+        {
+          "account": "6599",
+          "description": "PUBLICITY FRINGES",
+          "quantity": 1,
+          "unit": "calc",
+          "rate": 18229,
+          "subtotal": 18229
+        }
+      ]
+    },
+    {
+      "name": "INSURANCE",
+      "account": "6700",
+      "total": 2000,
+      "line_items": [
+        {
+          "account": "6701",
+          "description": "PRODUCTION INSURANCE",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 2000,
+          "subtotal": 2000,
+          "notes": "Studio covered - minimal allocation"
+        }
+      ]
+    },
+    {
+      "name": "GENERAL EXPENSES",
+      "account": "6800",
+      "total": 230605,
+      "line_items": [
+        {
+          "account": "6801",
+          "description": "LEGAL",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 50000,
+          "subtotal": 50000
+        },
+        {
+          "account": "6802",
+          "description": "ACCOUNTING FEES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 35000,
+          "subtotal": 35000
+        },
+        {
+          "account": "6803",
+          "description": "COMPLETION BOND",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 0,
+          "subtotal": 0,
+          "notes": "Studio production - no bond required"
+        },
+        {
+          "account": "6810",
+          "description": "TRAVEL & LIVING - PRODUCTION",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 75000,
+          "subtotal": 75000
+        },
+        {
+          "account": "6820",
+          "description": "SHIPPING & FREIGHT",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 25000,
+          "subtotal": 25000
+        },
+        {
+          "account": "6830",
+          "description": "PRODUCTION OFFICE EXPENSES",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 30000,
+          "subtotal": 30000
+        },
+        {
+          "account": "6840",
+          "description": "CONTINGENCY HELD",
+          "quantity": 1,
+          "unit": "allow",
+          "rate": 15605,
+          "subtotal": 15605
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "above_the_line": {
+      "total": 10025495,
+      "departments": ["1100", "1200", "1300", "1400"]
+    },
+    "below_the_line_production": {
+      "total": 17418605,
+      "departments": ["2000", "2100", "2200", "2500", "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3350", "3400", "3500", "3600", "3700", "4000", "4100", "4200"]
+    },
+    "below_the_line_post": {
+      "total": 7408383,
+      "departments": ["4400", "4500", "4600", "4700", "4800", "4900", "6500", "6700", "6800"]
+    },
+    "tax_incentives": {
+      "georgia_rebate": {
+        "percentage": 0.30,
+        "amount": 7036666,
+        "notes": "Georgia 30% tax rebate on qualified spend"
+      },
+      "chicago_rebate": {
+        "percentage": 0.30,
+        "amount": 252000,
+        "notes": "Chicago 30% tax rebate on 2nd Unit qualified spend"
+      }
+    }
+  }
+}

@@ -6,6 +6,18 @@ import { useRouter } from 'next/navigation'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-8e04.up.railway.app'
 
+// Format number with commas for display
+const formatNumberWithCommas = (value: string | number): string => {
+  const num = typeof value === 'string' ? value.replace(/,/g, '') : value.toString()
+  if (!num || isNaN(Number(num))) return ''
+  return Number(num).toLocaleString('en-US')
+}
+
+// Remove commas to get raw number
+const parseFormattedNumber = (value: string): string => {
+  return value.replace(/,/g, '')
+}
+
 interface Agreement {
   id: string
   union_name: string
@@ -23,6 +35,13 @@ interface Sideletter {
   wage_adjustment_pct: number
   holiday_pay_pct: number
   vacation_pay_pct: number
+}
+
+interface ChartOfAccounts {
+  id: string
+  name: string
+  description?: string
+  is_default: boolean
 }
 
 interface Recommendations {
@@ -47,6 +66,10 @@ export default function NewProduction() {
     episode_length_minutes: '30',
     season_number: '1',
     principal_photography_start: '',
+    // Production schedule weeks
+    prep_weeks: '4',
+    shoot_weeks: '12',
+    post_weeks: '8',
     is_union_signatory: true,
     iatse_agreement_id: '',
     sag_aftra_agreement_id: '',
@@ -54,6 +77,7 @@ export default function NewProduction() {
     wga_agreement_id: '',
     teamsters_agreement_id: '',
     agreement_notes: '',
+    coa_id: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -61,11 +85,13 @@ export default function NewProduction() {
   const [recommendations, setRecommendations] = useState<Recommendations | null>(null)
   const [agreements, setAgreements] = useState<{ [key: string]: Agreement[] }>({})
   const [loadingAgreements, setLoadingAgreements] = useState(true)
+  const [chartOfAccountsList, setChartOfAccountsList] = useState<ChartOfAccounts[]>([])
+  const [loadingCOA, setLoadingCOA] = useState(true)
 
   const productionTypes = [
     { value: 'multi_camera', label: 'Multi-Camera Sitcom' },
     { value: 'single_camera', label: 'Single-Camera Comedy/Drama' },
-    { value: 'theatrical', label: 'Theatrical Feature' },
+    { value: 'theatrical', label: 'Feature Film' },
     { value: 'long_form', label: 'Long-Form/MOW' },
     { value: 'mini_series', label: 'Mini-Series' },
   ]
@@ -101,6 +127,27 @@ export default function NewProduction() {
       }
     }
     loadAgreements()
+  }, [])
+
+  // Load available Chart of Accounts on mount
+  useEffect(() => {
+    const loadChartOfAccounts = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/chart-of-accounts`)
+        const coaList = response.data.data || []
+        setChartOfAccountsList(coaList)
+        // Auto-select the default COA if none selected
+        const defaultCOA = coaList.find((coa: ChartOfAccounts) => coa.is_default)
+        if (defaultCOA && !formData.coa_id) {
+          setFormData(prev => ({ ...prev, coa_id: defaultCOA.id }))
+        }
+      } catch (err) {
+        console.error('Error loading chart of accounts:', err)
+      } finally {
+        setLoadingCOA(false)
+      }
+    }
+    loadChartOfAccounts()
   }, [])
 
   // Get recommended agreements when production parameters change
@@ -179,6 +226,10 @@ export default function NewProduction() {
         episode_count: formData.production_type !== 'theatrical' ? parseInt(formData.episode_count) : null,
         episode_length_minutes: formData.production_type !== 'theatrical' ? parseInt(formData.episode_length_minutes) : null,
         season_number: formData.production_type !== 'theatrical' ? parseInt(formData.season_number) : null,
+        // Production schedule weeks
+        prep_weeks: parseInt(formData.prep_weeks) || 0,
+        shoot_weeks: parseInt(formData.shoot_weeks) || 0,
+        post_weeks: parseInt(formData.post_weeks) || 0,
         applied_sideletters: recommendations?.applicable_sideletters?.slice(0, 3) || [],
       }
 
@@ -280,6 +331,36 @@ export default function NewProduction() {
                 ))}
               </select>
             </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Chart of Accounts
+              </label>
+              {loadingCOA ? (
+                <p className="text-gray-500 text-sm py-2">Loading chart of accounts...</p>
+              ) : (
+                <>
+                  <select
+                    name="coa_id"
+                    value={formData.coa_id}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  >
+                    <option value="">Select Chart of Accounts...</option>
+                    {chartOfAccountsList.map((coa) => (
+                      <option key={coa.id} value={coa.id}>
+                        {coa.name} {coa.is_default ? '(Default)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                  {formData.coa_id && chartOfAccountsList.find(c => c.id === formData.coa_id)?.description && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {chartOfAccountsList.find(c => c.id === formData.coa_id)?.description}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
 
@@ -309,14 +390,22 @@ export default function NewProduction() {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Budget Target (USD)
               </label>
-              <input
-                type="number"
-                name="budget_target"
-                value={formData.budget_target}
-                onChange={handleChange}
-                placeholder="e.g., 4000000"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                <input
+                  type="text"
+                  name="budget_target"
+                  value={formatNumberWithCommas(formData.budget_target)}
+                  onChange={(e) => {
+                    const rawValue = parseFormattedNumber(e.target.value)
+                    if (rawValue === '' || /^\d+$/.test(rawValue)) {
+                      setFormData({ ...formData, budget_target: rawValue })
+                    }
+                  }}
+                  placeholder="e.g., 4,000,000"
+                  className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+              </div>
             </div>
 
             <div>
@@ -389,6 +478,71 @@ export default function NewProduction() {
             </div>
           </div>
         )}
+
+        {/* Production Schedule */}
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+          <h2 className="text-lg font-semibold mb-4">Production Schedule</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Define the overall schedule for your production. This will be used to calculate crew costs based on which phases they work.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Prep Weeks
+              </label>
+              <input
+                type="number"
+                name="prep_weeks"
+                value={formData.prep_weeks}
+                onChange={handleChange}
+                min="0"
+                placeholder="e.g., 4"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+              <p className="text-xs text-gray-500 mt-1">Pre-production phase</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Shoot Weeks
+              </label>
+              <input
+                type="number"
+                name="shoot_weeks"
+                value={formData.shoot_weeks}
+                onChange={handleChange}
+                min="0"
+                placeholder="e.g., 12"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+              <p className="text-xs text-gray-500 mt-1">Principal photography</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Post Weeks
+              </label>
+              <input
+                type="number"
+                name="post_weeks"
+                value={formData.post_weeks}
+                onChange={handleChange}
+                min="0"
+                placeholder="e.g., 8"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+              <p className="text-xs text-gray-500 mt-1">Post-production phase</p>
+            </div>
+          </div>
+
+          {/* Total weeks summary */}
+          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <p className="text-sm text-gray-700 dark:text-gray-300">
+              <span className="font-medium">Total Production:</span>{' '}
+              {(parseInt(formData.prep_weeks) || 0) + (parseInt(formData.shoot_weeks) || 0) + (parseInt(formData.post_weeks) || 0)} weeks
+            </p>
+          </div>
+        </div>
 
         {/* Union Agreements */}
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">

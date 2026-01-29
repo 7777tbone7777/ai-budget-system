@@ -8,14 +8,14 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-8
 interface TaxIncentive {
   id: string
   state: string
-  program_name: string
+  incentive_name: string | null
   incentive_type: string
-  rate_percentage: string
-  maximum_credit: string | null
+  incentive_min_percent: string
+  incentive_max_percent: string
+  project_cap: string | null
   minimum_spend: string | null
-  transferable: boolean
-  refundable: boolean
-  description: string
+  labor_uplifts: string | null
+  spend_uplifts: string | null
 }
 
 interface LocationComparison {
@@ -68,12 +68,13 @@ export default function LocationComparison() {
 
       let taxCredit = 0
       if (incentive) {
-        const rate = parseFloat(incentive.rate_percentage) / 100
+        // Use max percent for best-case scenario
+        const rate = parseFloat(incentive.incentive_max_percent) / 100
         taxCredit = baseLaborCost * rate
 
-        // Apply maximum credit if exists
-        if (incentive.maximum_credit) {
-          const maxCredit = parseFloat(incentive.maximum_credit)
+        // Apply project cap if exists
+        if (incentive.project_cap) {
+          const maxCredit = parseFloat(incentive.project_cap)
           taxCredit = Math.min(taxCredit, maxCredit)
         }
       }
@@ -162,7 +163,7 @@ export default function LocationComparison() {
                 Best Value: {bestDeal.location}, {bestDeal.state}
               </h2>
               <p className="text-gray-700 dark:text-gray-300 mt-1">
-                {bestDeal.taxIncentive?.program_name}
+                {bestDeal.taxIncentive?.incentive_name || `${bestDeal.taxIncentive?.incentive_type} Tax Credit`}
               </p>
             </div>
             <div className="text-right">
@@ -227,11 +228,11 @@ export default function LocationComparison() {
                       {comp.taxIncentive ? (
                         <div>
                           <div className="font-medium">
-                            {formatPercentage(comp.taxIncentive.rate_percentage)} {comp.taxIncentive.incentive_type}
+                            {formatPercentage(comp.taxIncentive.incentive_max_percent)} {comp.taxIncentive.incentive_type}
                           </div>
                           <div className="text-xs">
-                            {comp.taxIncentive.transferable && '📄 Transferable '}
-                            {comp.taxIncentive.refundable && '💵 Refundable'}
+                            {comp.taxIncentive.incentive_type === 'Transferable' && '📄 Transferable '}
+                            {comp.taxIncentive.incentive_type === 'Refundable' && '💵 Refundable'}
                           </div>
                         </div>
                       ) : (
@@ -272,23 +273,31 @@ export default function LocationComparison() {
                     {comp.location}, {comp.state}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {comp.taxIncentive.program_name}
+                    {comp.taxIncentive.incentive_name || `${comp.taxIncentive.incentive_type} Tax Credit`}
                   </p>
                 </div>
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                  {formatPercentage(comp.taxIncentive.rate_percentage)}
+                  {formatPercentage(comp.taxIncentive.incentive_max_percent)}
                 </div>
               </div>
 
-              <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
-                {comp.taxIncentive.description}
-              </p>
+              {comp.taxIncentive.labor_uplifts && (
+                <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                  {comp.taxIncentive.labor_uplifts}
+                </p>
+              )}
 
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Type:</span>
                   <span className="font-medium text-gray-900 dark:text-white">
                     {comp.taxIncentive.incentive_type}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Rate Range:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {formatPercentage(comp.taxIncentive.incentive_min_percent)} - {formatPercentage(comp.taxIncentive.incentive_max_percent)}
                   </span>
                 </div>
                 {comp.taxIncentive.minimum_spend && (
@@ -299,24 +308,24 @@ export default function LocationComparison() {
                     </span>
                   </div>
                 )}
-                {comp.taxIncentive.maximum_credit && (
+                {comp.taxIncentive.project_cap && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">Maximum Credit:</span>
+                    <span className="text-gray-600 dark:text-gray-400">Project Cap:</span>
                     <span className="font-medium text-gray-900 dark:text-white">
-                      {formatCurrency(parseFloat(comp.taxIncentive.maximum_credit))}
+                      {formatCurrency(parseFloat(comp.taxIncentive.project_cap))}
                     </span>
                   </div>
                 )}
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Transferable:</span>
-                  <span className={`font-medium ${comp.taxIncentive.transferable ? 'text-green-600' : 'text-gray-400'}`}>
-                    {comp.taxIncentive.transferable ? 'Yes' : 'No'}
+                  <span className={`font-medium ${comp.taxIncentive.incentive_type === 'Transferable' ? 'text-green-600' : 'text-gray-400'}`}>
+                    {comp.taxIncentive.incentive_type === 'Transferable' ? 'Yes' : 'No'}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Refundable:</span>
-                  <span className={`font-medium ${comp.taxIncentive.refundable ? 'text-green-600' : 'text-gray-400'}`}>
-                    {comp.taxIncentive.refundable ? 'Yes' : 'No'}
+                  <span className={`font-medium ${comp.taxIncentive.incentive_type === 'Refundable' ? 'text-green-600' : 'text-gray-400'}`}>
+                    {comp.taxIncentive.incentive_type === 'Refundable' ? 'Yes' : 'No'}
                   </span>
                 </div>
               </div>
@@ -349,12 +358,12 @@ export default function LocationComparison() {
           </li>
           <li>
             • <strong>Transferable Credits:</strong>{' '}
-            {comparisons.filter((c) => c.taxIncentive?.transferable).map((c) => c.state).join(', ')}
+            {comparisons.filter((c) => c.taxIncentive?.incentive_type === 'Transferable').map((c) => c.state).join(', ') || 'None'}
             {' '}(can be sold for cash)
           </li>
           <li>
             • <strong>Refundable Credits:</strong>{' '}
-            {comparisons.filter((c) => c.taxIncentive?.refundable).map((c) => c.state).join(', ')}
+            {comparisons.filter((c) => c.taxIncentive?.incentive_type === 'Refundable').map((c) => c.state).join(', ') || 'None'}
             {' '}(receive cash back)
           </li>
         </ul>

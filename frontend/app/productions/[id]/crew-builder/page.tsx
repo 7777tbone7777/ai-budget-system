@@ -79,7 +79,7 @@ export default function CrewBuilderPage() {
   const [selectedDepts, setSelectedDepts] = useState<Set<string>>(new Set());
 
   const productionTypes = [
-    { value: 'theatrical', label: 'Theatrical Feature' },
+    { value: 'theatrical', label: 'Feature Film' },
     { value: 'hbsvod', label: 'High Budget SVOD (Streaming)' },
     { value: 'television', label: 'TV Series' },
     { value: 'multi_cam', label: 'Multi-Camera Sitcom' },
@@ -170,13 +170,9 @@ export default function CrewBuilderPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-            <Link href="/productions" className="hover:text-blue-600">Productions</Link>
-            <span>/</span>
-            <Link href={`/productions/${productionId}`} className="hover:text-blue-600">Production</Link>
-            <span>/</span>
-            <span className="text-gray-900">Smart Crew Builder</span>
-          </div>
+          <Link href="/productions" className="text-blue-600 hover:text-blue-800 text-sm mb-2 inline-block">
+            ← Back to Productions
+          </Link>
           <h1 className="text-3xl font-bold text-gray-900">Smart Crew Builder</h1>
           <p className="mt-2 text-gray-600">
             AI-powered crew recommendations based on your production parameters
