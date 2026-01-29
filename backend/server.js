@@ -5424,6 +5424,228 @@ app.post('/api/ai/crew/union-rates/iatse-videotape/seed', async (req, res) => {
   }
 });
 
+// Seed IATSE Area Standards rates (Georgia 479, Louisiana 478, New Mexico 480)
+app.post('/api/ai/crew/union-rates/area-standards/seed', async (req, res) => {
+  try {
+    aiLogger.info('Seeding IATSE Area Standards rates for Locals 478, 479, 480');
+
+    // Define comprehensive rates from Area Standards Agreement 2024-27
+    // Source: Area_Standards_Wage_Rates_2024-27.pdf (Non-Maryland rates)
+    const rates = [];
+    const effectiveDate = '2024-08-04';
+    const contractYear = 2; // Year 2 of the agreement
+
+    // Rate tiers (Non-Maryland rates from PDF)
+    const keyRate = 44.88;
+    const secondRate = 40.94;
+    const thirdRate = 37.03;
+    const utilityRate = 33.15;
+
+    // Locals covered by Area Standards
+    const locals = [
+      { union_local: 'IATSE Local 479', location: 'Georgia' },
+      { union_local: 'IATSE Local 478', location: 'Louisiana' },
+      { union_local: 'IATSE Local 480', location: 'New Mexico' }
+    ];
+
+    // Job classifications by rate tier
+    const keyPositions = [
+      'Key Grip', 'Gaffer', 'Prop Master', 'Set Decorator', 'Greens Foreperson',
+      'SFX Coordinator/Key', 'Sound Mixer', 'VTR/Playback', 'Script Supervisor',
+      'Key Hair', 'Key Make-Up', 'Construction Coordinator', 'Construction Foreperson'
+    ];
+
+    const secondPositions = [
+      'Best Boy Grip', 'Best Boy Electric', 'Dolly Grip', 'Assistant Prop Master',
+      'Lead Person', 'First Greens', 'Key Costumer', 'SFX Assistant',
+      'Boom Operator', 'Generator Operator', 'Key Crafts Service',
+      'First Aid/EMT', 'Assistant Hair', 'Assistant Make-Up',
+      'Assistant Location Manager', 'Graphic Artist', 'Gang Boss',
+      'Lighting Programmer', 'Prop Weapons', 'Marine Coordinator',
+      'Scenic Foreperson', 'Scenic Artist', 'Sign Painters/Writers', 'On Set Painters'
+    ];
+
+    const thirdPositions = [
+      'Grip', 'Electrician', 'Prop Person', 'Dresser/Swing Gang',
+      'On Set Greens', 'Set Costumer', 'Tailor/Stitcher', 'SFX Mechanical',
+      'Sound Utility', 'Video Assist', 'Crafts Service Assistant',
+      'Shop Crafts Person', 'Draftsperson', 'Crane Operator', 'Pre-Rigger',
+      'Pipe Rigger', 'Props Buyer', 'Set Dressing Buyer', 'Draper/Upholsterer',
+      'Construction Buyer', 'Set Painters', 'Sculptors/Plasterers',
+      'Prop/Model Makers', 'Construction Divers', 'Boat Handlers',
+      'On Set Picture Cars/Boats', 'Costumer/Buyer/Stylist', 'Assistant Key Costumer'
+    ];
+
+    const utilityPositions = ['Utility Technician'];
+
+    // Build rates for each local
+    for (const local of locals) {
+      // Key positions
+      for (const job of keyPositions) {
+        rates.push({
+          union_local: local.union_local,
+          job_classification: job,
+          rate_type: 'hourly',
+          base_rate: keyRate,
+          location: local.location,
+          production_type: 'theatrical',
+          effective_date: effectiveDate,
+          contract_year: contractYear
+        });
+      }
+
+      // Second positions
+      for (const job of secondPositions) {
+        rates.push({
+          union_local: local.union_local,
+          job_classification: job,
+          rate_type: 'hourly',
+          base_rate: secondRate,
+          location: local.location,
+          production_type: 'theatrical',
+          effective_date: effectiveDate,
+          contract_year: contractYear
+        });
+      }
+
+      // Third positions
+      for (const job of thirdPositions) {
+        rates.push({
+          union_local: local.union_local,
+          job_classification: job,
+          rate_type: 'hourly',
+          base_rate: thirdRate,
+          location: local.location,
+          production_type: 'theatrical',
+          effective_date: effectiveDate,
+          contract_year: contractYear
+        });
+      }
+
+      // Utility positions
+      for (const job of utilityPositions) {
+        rates.push({
+          union_local: local.union_local,
+          job_classification: job,
+          rate_type: 'hourly',
+          base_rate: utilityRate,
+          location: local.location,
+          production_type: 'theatrical',
+          effective_date: effectiveDate,
+          contract_year: contractYear
+        });
+      }
+
+      // Television rates (Pilots/Long-Form) - Non-Maryland
+      // NOTE: Per PDF pages 7-10, Key positions are "per individual negotiation" - NOT seeded
+      // Only Second/Third/Utility positions have fixed rates
+      const tvSecondRate = 39.24;
+      const tvThirdRate = 35.42;
+      const tvUtilityRate = 31.53;
+
+      // Key positions are "per individual negotiation" per Area Standards PDF - we mark them with 0 rate and note
+      const tvNegotiatedPositions = ['Key Grip', 'Gaffer', 'Sound Mixer', 'Prop Master', 'VTR/Playback',
+        'SFX Coordinator/Key', 'Greens Foreperson', 'Script Supervisor', 'Key Hair', 'Key Make-Up'];
+      const tvSecondPositions = ['Best Boy Grip', 'Best Boy Electric', 'Boom Operator', 'Generator Operator',
+        'Dolly Grip', 'Assistant Hair', 'Assistant Make-Up', 'SFX Assistant', 'First Greens'];
+      const tvThirdPositions = ['Grip', 'Electrician', 'Sound Utility', 'Shop Crafts Person',
+        'Video Assist', 'SFX Mechanical', 'On Set Greens'];
+
+      // TV Key positions: "per individual negotiation" - use 0 rate with negotiated flag
+      for (const job of tvNegotiatedPositions) {
+        rates.push({
+          union_local: local.union_local,
+          job_classification: job,
+          rate_type: 'hourly',
+          base_rate: 0, // Per individual negotiation - marked as negotiated
+          location: local.location,
+          production_type: 'tv_pilot',
+          effective_date: effectiveDate,
+          contract_year: contractYear,
+          special_provisions: { negotiated: true, note: 'Rate per individual negotiation - Area Standards Agreement Non-Maryland TV' }
+        });
+      }
+
+      for (const job of tvSecondPositions) {
+        rates.push({
+          union_local: local.union_local,
+          job_classification: job,
+          rate_type: 'hourly',
+          base_rate: tvSecondRate,
+          location: local.location,
+          production_type: 'tv_pilot',
+          effective_date: effectiveDate,
+          contract_year: contractYear
+        });
+      }
+
+      for (const job of tvThirdPositions) {
+        rates.push({
+          union_local: local.union_local,
+          job_classification: job,
+          rate_type: 'hourly',
+          base_rate: tvThirdRate,
+          location: local.location,
+          production_type: 'tv_pilot',
+          effective_date: effectiveDate,
+          contract_year: contractYear
+        });
+      }
+
+      rates.push({
+        union_local: local.union_local,
+        job_classification: 'Utility Technician',
+        rate_type: 'hourly',
+        base_rate: tvUtilityRate,
+        location: local.location,
+        production_type: 'tv_pilot',
+        effective_date: effectiveDate,
+        contract_year: contractYear
+      });
+    }
+
+    // Delete existing rates for these locals
+    for (const local of locals) {
+      await db.query(`DELETE FROM rate_cards WHERE union_local = $1`, [local.union_local]);
+    }
+    aiLogger.info('Deleted existing Area Standards rates for 478, 479, 480');
+
+    // Insert all rates
+    let inserted = 0;
+    for (const rate of rates) {
+      await db.query(`
+        INSERT INTO rate_cards (union_local, job_classification, rate_type, base_rate, location, production_type, effective_date, contract_year, special_provisions)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `, [rate.union_local, rate.job_classification, rate.rate_type, rate.base_rate, rate.location, rate.production_type, rate.effective_date, rate.contract_year, rate.special_provisions || {}]);
+      inserted++;
+    }
+
+    aiLogger.info('IATSE Area Standards rates seeded', { inserted, total: rates.length });
+
+    // Get summary by local
+    const summary = await db.query(`
+      SELECT union_local, COUNT(*) as count
+      FROM rate_cards
+      WHERE union_local IN ('IATSE Local 478', 'IATSE Local 479', 'IATSE Local 480')
+      GROUP BY union_local
+      ORDER BY union_local
+    `);
+
+    res.json({
+      success: true,
+      message: `Seeded ${rates.length} Area Standards rate cards for Georgia, Louisiana, New Mexico`,
+      details: {
+        inserted,
+        total: rates.length,
+        by_local: summary.rows
+      }
+    });
+  } catch (error) {
+    aiLogger.error('Failed to seed Area Standards rates', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Get list of Chart of Accounts templates
 app.get('/api/chart-of-accounts', async (req, res) => {
   try {

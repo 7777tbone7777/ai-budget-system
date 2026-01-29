@@ -197,7 +197,7 @@ DATABASE_URL=<railway-db-url> node view_test_results.js
 | `budget_line_items` table | ✅ Deployed | 114 rows (using old flat structure) |
 | `fringe_calculation_rules` | ✅ Deployed | 6 rules |
 | Auto-calc triggers | ✅ Working | All 4 triggers installed |
-| Rate cards | ✅ Loaded | 2,860 cards |
+| Rate cards | ✅ Loaded | 3,089 cards (includes Area Standards for GA/LA/NM) |
 | Sideletter rules | ✅ Loaded | 66 rules |
 
 **Current Data State:**
