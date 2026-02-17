@@ -64,7 +64,7 @@ CREATE TABLE rate_cards (
   wage_increase_pct DECIMAL(5,2),
   -- 7.0, 4.0, 3.5
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(union_local, job_classification, location, production_type, effective_date)
+  UNIQUE(union_local, job_classification, rate_type, location, production_type, effective_date)
 );
 
 -- ============================================================================
