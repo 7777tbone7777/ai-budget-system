@@ -346,15 +346,15 @@ export default function LocationComparison() {
           </li>
           <li>
             • <strong>Highest Tax Credit:</strong>{' '}
-            {comparisons.reduce((max, comp) =>
+            {comparisons.length > 0 ? comparisons.reduce((max, comp) =>
               comp.taxCredit > max.taxCredit ? comp : max
-            ).location}{' '}
+            ).location : 'N/A'}{' '}
             with{' '}
-            {formatCurrency(
+            {comparisons.length > 0 ? formatCurrency(
               comparisons.reduce((max, comp) =>
                 comp.taxCredit > max.taxCredit ? comp : max
               ).taxCredit
-            )}
+            ) : '$0'}
           </li>
           <li>
             • <strong>Transferable Credits:</strong>{' '}
